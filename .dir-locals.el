@@ -1,0 +1,1 @@
+((nil . ((compile-command . "clang -framework CoreVideo -framework IOKit -framework Cocoa -framework GLUT -framework OpenGL libraylib.a main.c -o build/juego_en_el_tren && ./build/juego_en_el_tren"))))
