@@ -1,7 +1,8 @@
 #include "raylib.h"
+#include "raymath.h"
 
-#define WINDOW_WIDTH 600
-#define WINDOW_HEIGHT 400
+#define WINDOW_WIDTH 860
+#define WINDOW_HEIGHT 480
 
 #define WINDOW_CENTRE_H WINDOW_WIDTH / 2
 #define WINDOW_CENTRE_V WINDOW_HEIGHT / 2
@@ -69,6 +70,20 @@ void initEnemies()
     }
 }
 
+void processInput()
+{
+    Vector2 mousePosition = (Vector2){GetMouseX(), GetMouseY()};
+    float dx = mousePosition.x - player->position.x;
+    float dy = mousePosition.y - player->position.y;
+
+    float rot  = atan2f(dy, dx) * RAD2DEG;
+    // float rot = Vector2Angle(player->position, mousePosition);
+    // TraceLog(LOG_INFO, "MOUSE (%00.00f, %00.00f)", mousePosition.x, mousePosition.y);
+    // TraceLog(LOG_INFO, "ROT (%f)", rot);
+
+    player->rotation = rot;
+}
+
 void render()
 {
     int i;
@@ -111,6 +126,7 @@ int main()
     player = &objects[poid];
 
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Juego en el tren");
+    // SetWindowState(FLAG_WINDOW_RESIZABLE);
     SetTargetFPS(60);
 
     initObjects();
@@ -119,9 +135,11 @@ int main()
 
     while (!WindowShouldClose())
     {
+        processInput();
         BeginDrawing();
             ClearBackground((Color){50, 100, 200, 200});
-            playerUpdate();
+            // playerUpdate();
+            processInput();
             ai();
             render();
         EndDrawing();
