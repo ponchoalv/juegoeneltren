@@ -113,6 +113,7 @@ int main()
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Juego en el tren");
     SetTargetFPS(60);
 
+    initObjects();
     initPlayer();
     initEnemies();
 
