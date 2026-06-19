@@ -41,7 +41,7 @@ Objid poid = 0;
 
 int totalObjects = 1;
 
-Objid initObject(ObjType type)
+Objid InitObject(ObjType type)
 {
     int i;
     for(i = 1; i < totalObjects && i < MAX_OBJECTS; ++i)
@@ -55,7 +55,7 @@ Objid initObject(ObjType type)
     return NULL;
 }
 
-void initObjects()
+void InitObjects()
 {
     int i;
     // 0 is null / not allocated
@@ -66,9 +66,9 @@ void initObjects()
     }
 }
 
-void initPlayer()
+void InitPlayer()
 {
-    poid = initObject(T_player);
+    poid = InitObject(T_player);
     if (poid == NULL) TraceLog(LOG_FATAL, "failed allocating player object");
     player = &objects[poid];
     player->position.x = WINDOW_CENTRE_H;
@@ -80,12 +80,12 @@ void initPlayer()
     player->speed = 1.5;
 }
 
-void initEnemies()
+void InitEnemies()
 {
     int i;
     for (i = 1; i < TOTAL_ENEMIES; ++i)
     {
-        Objid objid = initObject(T_enemy);
+        Objid objid = InitObject(T_enemy);
         if (objid == NULL) TraceLog(LOG_FATAL, "failed allocating enemy object");
 
         objects[objid].position.x = GetRandomValue(0 + OBJ_SIZE, WINDOW_WIDTH - OBJ_SIZE);
@@ -98,7 +98,7 @@ void initEnemies()
     }
 }
 
-void processInput()
+void ProcessInput()
 {
     Vector2 mousePosition = GetMousePosition();
     float dx = mousePosition.x - player->position.x;
@@ -123,36 +123,43 @@ void processInput()
     }
 }
 
-void render()
+void Render()
 {
     int i;
-#ifdef SHOW_FPS
-    DrawFPS(0, 0);
-#endif
 
-    for (i = 1; i < totalObjects; ++i)
-    {
-        if (objects[i].type == T_none)
+
+    BeginDrawing();
+        ClearBackground(DARKGRAY);
+
+    #ifdef SHOW_FPS
+        DrawFPS(0, 0);
+    #endif
+
+        for (i = 1; i < totalObjects; ++i)
+        {
+            if (objects[i].type == T_none)
+                continue;
+            switch (objects[i].type) {
+            case T_enemy:
+                DrawPolyLines(objects[i].position, objects[i].sides, objects[i].radius, objects[i].rotation, objects[i].color);
+                break;
+            case T_player: {
+                float rotationRad = objects[i].rotation * DEG2RAD;
+
+                Vector2 litleTriangle = {
+                    objects[i].position.x + cosf(rotationRad) * (objects[i].radius / 2.0f),
+                    objects[i].position.y + sinf(rotationRad) * (objects[i].radius / 2.0f)
+                };
+                DrawPolyLines(objects[i].position, objects[i].sides, objects[i].radius, objects[i].rotation, objects[i].color);
+                DrawPoly(litleTriangle, objects[i].sides, objects[i].radius / 2.0f, objects[i].rotation, RED);
+                break;
+            }
+        default:
             continue;
-        switch (objects[i].type) {
-        case T_enemy:
-            DrawPolyLines(objects[i].position, objects[i].sides, objects[i].radius, objects[i].rotation, objects[i].color);
-            break;
-        case T_player: {
-            float rotationRad = objects[i].rotation * DEG2RAD;
-
-            Vector2 litleTriangle = {
-                objects[i].position.x + cosf(rotationRad) * (objects[i].radius / 2.0f),
-                objects[i].position.y + sinf(rotationRad) * (objects[i].radius / 2.0f)
-            };
-            DrawPolyLines(objects[i].position, objects[i].sides, objects[i].radius, objects[i].rotation, objects[i].color);
-            DrawPoly(litleTriangle, objects[i].sides, objects[i].radius / 2.0f, objects[i].rotation, RED);
-            break;
+            }
         }
-    default:
-        continue;
-        }
-    }
+    
+    EndDrawing(); 
 }
 
 void playerUpdate()
@@ -160,7 +167,7 @@ void playerUpdate()
     player->rotation += 1;
 }
 
-void ai()
+void Ai()
 {
     int i = 1;
     int removeRandomObject, showRandomObject;
@@ -178,26 +185,26 @@ void ai()
     }
 }
 
+void UpdateAndDrawFrame()
+{
+    ProcessInput();
+    Ai();
+    Render();
+}
+
 int main()
 {
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Juego en el tren");
     // SetWindowState(FLAG_WINDOW_RESIZABLE);
     SetTargetFPS(60);
 
-    initObjects();
-    initPlayer();
-    initEnemies();
+    InitObjects();
+    InitPlayer();
+    InitEnemies();
 
     while (!WindowShouldClose())
     {
-        processInput();
-        BeginDrawing();
-            ClearBackground(DARKGRAY);
-            // playerUpdate();
-            processInput();
-            ai();
-            render();
-        EndDrawing();
+        UpdateAndDrawFrame();
     }
 
     CloseWindow();
