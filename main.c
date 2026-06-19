@@ -52,7 +52,7 @@ Objid initObject(ObjType type)
             return i;
         }
     }
-    return 0;
+    return NULL;
 }
 
 void initObjects()
@@ -91,7 +91,7 @@ void initEnemies()
         objects[objid].position.x = GetRandomValue(0 + OBJ_SIZE, WINDOW_WIDTH - OBJ_SIZE);
         objects[objid].position.y = GetRandomValue(0 + OBJ_SIZE, WINDOW_HEIGHT - OBJ_SIZE);
         objects[objid].rotation = 0;
-        objects[objid].color = RED;
+        objects[objid].color = PURPLE;
         objects[objid].sides = 5;
         objects[objid].radius = 15;
         objects[objid].speed = 0.1;
@@ -100,7 +100,7 @@ void initEnemies()
 
 void processInput()
 {
-    Vector2 mousePosition = (Vector2){GetMouseX(), GetMouseY()};
+    Vector2 mousePosition = GetMousePosition();
     float dx = mousePosition.x - player->position.x;
     float dy = mousePosition.y - player->position.y;
     float rot  = atan2f(dy, dx) * RAD2DEG;
@@ -134,7 +134,24 @@ void render()
     {
         if (objects[i].type == T_none)
             continue;
-        DrawPolyLines(objects[i].position, objects[i].sides, objects[i].radius, objects[i].rotation, objects[i].color);
+        switch (objects[i].type) {
+        case T_enemy:
+            DrawPolyLines(objects[i].position, objects[i].sides, objects[i].radius, objects[i].rotation, objects[i].color);
+            break;
+        case T_player: {
+            float rotationRad = objects[i].rotation * DEG2RAD;
+
+            Vector2 litleTriangle = {
+                objects[i].position.x + cosf(rotationRad) * (objects[i].radius / 2.0f),
+                objects[i].position.y + sinf(rotationRad) * (objects[i].radius / 2.0f)
+            };
+            DrawPolyLines(objects[i].position, objects[i].sides, objects[i].radius, objects[i].rotation, objects[i].color);
+            DrawPoly(litleTriangle, objects[i].sides, objects[i].radius / 2.0f, objects[i].rotation, RED);
+            break;
+        }
+    default:
+        continue;
+        }
     }
 }
 
@@ -175,7 +192,7 @@ int main()
     {
         processInput();
         BeginDrawing();
-            ClearBackground((Color){50, 100, 200, 200});
+            ClearBackground(DARKGRAY);
             // playerUpdate();
             processInput();
             ai();
