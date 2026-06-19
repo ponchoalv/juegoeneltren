@@ -104,6 +104,7 @@ void ProcessInput()
     float dx = mousePosition.x - player->position.x;
     float dy = mousePosition.y - player->position.y;
     float rot  = atan2f(dy, dx) * RAD2DEG;
+    // float rot = -Vector2LineAngle(player->position, mousePosition) * RAD2DEG;
     player->rotation = rot;
 
     if(IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT)) {
@@ -158,8 +159,8 @@ void Render()
             continue;
             }
         }
-    
-    EndDrawing(); 
+
+    EndDrawing();
 }
 
 void playerUpdate()
@@ -192,11 +193,23 @@ void UpdateAndDrawFrame()
     Render();
 }
 
+void TestRandNumbers(void)
+{
+    int i;
+    int *numbers = LoadRandomSequence(10, 0, 100);
+    for(i = 0; i < 10; ++i)
+    {
+        TraceLog(LOG_INFO, "The random number at %d is %d", i, numbers[i]);
+    }
+}
+
+
 int main()
 {
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Juego en el tren");
     // SetWindowState(FLAG_WINDOW_RESIZABLE);
     SetTargetFPS(60);
+    TestRandNumbers();
 
     InitObjects();
     InitPlayer();
