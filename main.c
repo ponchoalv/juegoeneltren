@@ -11,6 +11,8 @@
 #define OBJ_SIZE 25
 #define TOTAL_ENEMIES 16
 
+#define NULL 0
+
 #define SHOW_FPS
 
 typedef enum
@@ -28,31 +30,54 @@ typedef struct Object
     Color color;
     int sides;
     int radius;
+    float speed;
 } Object;
+
+typedef int Objid;
 
 Object objects[MAX_OBJECTS];
 Object *player;
-const int poid = 0;
-int totalObjects = TOTAL_ENEMIES + 1;
+Objid poid = 0;
+
+int totalObjects = 1;
+
+Objid initObject(ObjType type)
+{
+    int i;
+    for(i = 1; i < totalObjects && i < MAX_OBJECTS; ++i)
+    {
+        if (objects[i].type == T_none)
+        {
+            objects[i].type = type;
+            return i;
+        }
+    }
+    return 0;
+}
 
 void initObjects()
 {
     int i;
-    for (i = 0; i < MAX_OBJECTS; ++i)
+    // 0 is null / not allocated
+    for (i = 1; i < MAX_OBJECTS; ++i)
     {
+        totalObjects++;
         objects[i].type = T_none;
     }
 }
 
 void initPlayer()
 {
+    poid = initObject(T_player);
+    if (poid == NULL) TraceLog(LOG_FATAL, "failed allocating player object");
+    player = &objects[poid];
     player->position.x = WINDOW_CENTRE_H;
     player->position.y = WINDOW_CENTRE_V;
-    player->type = T_player;
     player->color = GREEN;
     player->rotation = 0;
     player->sides = 3;
     player->radius = 20;
+    player->speed = 1.5;
 }
 
 void initEnemies()
@@ -60,13 +85,16 @@ void initEnemies()
     int i;
     for (i = 1; i < TOTAL_ENEMIES; ++i)
     {
-        objects[i].position.x = GetRandomValue(0 + OBJ_SIZE, WINDOW_WIDTH - OBJ_SIZE);
-        objects[i].position.y = GetRandomValue(0 + OBJ_SIZE, WINDOW_HEIGHT - OBJ_SIZE);
-        objects[i].rotation = 0;
-        objects[i].type = T_enemy;
-        objects[i].color = RED;
-        objects[i].sides = 7;
-        objects[i].radius = 15;
+        Objid objid = initObject(T_enemy);
+        if (objid == NULL) TraceLog(LOG_FATAL, "failed allocating enemy object");
+
+        objects[objid].position.x = GetRandomValue(0 + OBJ_SIZE, WINDOW_WIDTH - OBJ_SIZE);
+        objects[objid].position.y = GetRandomValue(0 + OBJ_SIZE, WINDOW_HEIGHT - OBJ_SIZE);
+        objects[objid].rotation = 0;
+        objects[objid].color = RED;
+        objects[objid].sides = 5;
+        objects[objid].radius = 15;
+        objects[objid].speed = 0.1;
     }
 }
 
@@ -75,13 +103,24 @@ void processInput()
     Vector2 mousePosition = (Vector2){GetMouseX(), GetMouseY()};
     float dx = mousePosition.x - player->position.x;
     float dy = mousePosition.y - player->position.y;
-
     float rot  = atan2f(dy, dx) * RAD2DEG;
-    // float rot = Vector2Angle(player->position, mousePosition);
-    // TraceLog(LOG_INFO, "MOUSE (%00.00f, %00.00f)", mousePosition.x, mousePosition.y);
-    // TraceLog(LOG_INFO, "ROT (%f)", rot);
-
     player->rotation = rot;
+
+    if(IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT)) {
+        player->position.x -= player->speed;
+    }
+
+    if(IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT)) {
+        player->position.x += player->speed;
+    }
+
+    if(IsKeyDown(KEY_S) || IsKeyDown(KEY_DOWN)) {
+        player->position.y += player->speed;
+    }
+
+    if(IsKeyDown(KEY_W) || IsKeyDown(KEY_UP)) {
+        player->position.y -= player->speed;
+    }
 }
 
 void render()
@@ -91,7 +130,7 @@ void render()
     DrawFPS(0, 0);
 #endif
 
-    for (i = 0; i < totalObjects; ++i)
+    for (i = 1; i < totalObjects; ++i)
     {
         if (objects[i].type == T_none)
             continue;
@@ -113,6 +152,7 @@ void ai()
 
     for (i = 1; i < totalObjects; ++i)
     {
+        if (i == poid) continue;
         if (i == removeRandomObject)
             objects[i].type = T_none;
         if (i == showRandomObject)
@@ -123,8 +163,6 @@ void ai()
 
 int main()
 {
-    player = &objects[poid];
-
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Juego en el tren");
     // SetWindowState(FLAG_WINDOW_RESIZABLE);
     SetTargetFPS(60);
