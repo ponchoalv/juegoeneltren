@@ -55,7 +55,7 @@ Objid InitObject(ObjType type)
     return NULL;
 }
 
-void InitObjects()
+void InitObjects(void)
 {
     int i;
     // 0 is null / not allocated
@@ -66,7 +66,7 @@ void InitObjects()
     }
 }
 
-void InitPlayer()
+void InitPlayer(void)
 {
     poid = InitObject(T_player);
     if (poid == NULL) TraceLog(LOG_FATAL, "failed allocating player object");
@@ -80,7 +80,7 @@ void InitPlayer()
     player->speed = 1.5;
 }
 
-void InitEnemies()
+void InitEnemies(void)
 {
     int i;
     for (i = 1; i < TOTAL_ENEMIES; ++i)
@@ -98,7 +98,7 @@ void InitEnemies()
     }
 }
 
-void ProcessInput()
+void ProcessInput(void)
 {
     Vector2 mousePosition = GetMousePosition();
     float dx = mousePosition.x - player->position.x;
@@ -124,7 +124,7 @@ void ProcessInput()
     }
 }
 
-void Render()
+void Render(void)
 {
     int i;
 
@@ -163,12 +163,12 @@ void Render()
     EndDrawing();
 }
 
-void playerUpdate()
+void playerUpdate(void)
 {
     player->rotation += 1;
 }
 
-void Ai()
+void Ai(void)
 {
     int i = 1;
     int removeRandomObject, showRandomObject;
@@ -186,7 +186,7 @@ void Ai()
     }
 }
 
-void UpdateAndDrawFrame()
+void UpdateAndDrawFrame(void)
 {
     ProcessInput();
     Ai();
@@ -204,12 +204,12 @@ void TestRandNumbers(void)
 }
 
 
-int main()
+int main(void)
 {
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Juego en el tren");
     // SetWindowState(FLAG_WINDOW_RESIZABLE);
     SetTargetFPS(60);
-    TestRandNumbers();
+    // TestRandNumbers();
 
     InitObjects();
     InitPlayer();
