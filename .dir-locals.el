@@ -1,1 +1,1 @@
-((nil . ((compile-command . "clang -Wall -Wextra -Wpedantic -framework CoreVideo -framework IOKit -framework Cocoa -framework GLUT -framework OpenGL libraylib.a main.c -o build/juego_en_el_tren && ./build/juego_en_el_tren"))))
+((nil . ((compile-command . "clang -std=c99 -Wall -Wextra -Wpedantic -framework CoreVideo -framework IOKit -framework Cocoa -framework GLUT -framework OpenGL libraylib.a main.c -o build/juego_en_el_tren && ./build/juego_en_el_tren"))))

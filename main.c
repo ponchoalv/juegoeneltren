@@ -30,7 +30,7 @@ typedef struct Object
     Color color;
     int sides;
     int radius;
-    float speed;
+    Vector2 vel;
 } Object;
 
 typedef int Objid;
@@ -77,7 +77,7 @@ void InitPlayer(void)
     player->rotation = 0;
     player->sides = 3;
     player->radius = 20;
-    player->speed = 1.5;
+    player->vel = (Vector2){15, 10};
 }
 
 void InitEnemies(void)
@@ -94,7 +94,7 @@ void InitEnemies(void)
         objects[objid].color = PURPLE;
         objects[objid].sides = 5;
         objects[objid].radius = 15;
-        objects[objid].speed = 0.1;
+        objects[objid].vel = (Vector2){10, 5};
     }
 }
 
@@ -108,19 +108,19 @@ void ProcessInput(void)
     player->rotation = rot;
 
     if(IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT)) {
-        player->position.x -= player->speed;
+        player->position.x -= player->vel.x;
     }
 
     if(IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT)) {
-        player->position.x += player->speed;
+        player->position.x += player->vel.x;
     }
 
     if(IsKeyDown(KEY_S) || IsKeyDown(KEY_DOWN)) {
-        player->position.y += player->speed;
+        player->position.y += player->vel.y;
     }
 
     if(IsKeyDown(KEY_W) || IsKeyDown(KEY_UP)) {
-        player->position.y -= player->speed;
+        player->position.y -= player->vel.y;
     }
 }
 
