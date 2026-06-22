@@ -10,6 +10,7 @@
 #define MAX_OBJECTS 32000
 #define OBJ_SIZE 25
 #define TOTAL_ENEMIES 16
+// #define TOTAL_RAND_NUMS 25
 
 #define NULL 0
 
@@ -31,6 +32,8 @@ typedef struct Object
     int sides;
     int radius;
     Vector2 vel;
+    double timeVisible;
+    int isVisible;
 } Object;
 
 typedef int Objid;
@@ -40,6 +43,7 @@ Object *player;
 Objid poid = 0;
 
 int totalObjects = 1;
+// int *randEnemies;
 
 Objid InitObject(ObjType type)
 {
@@ -80,6 +84,8 @@ void InitPlayer(void)
     player->vel = (Vector2){15, 10};
 }
 
+
+// TODO(2026-06-22: quiero hacer que los enemigos que desaparecen lo hagan por 3 segundos)
 void InitEnemies(void)
 {
     int i;
@@ -92,11 +98,18 @@ void InitEnemies(void)
         objects[objid].position.y = GetRandomValue(0 + OBJ_SIZE, WINDOW_HEIGHT - OBJ_SIZE);
         objects[objid].rotation = 0;
         objects[objid].color = PURPLE;
-        objects[objid].sides = 5;
+        objects[objid].sides = GetRandomValue(1, 10);
         objects[objid].radius = 15;
         objects[objid].vel = (Vector2){10, 5};
+        objects[objid].isVisible = 1;
+        objects[objid].timeVisible = 0;
     }
 }
+
+// void InitializeRandNumbs(void)
+// {
+//     randEnemies = LoadRandomSequence(TOTAL_RAND_NUMS, 1, TOTAL_ENEMIES);
+// }
 
 void ProcessInput(void)
 {
@@ -107,20 +120,37 @@ void ProcessInput(void)
     // float rot = -Vector2LineAngle(player->position, mousePosition) * RAD2DEG;
     player->rotation = rot;
 
-    if(IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT)) {
+    if(IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT))
+    {
         player->position.x -= player->vel.x;
+        if (player->position.x < 0)
+        {
+            player->position.x = WINDOW_WIDTH;
+        }
     }
 
     if(IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT)) {
         player->position.x += player->vel.x;
+        if (player->position.x > WINDOW_WIDTH)
+        {
+            player->position.x = 0;
+        }
     }
 
     if(IsKeyDown(KEY_S) || IsKeyDown(KEY_DOWN)) {
         player->position.y += player->vel.y;
+        if(player->position.y > WINDOW_HEIGHT)
+        {
+            player->position.y = 0;
+        }
     }
 
     if(IsKeyDown(KEY_W) || IsKeyDown(KEY_UP)) {
         player->position.y -= player->vel.y;
+        if(player->position.y < 0)
+        {
+            player->position.y = WINDOW_HEIGHT;
+        }
     }
 }
 
@@ -171,18 +201,28 @@ void playerUpdate(void)
 void Ai(void)
 {
     int i = 1;
-    int removeRandomObject, showRandomObject;
-    removeRandomObject = GetRandomValue(1, TOTAL_ENEMIES);
-    showRandomObject = GetRandomValue(1, TOTAL_ENEMIES);
+    // int makeObjectInvisible;
+
+    // makeObjectInvisible = GetRandomValue(1, TOTAL_ENEMIES);
+    // double timeNow = GetTime();
 
     for (i = 1; i < totalObjects; ++i)
     {
         if (i == poid) continue;
-        if (i == removeRandomObject)
-            objects[i].type = T_none;
-        if (i == showRandomObject)
-            objects[i].type = T_enemy;
+
         objects[i].rotation += GetRandomValue(-10, 10);
+        // if (!objects[i].isVisible && objects[i].timeVisible < timeNow)
+        // {
+        //     objects[i].isVisible = 1;
+        //     objects[i].type = T_enemy;
+        // }
+
+        // if (i == makeObjectInvisible)
+        // {
+        //     objects[i].isVisible = 0;
+        //     objects[i].timeVisible = timeNow + 0.3;
+        //     objects[i].type = T_none;
+        // }
     }
 }
 
@@ -211,6 +251,7 @@ int main(void)
     SetTargetFPS(60);
     // TestRandNumbers();
 
+    // InitializeRandNumbs();
     InitObjects();
     InitPlayer();
     InitEnemies();
