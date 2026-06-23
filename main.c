@@ -9,7 +9,9 @@
 
 #define MAX_OBJECTS 32000
 #define OBJ_SIZE 25
-#define TOTAL_ENEMIES 16
+#define TOTAL_ENEMIES 20
+#define BULLETS_VISIBLE_SECONDS 1
+#define BULLETS_SPEED 3
 // #define TOTAL_RAND_NUMS 25
 
 #define NULL 0
@@ -20,7 +22,8 @@ typedef enum
 {
     T_none,
     T_player,
-    T_enemy
+    T_enemy,
+    T_bullet
 } ObjType;
 
 typedef struct Object
@@ -36,11 +39,18 @@ typedef struct Object
     int isVisible;
 } Object;
 
+// TODO(2026-06-23): Add game state, something to react to WIN, LOSE, PLAYING
+// typedef struct GameState
+// {
+
+// }
+
 typedef int Objid;
 
 Object objects[MAX_OBJECTS];
 Object *player;
 Objid poid = 0;
+int score = 0;
 
 int totalObjects = 1;
 // int *randEnemies;
@@ -70,6 +80,26 @@ void InitObjects(void)
     }
 }
 
+void FireBullet(void)
+{
+    Vector2 mousePosition = GetMousePosition();
+    Vector2 playerTip = Vector2MoveTowards(player->position, mousePosition, 25);
+
+    Vector2 vel = {
+        mousePosition.x-player->position.x,
+        mousePosition.y-player->position.y
+    };
+
+     Objid boid = InitObject(T_bullet);
+     objects[boid].timeVisible = GetTime() + BULLETS_VISIBLE_SECONDS;
+     objects[boid].position = playerTip;
+     objects[boid].vel = Vector2Multiply(Vector2Normalize(vel), (Vector2){BULLETS_SPEED,BULLETS_SPEED});
+     objects[boid].color = BLUE;
+     objects[boid].radius = 4;
+     objects[boid].sides = 10;
+     // TraceLog(LOG_INFO, "bullet fired with (%f, %f) with direction: (%f,%f)", playerTip.x, playerTip.y, player->vel.x, player->vel.y);
+}
+
 void InitPlayer(void)
 {
     poid = InitObject(T_player);
@@ -81,7 +111,7 @@ void InitPlayer(void)
     player->rotation = 0;
     player->sides = 3;
     player->radius = 20;
-    player->vel = (Vector2){15, 10};
+    player->vel = (Vector2){10, 7};
 }
 
 
@@ -99,7 +129,7 @@ void InitEnemies(void)
         objects[objid].rotation = 0;
         objects[objid].color = PURPLE;
         objects[objid].sides = GetRandomValue(1, 10);
-        objects[objid].radius = 15;
+        objects[objid].radius = GetRandomValue(8,15);GetRandomValue(0 + OBJ_SIZE, WINDOW_HEIGHT - OBJ_SIZE);
         objects[objid].vel = (Vector2){10, 5};
         objects[objid].isVisible = 1;
         objects[objid].timeVisible = 0;
@@ -152,6 +182,10 @@ void ProcessInput(void)
             player->position.y = WINDOW_HEIGHT;
         }
     }
+
+    if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+        FireBullet();
+    }
 }
 
 void Render(void)
@@ -161,6 +195,7 @@ void Render(void)
 
     BeginDrawing();
         ClearBackground(DARKGRAY);
+        DrawText(TextFormat("SCORE: %2i", score), 90, 0, 20, GREEN);
 
     #ifdef SHOW_FPS
         DrawFPS(0, 0);
@@ -174,6 +209,7 @@ void Render(void)
             case T_enemy:
                 DrawPolyLines(objects[i].position, objects[i].sides, objects[i].radius, objects[i].rotation, objects[i].color);
                 break;
+
             case T_player: {
                 float rotationRad = objects[i].rotation * DEG2RAD;
 
@@ -185,8 +221,13 @@ void Render(void)
                 DrawPoly(litleTriangle, objects[i].sides, objects[i].radius / 2.0f, objects[i].rotation, RED);
                 break;
             }
-        default:
-            continue;
+
+            case T_bullet:
+                DrawPoly(objects[i].position, objects[i].sides, objects[i].radius, objects[i].rotation, objects[i].color);
+                break;
+
+            default:
+                continue;
             }
         }
 
@@ -198,38 +239,58 @@ void playerUpdate(void)
     player->rotation += 1;
 }
 
-void Ai(void)
+void UpdateGameState(void)
 {
     int i = 1;
+    int j = 1;
     // int makeObjectInvisible;
 
     // makeObjectInvisible = GetRandomValue(1, TOTAL_ENEMIES);
-    // double timeNow = GetTime();
+    double timeNow = GetTime();
 
     for (i = 1; i < totalObjects; ++i)
     {
         if (i == poid) continue;
 
-        objects[i].rotation += GetRandomValue(-10, 10);
-        // if (!objects[i].isVisible && objects[i].timeVisible < timeNow)
-        // {
-        //     objects[i].isVisible = 1;
-        //     objects[i].type = T_enemy;
-        // }
+        switch (objects[i].type) {
+            case T_none:
+                continue;
+                break;
+            case T_enemy:
+                objects[i].rotation += GetRandomValue(-10, 10);
+                break;
+            case T_bullet:
+                objects[i].position.x += objects[i].vel.x;
+                objects[i].position.y += objects[i].vel.y;
 
-        // if (i == makeObjectInvisible)
-        // {
-        //     objects[i].isVisible = 0;
-        //     objects[i].timeVisible = timeNow + 0.3;
-        //     objects[i].type = T_none;
-        // }
+                // destroy the bullet
+                if (objects[i].timeVisible < timeNow)
+                {
+                    objects[i].type = T_none;
+                }
+                for (j = 1; j < totalObjects; ++j)
+                {
+                    if(j == i) continue;
+                    if ((objects[j].type == T_enemy || objects[j].type == T_player)&& CheckCollisionCircles(objects[i].position, objects[i].radius, objects[j].position, objects[j].radius)) {
+                        objects[i].type = T_none;
+                        objects[j].type = T_none;
+                        ++score;
+                        // TODO(2026-06-23): Do something different for the player, maybe update the game state to lose
+
+                        break;
+                    }
+                }
+                break;
+            default:
+                continue;
+            }
     }
 }
 
 void UpdateAndDrawFrame(void)
 {
     ProcessInput();
-    Ai();
+    UpdateGameState();
     Render();
 }
 
