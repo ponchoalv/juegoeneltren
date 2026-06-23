@@ -39,11 +39,18 @@ typedef struct Object
     int isVisible;
 } Object;
 
-// TODO(2026-06-23): Add game state, something to react to WIN, LOSE, PLAYING
-// typedef struct GameState
-// {
+typedef enum
+{
+    S_playing,
+    S_lose,
+    S_win
+} GameState;
 
-// }
+// TODO(2026-06-23): Add game state, something to react to WIN, LOSE, PLAYING
+typedef struct CurrentState
+{
+    GameState status;
+} CurrentState;
 
 typedef int Objid;
 
@@ -51,6 +58,7 @@ Object objects[MAX_OBJECTS];
 Object *player;
 Objid poid = 0;
 int score = 0;
+CurrentState currentState = {0};
 
 int totalObjects = 1;
 // int *randEnemies;
@@ -282,9 +290,14 @@ void UpdateGameState(void)
                     CheckCollisionCircles(objects[i].position, objects[i].radius, objects[j].position,
                                           objects[j].radius))
                 {
-                    objects[i].type = T_none;
-                    objects[j].type = T_none;
-                    ++score;
+                    if (objects[j].type == T_enemy)
+                    {
+                        objects[i].type = T_none;
+                        objects[j].type = T_none;
+                        ++score;
+                    } else {
+
+                    }
                     // TODO(2026-06-23): Do something different for the player, maybe update the game state to lose
 
                     break;
@@ -325,6 +338,7 @@ int main(void)
     InitObjects();
     InitPlayer();
     InitEnemies();
+    currentState.status = S_playing;
 
     while (!WindowShouldClose())
     {
