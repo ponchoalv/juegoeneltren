@@ -58,7 +58,7 @@ int totalObjects = 1;
 Objid InitObject(ObjType type)
 {
     int i;
-    for(i = 1; i < totalObjects && i < MAX_OBJECTS; ++i)
+    for (i = 1; i < totalObjects && i < MAX_OBJECTS; ++i)
     {
         if (objects[i].type == T_none)
         {
@@ -85,25 +85,24 @@ void FireBullet(void)
     Vector2 mousePosition = GetMousePosition();
     Vector2 playerTip = Vector2MoveTowards(player->position, mousePosition, 25);
 
-    Vector2 vel = {
-        mousePosition.x-player->position.x,
-        mousePosition.y-player->position.y
-    };
+    Vector2 vel = {mousePosition.x - player->position.x, mousePosition.y - player->position.y};
 
-     Objid boid = InitObject(T_bullet);
-     objects[boid].timeVisible = GetTime() + BULLETS_VISIBLE_SECONDS;
-     objects[boid].position = playerTip;
-     objects[boid].vel = Vector2Multiply(Vector2Normalize(vel), (Vector2){BULLETS_SPEED,BULLETS_SPEED});
-     objects[boid].color = BLUE;
-     objects[boid].radius = 4;
-     objects[boid].sides = 10;
-     // TraceLog(LOG_INFO, "bullet fired with (%f, %f) with direction: (%f,%f)", playerTip.x, playerTip.y, player->vel.x, player->vel.y);
+    Objid boid = InitObject(T_bullet);
+    objects[boid].timeVisible = GetTime() + BULLETS_VISIBLE_SECONDS;
+    objects[boid].position = playerTip;
+    objects[boid].vel = Vector2Multiply(Vector2Normalize(vel), (Vector2){BULLETS_SPEED, BULLETS_SPEED});
+    objects[boid].color = BLUE;
+    objects[boid].radius = 4;
+    objects[boid].sides = 10;
+    // TraceLog(LOG_INFO, "bullet fired with (%f, %f) with direction: (%f,%f)", playerTip.x, playerTip.y, player->vel.x,
+    // player->vel.y);
 }
 
 void InitPlayer(void)
 {
     poid = InitObject(T_player);
-    if (poid == NULL) TraceLog(LOG_FATAL, "failed allocating player object");
+    if (poid == NULL)
+        TraceLog(LOG_FATAL, "failed allocating player object");
     player = &objects[poid];
     player->position.x = WINDOW_CENTRE_H;
     player->position.y = WINDOW_CENTRE_V;
@@ -114,7 +113,6 @@ void InitPlayer(void)
     player->vel = (Vector2){10, 7};
 }
 
-
 // TODO(2026-06-22: quiero hacer que los enemigos que desaparecen lo hagan por 3 segundos)
 void InitEnemies(void)
 {
@@ -122,14 +120,16 @@ void InitEnemies(void)
     for (i = 1; i < TOTAL_ENEMIES; ++i)
     {
         Objid objid = InitObject(T_enemy);
-        if (objid == NULL) TraceLog(LOG_FATAL, "failed allocating enemy object");
+        if (objid == NULL)
+            TraceLog(LOG_FATAL, "failed allocating enemy object");
 
         objects[objid].position.x = GetRandomValue(0 + OBJ_SIZE, WINDOW_WIDTH - OBJ_SIZE);
         objects[objid].position.y = GetRandomValue(0 + OBJ_SIZE, WINDOW_HEIGHT - OBJ_SIZE);
         objects[objid].rotation = 0;
         objects[objid].color = PURPLE;
         objects[objid].sides = GetRandomValue(1, 10);
-        objects[objid].radius = GetRandomValue(8,15);GetRandomValue(0 + OBJ_SIZE, WINDOW_HEIGHT - OBJ_SIZE);
+        objects[objid].radius = GetRandomValue(8, 15);
+        GetRandomValue(0 + OBJ_SIZE, WINDOW_HEIGHT - OBJ_SIZE);
         objects[objid].vel = (Vector2){10, 5};
         objects[objid].isVisible = 1;
         objects[objid].timeVisible = 0;
@@ -146,11 +146,11 @@ void ProcessInput(void)
     Vector2 mousePosition = GetMousePosition();
     float dx = mousePosition.x - player->position.x;
     float dy = mousePosition.y - player->position.y;
-    float rot  = atan2f(dy, dx) * RAD2DEG;
+    float rot = atan2f(dy, dx) * RAD2DEG;
     // float rot = -Vector2LineAngle(player->position, mousePosition) * RAD2DEG;
     player->rotation = rot;
 
-    if(IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT))
+    if (IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT))
     {
         player->position.x -= player->vel.x;
         if (player->position.x < 0)
@@ -159,7 +159,8 @@ void ProcessInput(void)
         }
     }
 
-    if(IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT)) {
+    if (IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT))
+    {
         player->position.x += player->vel.x;
         if (player->position.x > WINDOW_WIDTH)
         {
@@ -167,23 +168,26 @@ void ProcessInput(void)
         }
     }
 
-    if(IsKeyDown(KEY_S) || IsKeyDown(KEY_DOWN)) {
+    if (IsKeyDown(KEY_S) || IsKeyDown(KEY_DOWN))
+    {
         player->position.y += player->vel.y;
-        if(player->position.y > WINDOW_HEIGHT)
+        if (player->position.y > WINDOW_HEIGHT)
         {
             player->position.y = 0;
         }
     }
 
-    if(IsKeyDown(KEY_W) || IsKeyDown(KEY_UP)) {
+    if (IsKeyDown(KEY_W) || IsKeyDown(KEY_UP))
+    {
         player->position.y -= player->vel.y;
-        if(player->position.y < 0)
+        if (player->position.y < 0)
         {
             player->position.y = WINDOW_HEIGHT;
         }
     }
 
-    if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+    {
         FireBullet();
     }
 }
@@ -191,7 +195,6 @@ void ProcessInput(void)
 void Render(void)
 {
     int i;
-
 
     BeginDrawing();
         ClearBackground(DARKGRAY);
@@ -205,19 +208,20 @@ void Render(void)
         {
             if (objects[i].type == T_none)
                 continue;
-            switch (objects[i].type) {
+            switch (objects[i].type)
+            {
             case T_enemy:
-                DrawPolyLines(objects[i].position, objects[i].sides, objects[i].radius, objects[i].rotation, objects[i].color);
+                DrawPolyLines(objects[i].position, objects[i].sides, objects[i].radius, objects[i].rotation,
+                              objects[i].color);
                 break;
 
             case T_player: {
                 float rotationRad = objects[i].rotation * DEG2RAD;
 
-                Vector2 litleTriangle = {
-                    objects[i].position.x + cosf(rotationRad) * (objects[i].radius / 2.0f),
-                    objects[i].position.y + sinf(rotationRad) * (objects[i].radius / 2.0f)
-                };
-                DrawPolyLines(objects[i].position, objects[i].sides, objects[i].radius, objects[i].rotation, objects[i].color);
+                Vector2 litleTriangle = {objects[i].position.x + cosf(rotationRad) * (objects[i].radius / 2.0f),
+                                         objects[i].position.y + sinf(rotationRad) * (objects[i].radius / 2.0f)};
+                DrawPolyLines(objects[i].position, objects[i].sides, objects[i].radius, objects[i].rotation,
+                              objects[i].color);
                 DrawPoly(litleTriangle, objects[i].sides, objects[i].radius / 2.0f, objects[i].rotation, RED);
                 break;
             }
@@ -250,40 +254,46 @@ void UpdateGameState(void)
 
     for (i = 1; i < totalObjects; ++i)
     {
-        if (i == poid) continue;
+        if (i == poid)
+            continue;
 
-        switch (objects[i].type) {
-            case T_none:
-                continue;
-                break;
-            case T_enemy:
-                objects[i].rotation += GetRandomValue(-10, 10);
-                break;
-            case T_bullet:
-                objects[i].position.x += objects[i].vel.x;
-                objects[i].position.y += objects[i].vel.y;
+        switch (objects[i].type)
+        {
+        case T_none:
+            continue;
+            break;
+        case T_enemy:
+            objects[i].rotation += GetRandomValue(-10, 10);
+            break;
+        case T_bullet:
+            objects[i].position.x += objects[i].vel.x;
+            objects[i].position.y += objects[i].vel.y;
 
-                // destroy the bullet
-                if (objects[i].timeVisible < timeNow)
+            // destroy the bullet
+            if (objects[i].timeVisible < timeNow)
+            {
+                objects[i].type = T_none;
+            }
+            for (j = 1; j < totalObjects; ++j)
+            {
+                if (j == i)
+                    continue;
+                if ((objects[j].type == T_enemy || objects[j].type == T_player) &&
+                    CheckCollisionCircles(objects[i].position, objects[i].radius, objects[j].position,
+                                          objects[j].radius))
                 {
                     objects[i].type = T_none;
-                }
-                for (j = 1; j < totalObjects; ++j)
-                {
-                    if(j == i) continue;
-                    if ((objects[j].type == T_enemy || objects[j].type == T_player)&& CheckCollisionCircles(objects[i].position, objects[i].radius, objects[j].position, objects[j].radius)) {
-                        objects[i].type = T_none;
-                        objects[j].type = T_none;
-                        ++score;
-                        // TODO(2026-06-23): Do something different for the player, maybe update the game state to lose
+                    objects[j].type = T_none;
+                    ++score;
+                    // TODO(2026-06-23): Do something different for the player, maybe update the game state to lose
 
-                        break;
-                    }
+                    break;
                 }
-                break;
-            default:
-                continue;
             }
+            break;
+        default:
+            continue;
+        }
     }
 }
 
@@ -298,12 +308,11 @@ void TestRandNumbers(void)
 {
     int i;
     int *numbers = LoadRandomSequence(10, 0, 100);
-    for(i = 0; i < 10; ++i)
+    for (i = 0; i < 10; ++i)
     {
         TraceLog(LOG_INFO, "The random number at %d is %d", i, numbers[i]);
     }
 }
-
 
 int main(void)
 {
