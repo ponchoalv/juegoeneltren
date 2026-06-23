@@ -50,7 +50,7 @@ typedef int Objid;
 // TODO(2026-06-23): Add game state, something to react to WIN, LOSE, PLAYING
 typedef struct CurrentState
 {
-    int totalObjects;
+    int activeObjects;
     GameState status;
     Object *player;
     Object objects[MAX_OBJECTS];
@@ -69,7 +69,7 @@ Objid InitObject(ObjType type)
         if (currentState.objects[i].type == T_none)
         {
             currentState.objects[i].type = type;
-            ++currentState.totalObjects;
+            ++currentState.activeObjects;
             return i;
         }
     }
@@ -81,7 +81,7 @@ void DestroyObject(Objid objid)
     if(objid < MAX_OBJECTS)
     {
         currentState.objects[objid].type = T_none;
-        --currentState.totalObjects;
+        --currentState.activeObjects;
     }
 }
 
@@ -155,6 +155,8 @@ void InitEnemies(void)
 void InitGame(void)
 {
     currentState.status = S_playing;
+    currentState.activeObjects = 0;
+    currentState.score = 0;
     InitObjects();
     InitPlayer();
     InitEnemies();
@@ -218,9 +220,11 @@ void ProcessInput(void)
     case S_playing:
         ProcessPlayingInput();
         break;
-    default:
-        // TraceLog(LOG_INFO, "Game State not implemented");
-        // TODO(20270623):Implement input processing for S_win and S_lose;
+        default:
+        if(IsKeyPressed(KEY_SPACE))
+        {
+            InitGame();
+        }
         break;
     }
 }
@@ -281,6 +285,7 @@ void Render(void)
             break;
         case S_win:
             DrawText("YOU WON", WINDOW_WIDTH/2.0 - MeasureText("YOU WON",30), WINDOW_HEIGHT/2 - 30, 60, GREEN);
+            DrawText("Press [SPACE] to start again", WINDOW_WIDTH/2.0 - MeasureText("Press [SPACE] to start again",15), WINDOW_HEIGHT/2.0 + 30, 30, GREEN);
             break;
         }
 
@@ -303,6 +308,7 @@ void UpdatePlayingGameState(void)
 
     for (i = 1; i < MAX_OBJECTS; ++i)
     {
+        // TODO: look a way to make it lose, maybe when the player collide with an enemy
         if (i == currentState.poid)
             continue;
 
@@ -312,6 +318,7 @@ void UpdatePlayingGameState(void)
             continue;
             break;
         case T_enemy:
+            // TODO implement proper AI / logic to move and attack the player
             currentState.objects[i].rotation += GetRandomValue(-10, 10);
             break;
         case T_bullet:
@@ -338,8 +345,8 @@ void UpdatePlayingGameState(void)
                 }
             }
 
-            // TraceLog(LOG_INFO, "currentState.totalObjects %d", currentState.totalObjects);
-            if (currentState.totalObjects == 1)
+            // TraceLog(LOG_INFO, "currentState.activeObjects %d", currentState.activeObjects);
+            if (currentState.activeObjects == 1)
             {
                 currentState.status = S_win;
             }
