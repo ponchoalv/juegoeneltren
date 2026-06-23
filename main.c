@@ -220,7 +220,7 @@ void ProcessInput(void)
     case S_playing:
         ProcessPlayingInput();
         break;
-        default:
+    default:
         if(IsKeyPressed(KEY_SPACE))
         {
             InitGame();
