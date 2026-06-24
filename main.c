@@ -292,11 +292,6 @@ void Render(void)
     EndDrawing();
 }
 
-void playerUpdate(void)
-{
-    currentState.player->rotation += 1;
-}
-
 void UpdatePlayingGameState(void)
 {
     int i = 1;
@@ -329,7 +324,9 @@ void UpdatePlayingGameState(void)
             if (currentState.objects[i].timeVisible < timeNow)
             {
                 DestroyObject(i);
+                continue;
             }
+
             for (j = 1; j < MAX_OBJECTS; ++j)
             {
                 if (j == i)
