@@ -4,3 +4,6 @@ TAGS
 /nob.old
 /#nob.c#
 /nob
+deps/nob 
+deps/raylib/**
+/deps/raylib/

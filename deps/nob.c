@@ -22,16 +22,19 @@
 #include "nob.h"
 
 // Some folder paths that we use throughout the build process.
-#define BUILD_FOLDER "build/"
-#define SRC_FOLDER   "./"
-#define DEPS "./deps/"
-#define RAYLIB DEPS"raylib/src/libraylib.a"
+#define RAYLIB_SRC   "./raylib/src"
 
 int main(int argc, char **argv)
 {
     // This line enables the self-rebuilding. It detects when nob.c is updated and auto rebuilds it then
     // runs it again.
     NOB_GO_REBUILD_URSELF(argc, argv);
+
+    if (nob_file_exists(RAYLIB_SRC"/libraylib.a")) {
+      return 0;
+    }
+
+    nob_set_current_dir(RAYLIB_SRC);
 
     // It's better to keep all the building artifacts in a separate build folder. Let's create it if it
     // does not exist yet.
@@ -40,46 +43,33 @@ int main(int argc, char **argv)
     // success, false - failure). If the operation returned false you don't need to log anything, the
     // convention is usually that the function logs what happened to itself. Just do
     // `if (!nob_function()) return;`
-    if (!nob_mkdir_if_not_exists(BUILD_FOLDER)) return 1;
+    /* if (!nob_mkdir_if_not_exists(BUILD_FOLDER)) return 1; */
 
     // The working horse of nob is the Nob_Cmd structure. It's a Dynamic Array of strings which represent
     // command line that you want to execute.
     Nob_Cmd cmd = {0};
 
-    nob_set_current_dir(DEPS);
-
-    if(!nob_file_exists("nob")) {
-      nob_cc(&cmd);
-      nob_cmd_append(&cmd, "nob.c", "-o", "nob");
-      if (!nob_cmd_run(&cmd)) return 1;
-    }
-
-    nob_cmd_append(&cmd, "./nob");
-    if (!nob_cmd_run(&cmd)) return 1;
-
-    nob_set_current_dir("../");
-
     // Let's append the command line arguments
 #if !defined(_MSC_VER)
     // On POSIX
     /// "clang", "-std=c99", "-Wall", "-Wextra", "-Wpedantic", "-framework", "CoreVideo", "-framework", "IOKit", "-framework", "Cocoa", "-framework", "GLUT", "-framework", "OpenGL", "libraylib.a", "main.c", "-o", "build/juego_en_el_tren"
-    nob_cmd_append(&cmd, "clang", "-std=c99", "-Wall", "-Wextra", "-Wpedantic", "-framework", "CoreVideo", "-framework", "IOKit", "-framework", "Cocoa", "-framework", "GLUT", "-framework", "OpenGL", RAYLIB, SRC_FOLDER"main.c", "-o", BUILD_FOLDER"juego_en_el_tren");
+    nob_cmd_append(&cmd, "make", "PLATFORM=PLATFORM_DESKTOP", "RAYLIB_LIBTYPE=STATIC");
 #else
     // On MSVC
-    nob_cmd_append(&cmd, "cl", "-std=c99", "-Wall", "-Wextra", "-Wpedantic", "-framework", "CoreVideo", "-framework", "IOKit", "-framework", "Cocoa", "-framework", "GLUT", "-framework", "OpenGL", RAYLIB, SRC_FOLDER"main.c", "-o", BUILD_FOLDER"juego_en_el_tren");
+    nob_cmd_append(&cmd, "make", "PLATFORM=PLATFORM_DESKTOP", "RAYLIB_LIBTYPE=STATIC");
 #endif // _MSC_VER
 
     // Let's execute the command.
     if (!nob_cmd_run(&cmd)) return 1;
-    // nob_cmd_run() automatically resets the cmd array, so you can nob_cmd_append() more strings
-    // into it.
+    /* // nob_cmd_run() automatically resets the cmd array, so you can nob_cmd_append() more strings */
+    /* // into it. */
 
-    if (argc > 1) {
-      if(strncmp(argv[1], "-run", 4) == 0) {
-        nob_cmd_append(&cmd, "./"BUILD_FOLDER"/juego_en_el_tren");
-        if (!nob_cmd_run(&cmd)) return 1;
-      }
-    }
+    /* if (argc > 1) { */
+    /*   if(strncmp(argv[1], "-run", 4) == 0) { */
+    /*     nob_cmd_append(&cmd, "./"BUILD_FOLDER"/juego_en_el_tren"); */
+    /*     if (!nob_cmd_run(&cmd)) return 1; */
+    /*   } */
+    /* } */
     // nob.h ships with a bunch of nob_cc_* macros that try abstract away the specific compiler.
     // They are verify basic and not particularly flexible, but you can redefine them if you need to
     // or not use them at all and create your own abstraction on top of Nob_Cmd.
