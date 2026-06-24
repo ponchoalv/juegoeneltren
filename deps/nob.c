@@ -19,7 +19,7 @@
 //
 // (In these examples we actually symlinking nob.h, but this is to keep nob.h-s synced among all the
 // examples)
-#include "nob.h"
+#include "../nob.h"
 
 // Some folder paths that we use throughout the build process.
 #define RAYLIB_SRC   "./raylib/src"

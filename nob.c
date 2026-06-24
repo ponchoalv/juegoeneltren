@@ -76,7 +76,7 @@ int main(int argc, char **argv)
 
     if (argc > 1) {
       if(strncmp(argv[1], "-run", 4) == 0) {
-        nob_cmd_append(&cmd, "./"BUILD_FOLDER"/juego_en_el_tren");
+        nob_cmd_append(&cmd, "./"BUILD_FOLDER"juego_en_el_tren");
         if (!nob_cmd_run(&cmd)) return 1;
       }
     }
