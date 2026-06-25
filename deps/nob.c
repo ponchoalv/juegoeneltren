@@ -22,7 +22,7 @@
 #include "../nob.h"
 
 // Some folder paths that we use throughout the build process.
-#define RAYLIB_SRC   "./raylib/src"
+#define RAYLIB_SRC   "./raylib/src/"
 
 int main(int argc, char **argv)
 {
@@ -30,7 +30,7 @@ int main(int argc, char **argv)
     // runs it again.
     NOB_GO_REBUILD_URSELF(argc, argv);
 
-    if (nob_file_exists(RAYLIB_SRC"/libraylib.a")) {
+    if (nob_file_exists(RAYLIB_SRC"libraylib.a")) {
       return 0;
     }
 

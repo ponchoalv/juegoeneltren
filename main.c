@@ -56,6 +56,7 @@ typedef struct CurrentState
     Object objects[MAX_OBJECTS];
     Objid poid;
     int score;
+    int totalEnemies;
 } CurrentState;
 
 CurrentState currentState = {0};
@@ -70,6 +71,7 @@ Objid InitObject(ObjType type)
         {
             currentState.objects[i].type = type;
             ++currentState.activeObjects;
+            if (type == T_enemy) ++currentState.totalEnemies;
             return i;
         }
     }
@@ -80,6 +82,7 @@ void DestroyObject(Objid objid)
 {
     if(objid < MAX_OBJECTS)
     {
+        if (currentState.objects[objid].type == T_enemy) --currentState.totalEnemies;
         currentState.objects[objid].type = T_none;
         --currentState.activeObjects;
     }
@@ -211,6 +214,12 @@ void ProcessPlayingInput(void)
     {
         FireBullet();
     }
+
+    // capture the mouse within the window
+    if (WINDOW_WIDTH < GetMouseX()) SetMousePosition(WINDOW_WIDTH, GetMouseY());
+    if (0 >= GetMouseX()) SetMousePosition(0, GetMouseY());
+    if (0 >= GetMouseY()) SetMousePosition(GetMouseX(), 0);
+    if (WINDOW_HEIGHT <= GetMouseY()) SetMousePosition(GetMouseX(), WINDOW_HEIGHT);
 }
 
 void ProcessInput(void)
@@ -292,6 +301,11 @@ void Render(void)
     EndDrawing();
 }
 
+
+int CheckCollisionBetweenObjects(Object a, Object b) {
+  return (a.type != b.type) && CheckCollisionCircles(a.position, a.radius, b.position, b.radius);
+}
+
 void UpdatePlayingGameState(void)
 {
     int i = 1;
@@ -304,11 +318,16 @@ void UpdatePlayingGameState(void)
     for (i = 1; i < MAX_OBJECTS; ++i)
     {
         // TODO: look a way to make it lose, maybe when the player collide with an enemy
-        if (i == currentState.poid)
-            continue;
 
         switch (currentState.objects[i].type)
         {
+        case T_player:
+            for (j  = 1; j < MAX_OBJECTS; ++j) {
+              // bullest won't destroyed the player for now
+              if (j == i || currentState.objects[j].type == T_bullet) continue;
+              if (CheckCollisionBetweenObjects(currentState.objects[j], currentState.objects[i])) currentState.status = S_lose;
+            }
+            break;
         case T_none:
             continue;
             break;
@@ -329,11 +348,9 @@ void UpdatePlayingGameState(void)
 
             for (j = 1; j < MAX_OBJECTS; ++j)
             {
-                if (j == i)
+                if (j == i || j == currentState.poid)
                     continue;
-                if ((currentState.objects[j].type == T_enemy) &&
-                    CheckCollisionCircles(currentState.objects[i].position, currentState.objects[i].radius, currentState.objects[j].position,
-                                          currentState.objects[j].radius))
+                if (CheckCollisionBetweenObjects(currentState.objects[i], currentState.objects[j]))
                 {
                     DestroyObject(i);
                     DestroyObject(j);
@@ -349,7 +366,7 @@ void UpdatePlayingGameState(void)
         }
     }
 
-    if (currentState.activeObjects == 1)
+    if (currentState.totalEnemies == 0)
     {
         currentState.status = S_win;
     }

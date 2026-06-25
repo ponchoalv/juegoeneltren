@@ -7,3 +7,4 @@ TAGS
 deps/nob 
 deps/raylib/**
 /deps/raylib/
+/deps/nob.old
