@@ -303,7 +303,7 @@ void Render(void)
 
 
 int CheckCollisionBetweenObjects(Object a, Object b) {
-  return (a.type != b.type) && CheckCollisionCircles(a.position, a.radius, b.position, b.radius);
+  return (a.type != b.type && a.type != T_none && b.type != T_none) && CheckCollisionCircles(a.position, a.radius, b.position, b.radius);
 }
 
 void UpdatePlayingGameState(void)
@@ -321,13 +321,6 @@ void UpdatePlayingGameState(void)
 
         switch (currentState.objects[i].type)
         {
-        case T_player:
-            for (j  = 1; j < MAX_OBJECTS; ++j) {
-              // bullest won't destroyed the player for now
-              if (j == i || currentState.objects[j].type == T_bullet) continue;
-              if (CheckCollisionBetweenObjects(currentState.objects[j], currentState.objects[i])) currentState.status = S_lose;
-            }
-            break;
         case T_none:
             continue;
             break;
@@ -359,7 +352,14 @@ void UpdatePlayingGameState(void)
                 }
             }
 
-            // TraceLog(LOG_INFO, "currentState.activeObjects %d", currentState.activeObjects);
+            // TraceLog(LOG_INFO, "currentState.activeObjects %d", currentState.activeObjects);w
+            break;
+        case T_player:
+            for (j  = 1; j < MAX_OBJECTS; ++j) {
+              // bullest won't destroyed the player for now
+              if (j == i || currentState.objects[j].type == T_bullet) continue;
+              if (CheckCollisionBetweenObjects(currentState.objects[j], currentState.objects[i])) currentState.status = S_lose;
+            }
             break;
         default:
             continue;
