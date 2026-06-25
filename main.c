@@ -63,10 +63,8 @@ CurrentState currentState = {0};
 Objid InitObject(ObjType type)
 {
     int i;
-    for (i = 1; i < MAX_OBJECTS; ++i)
-    {
-        if (currentState.objects[i].type == T_none)
-        {
+    for (i = 1; i < MAX_OBJECTS; ++i) {
+        if (currentState.objects[i].type == T_none) {
             currentState.objects[i].type = type;
             ++currentState.activeObjects;
             if (type == T_enemy) ++currentState.totalEnemies;
@@ -78,8 +76,7 @@ Objid InitObject(ObjType type)
 
 void DestroyObject(Objid objid)
 {
-    if(objid < MAX_OBJECTS)
-    {
+    if(objid < MAX_OBJECTS) {
         if (currentState.objects[objid].type == T_enemy) --currentState.totalEnemies;
         currentState.objects[objid].type = T_none;
         --currentState.activeObjects;
@@ -133,8 +130,7 @@ void InitEnemies(void)
 {
     int i;
     // we leave 0 (or NULL) to return not found / failure to get a new object for InitObject()
-    for (i = 1; i < TOTAL_ENEMIES+1 && currentState.totalEnemies <= TOTAL_ENEMIES; ++i)
-    {
+    for (i = 1; i < TOTAL_ENEMIES+1 && currentState.totalEnemies <= TOTAL_ENEMIES; ++i) {
         Objid objid = InitObject(T_enemy);
         if (objid == NULL)
             TraceLog(LOG_FATAL, "failed allocating enemy object");
@@ -168,44 +164,35 @@ void ProcessPlayingInput(void)
     // float rot = -Vector2LineAngle(player->position, mousePosition) * RAD2DEG;
     currentState.player->rotation = rot;
 
-    if (IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT))
-    {
+    if (IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT)) {
         currentState.player->position.x -= currentState.player->vel.x;
-        if (currentState.player->position.x < 0)
-        {
+        if (currentState.player->position.x < 0) {
             currentState.player->position.x = WINDOW_WIDTH;
         }
     }
 
-    if (IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT))
-    {
+    if (IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT)) {
         currentState.player->position.x += currentState.player->vel.x;
-        if (currentState.player->position.x > WINDOW_WIDTH)
-        {
+        if (currentState.player->position.x > WINDOW_WIDTH) {
             currentState.player->position.x = 0;
         }
     }
 
-    if (IsKeyDown(KEY_S) || IsKeyDown(KEY_DOWN))
-    {
+    if (IsKeyDown(KEY_S) || IsKeyDown(KEY_DOWN)) {
         currentState.player->position.y += currentState.player->vel.y;
-        if (currentState.player->position.y > WINDOW_HEIGHT)
-        {
+        if (currentState.player->position.y > WINDOW_HEIGHT) {
             currentState.player->position.y = 0;
         }
     }
 
-    if (IsKeyDown(KEY_W) || IsKeyDown(KEY_UP))
-    {
+    if (IsKeyDown(KEY_W) || IsKeyDown(KEY_UP)) {
         currentState.player->position.y -= currentState.player->vel.y;
-        if (currentState.player->position.y < 0)
-        {
+        if (currentState.player->position.y < 0) {
             currentState.player->position.y = WINDOW_HEIGHT;
         }
     }
 
-    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
-    {
+    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
         FireBullet();
     }
 
@@ -224,8 +211,7 @@ void ProcessInput(void)
         ProcessPlayingInput();
         break;
     default:
-        if(IsKeyPressed(KEY_SPACE))
-        {
+        if(IsKeyPressed(KEY_SPACE)) {
             InitGame();
         }
         break;
@@ -237,8 +223,7 @@ void DrawPlaying(void)
 {
     int i;
     DrawText(TextFormat("SCORE: %2i", currentState.score), 90, 0, 20, GREEN);
-    for (i = 1; i < MAX_OBJECTS; ++i)
-    {
+    for (i = 1; i < MAX_OBJECTS; ++i) {
         if (currentState.objects[i].type == T_none)
             continue;
         switch (currentState.objects[i].type)
@@ -248,7 +233,8 @@ void DrawPlaying(void)
                           currentState.objects[i].color);
             break;
 
-        case T_player: {
+        case T_player:
+        {
             float rotationRad = currentState.objects[i].rotation * DEG2RAD;
 
             Vector2 litleTriangle = {currentState.objects[i].position.x + cosf(rotationRad) * (currentState.objects[i].radius / 2.0f),
@@ -297,7 +283,8 @@ void Render(void)
 }
 
 
-int CheckCollisionBetweenObjects(Object a, Object b) {
+int CheckCollisionBetweenObjects(Object a, Object b)
+{
   return (a.type != b.type && a.type != T_none && b.type != T_none) && CheckCollisionCircles(a.position, a.radius, b.position, b.radius);
 }
 
@@ -310,8 +297,7 @@ void UpdatePlayingGameState(void)
     // makeObjectInvisible = GetRandomValue(1, TOTAL_ENEMIES);
     double timeNow = GetTime();
 
-    for (i = 1; i < MAX_OBJECTS; ++i)
-    {
+    for (i = 1; i < MAX_OBJECTS; ++i) {
         // TODO: look a way to make it lose, maybe when the player collide with an enemy
 
         switch (currentState.objects[i].type)
@@ -328,18 +314,15 @@ void UpdatePlayingGameState(void)
             currentState.objects[i].position.y += currentState.objects[i].vel.y;
 
             // destroy the bullet
-            if (currentState.objects[i].timeVisible < timeNow)
-            {
+            if (currentState.objects[i].timeVisible < timeNow) {
                 DestroyObject(i);
                 continue;
             }
 
-            for (j = 1; j < MAX_OBJECTS; ++j)
-            {
+            for (j = 1; j < MAX_OBJECTS; ++j) {
                 if (j == i || j == currentState.poid)
                     continue;
-                if (CheckCollisionBetweenObjects(currentState.objects[i], currentState.objects[j]))
-                {
+                if (CheckCollisionBetweenObjects(currentState.objects[i], currentState.objects[j])) {
                     DestroyObject(i);
                     DestroyObject(j);
                     ++currentState.score;
@@ -351,9 +334,9 @@ void UpdatePlayingGameState(void)
             break;
         case T_player:
             for (j  = 1; j < MAX_OBJECTS; ++j) {
-              // bullest won't destroyed the player for now
-              if (j == i || currentState.objects[j].type == T_bullet) continue;
-              if (CheckCollisionBetweenObjects(currentState.objects[j], currentState.objects[i])) currentState.status = S_lose;
+                // bullest won't destroyed the player for now
+                if (j == i || currentState.objects[j].type == T_bullet) continue;
+                if (CheckCollisionBetweenObjects(currentState.objects[j], currentState.objects[i])) currentState.status = S_lose;
             }
             break;
         default:
@@ -361,9 +344,7 @@ void UpdatePlayingGameState(void)
         }
     }
 
-    TraceLog(LOG_INFO, "currentState.totalEnemies: %d", currentState.totalEnemies);
-    if (currentState.totalEnemies == 0)
-    {
+    if (currentState.totalEnemies == 0) {
         currentState.status = S_win;
     }
 }
