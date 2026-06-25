@@ -11,7 +11,6 @@
 #define TOTAL_ENEMIES 20
 #define BULLETS_VISIBLE_SECONDS 1
 #define BULLETS_SPEED 3
-// #define TOTAL_RAND_NUMS 25
 
 #define NULL 0
 
@@ -60,7 +59,6 @@ typedef struct CurrentState
 } CurrentState;
 
 CurrentState currentState = {0};
-
 
 Objid InitObject(ObjType type)
 {
@@ -131,11 +129,11 @@ void InitPlayer(void)
     currentState.player->vel = (Vector2){10, 7};
 }
 
-// TODO(2026-06-22: quiero hacer que los enemigos que desaparecen lo hagan por 3 segundos)
 void InitEnemies(void)
 {
     int i;
-    for (i = 1; i < TOTAL_ENEMIES; ++i)
+    // we leave 0 (or NULL) to return not found / failure to get a new object for InitObject()
+    for (i = 1; i < TOTAL_ENEMIES+1 && currentState.totalEnemies <= TOTAL_ENEMIES; ++i)
     {
         Objid objid = InitObject(T_enemy);
         if (objid == NULL)
@@ -150,16 +148,12 @@ void InitEnemies(void)
     }
 }
 
-// void InitializeRandNumbs(void)
-// {
-//     randEnemies = LoadRandomSequence(TOTAL_RAND_NUMS, 1, TOTAL_ENEMIES);
-// }
-
 void InitGame(void)
 {
     currentState.status = S_playing;
     currentState.activeObjects = 0;
     currentState.score = 0;
+    currentState.totalEnemies = 0;
     InitObjects();
     InitPlayer();
     InitEnemies();
@@ -290,11 +284,12 @@ void Render(void)
             DrawPlaying();
             break;
         case S_lose:
-            DrawText("YOU LOSE", WINDOW_WIDTH/2.0 - MeasureText("YOU LOSE", 30), WINDOW_HEIGHT/2 - 30, 60, RED);
+            DrawText("YOU LOOSED", WINDOW_WIDTH/2.0 - MeasureText("YOU LOOSED", 30), WINDOW_HEIGHT/2 - 40, 60, RED);
+            DrawText("Press [SPACE] to start again", WINDOW_WIDTH/2.0 - MeasureText("Press [SPACE] to start again", 30)/2.0, WINDOW_HEIGHT/2.0 + 30, 30, RED);
             break;
         case S_win:
-            DrawText("YOU WON", WINDOW_WIDTH/2.0 - MeasureText("YOU WON",30), WINDOW_HEIGHT/2 - 40, 60, GREEN);
-            DrawText("Press [SPACE] to start again", WINDOW_WIDTH/2.0 - MeasureText("Press [SPACE] to start again",15), WINDOW_HEIGHT/2.0 + 30, 30, GREEN);
+            DrawText("YOU WON", WINDOW_WIDTH/2.0 - MeasureText("YOU WON", 30), WINDOW_HEIGHT/2 - 40, 60, GREEN);
+            DrawText("Press [SPACE] to start again", WINDOW_WIDTH/2.0 - MeasureText("Press [SPACE] to start again", 30)/2.0, WINDOW_HEIGHT/2.0 + 30, 30, GREEN);
             break;
         }
 
@@ -366,6 +361,7 @@ void UpdatePlayingGameState(void)
         }
     }
 
+    TraceLog(LOG_INFO, "currentState.totalEnemies: %d", currentState.totalEnemies);
     if (currentState.totalEnemies == 0)
     {
         currentState.status = S_win;
