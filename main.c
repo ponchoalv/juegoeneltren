@@ -108,11 +108,11 @@ void FireBullet(void)
 
     Objid boid = InitObject(T_bullet);
     currentState.objects[boid].timeVisible = GetTime() + BULLETS_VISIBLE_SECONDS;
-    currentState.objects[boid].position = playerTip;
-    currentState.objects[boid].vel = Vector2Multiply(Vector2Normalize(vel), (Vector2){BULLETS_SPEED, BULLETS_SPEED});
-    currentState.objects[boid].color = BLUE;
-    currentState.objects[boid].radius = 4;
-    currentState.objects[boid].sides = 10;
+    currentState.objects[boid].position    = playerTip;
+    currentState.objects[boid].vel         = Vector2Multiply(Vector2Normalize(vel), (Vector2){BULLETS_SPEED, BULLETS_SPEED});
+    currentState.objects[boid].color       = BLUE;
+    currentState.objects[boid].radius      = 4;
+    currentState.objects[boid].sides       = 10;
     // TraceLog(LOG_INFO, "bullet fired with (%f, %f) with direction: (%f,%f)",
     // playerTip.x, playerTip.y, player->vel.x, player->vel.y);
 }
@@ -122,14 +122,14 @@ void InitPlayer(void)
     currentState.poid = InitObject(T_player);
     if (currentState.poid == NULL)
         TraceLog(LOG_FATAL, "failed allocating player object");
-    currentState.player = &currentState.objects[currentState.poid];
+    currentState.player             = &currentState.objects[currentState.poid];
     currentState.player->position.x = WINDOW_CENTRE_H;
     currentState.player->position.y = WINDOW_CENTRE_V;
-    currentState.player->color = GREEN;
-    currentState.player->rotation = 0;
-    currentState.player->sides = 3;
-    currentState.player->radius = 20;
-    currentState.player->vel = (Vector2){10, 7};
+    currentState.player->color      = GREEN;
+    currentState.player->rotation   = 0;
+    currentState.player->sides      = 3;
+    currentState.player->radius     = 20;
+    currentState.player->vel        = (Vector2){10, 7};
 }
 
 void InitEnemies(void)
@@ -143,23 +143,28 @@ void InitEnemies(void)
         if (objid == NULL)
             TraceLog(LOG_FATAL, "failed allocating enemy object");
 
-        currentState.objects[objid].radius = GetRandomValue(8, 15);
+        currentState.objects[objid].radius     = GetRandomValue(8, 15);
         currentState.objects[objid].position.x =
             GetRandomValue(0 + currentState.objects[objid].radius, WINDOW_WIDTH - currentState.objects[objid].radius);
         currentState.objects[objid].position.y =
             GetRandomValue(0 + currentState.objects[objid].radius, WINDOW_HEIGHT - currentState.objects[objid].radius);
-        currentState.objects[objid].rotation = 0;
-        currentState.objects[objid].color = PURPLE;
-        currentState.objects[objid].sides = GetRandomValue(1, 10);
+        currentState.objects[objid].rotation   = 0;
+        currentState.objects[objid].color      = PURPLE;
+        currentState.objects[objid].sides      = GetRandomValue(1, 10);
     }
 }
 
 void InitGame(void)
 {
+    // first we reset the state of the game to be in playing mode.
+    // then we set the counters to the initial status.
     currentState.status = S_playing;
     currentState.activeObjects = 0;
     currentState.score = 0;
     currentState.totalEnemies = 0;
+
+    // here we create all the object.
+    // this objects should be visible during playing status.
     InitObjects();
     InitPlayer();
     InitEnemies();
@@ -436,3 +441,22 @@ int main(void)
 
     return 0;
 }
+
+/*
+* TODO(1): Add subtypes of enemies that will have different AI behavior:
+*             - Attacker -> follow the player at reduced speed, to stress
+*              the player aim.
+*             - Ambusher -> Follow the player very slowly (at least half
+*              the speed of the attacker) and accelerate randomly but
+*              keeping a minimum distance. To create a feeling of ambush.
+*             - Dumb -> Just do random movements. Not following any one.
+*
+* TODO(2): Maybe add different types of gameplay, eg; change the way of
+*          keeping the score, like time to eliminate all enemies, or
+*          survival mode if enemies spawn for ever.
+*
+* TODO(3): Make the game available for other platforms, thinking on
+*          Web and mobile. But I would start with web now.
+*
+* TODO(4): Add sound support.
+*/
