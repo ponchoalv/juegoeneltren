@@ -108,11 +108,11 @@ void FireBullet(void)
 
     Objid boid = InitObject(T_bullet);
     currentState.objects[boid].timeVisible = GetTime() + BULLETS_VISIBLE_SECONDS;
-    currentState.objects[boid].position    = playerTip;
-    currentState.objects[boid].vel         = Vector2Multiply(Vector2Normalize(vel), (Vector2){BULLETS_SPEED, BULLETS_SPEED});
-    currentState.objects[boid].color       = BLUE;
-    currentState.objects[boid].radius      = 4;
-    currentState.objects[boid].sides       = 10;
+    currentState.objects[boid].position = playerTip;
+    currentState.objects[boid].vel = Vector2Multiply(Vector2Normalize(vel), (Vector2){BULLETS_SPEED, BULLETS_SPEED});
+    currentState.objects[boid].color = BLUE;
+    currentState.objects[boid].radius = 4;
+    currentState.objects[boid].sides = 10;
     // TraceLog(LOG_INFO, "bullet fired with (%f, %f) with direction: (%f,%f)",
     // playerTip.x, playerTip.y, player->vel.x, player->vel.y);
 }
@@ -122,14 +122,14 @@ void InitPlayer(void)
     currentState.poid = InitObject(T_player);
     if (currentState.poid == NULL)
         TraceLog(LOG_FATAL, "failed allocating player object");
-    currentState.player             = &currentState.objects[currentState.poid];
+    currentState.player = &currentState.objects[currentState.poid];
     currentState.player->position.x = WINDOW_CENTRE_H;
     currentState.player->position.y = WINDOW_CENTRE_V;
-    currentState.player->color      = GREEN;
-    currentState.player->rotation   = 0;
-    currentState.player->sides      = 3;
-    currentState.player->radius     = 20;
-    currentState.player->vel        = (Vector2){10, 7};
+    currentState.player->color = GREEN;
+    currentState.player->rotation = 0;
+    currentState.player->sides = 3;
+    currentState.player->radius = 20;
+    currentState.player->vel = (Vector2){10, 7};
 }
 
 void InitEnemies(void)
@@ -143,14 +143,14 @@ void InitEnemies(void)
         if (objid == NULL)
             TraceLog(LOG_FATAL, "failed allocating enemy object");
 
-        currentState.objects[objid].radius     = GetRandomValue(8, 15);
+        currentState.objects[objid].radius = GetRandomValue(8, 15);
         currentState.objects[objid].position.x =
             GetRandomValue(0 + currentState.objects[objid].radius, WINDOW_WIDTH - currentState.objects[objid].radius);
         currentState.objects[objid].position.y =
             GetRandomValue(0 + currentState.objects[objid].radius, WINDOW_HEIGHT - currentState.objects[objid].radius);
-        currentState.objects[objid].rotation   = 0;
-        currentState.objects[objid].color      = PURPLE;
-        currentState.objects[objid].sides      = GetRandomValue(1, 10);
+        currentState.objects[objid].rotation = 0;
+        currentState.objects[objid].color = PURPLE;
+        currentState.objects[objid].sides = GetRandomValue(1, 10);
     }
 }
 
@@ -255,23 +255,19 @@ void DrawPlaying(void)
     {
         if (currentState.objects[i].type == T_none)
             continue;
+
+        // Both T_enemies and T_player will draw the same thing here:
+        DrawPolyLines(currentState.objects[i].position, currentState.objects[i].sides, currentState.objects[i].radius,
+                      currentState.objects[i].rotation, currentState.objects[i].color);
         switch (currentState.objects[i].type)
         {
-        case T_enemy:
-            DrawPolyLines(currentState.objects[i].position, currentState.objects[i].sides,
-                          currentState.objects[i].radius, currentState.objects[i].rotation,
-                          currentState.objects[i].color);
-            break;
-
         case T_player: {
             float rotationRad = currentState.objects[i].rotation * DEG2RAD;
 
             Vector2 litleTriangle = {
                 currentState.objects[i].position.x + cosf(rotationRad) * (currentState.objects[i].radius / 2.0f),
                 currentState.objects[i].position.y + sinf(rotationRad) * (currentState.objects[i].radius / 2.0f)};
-            DrawPolyLines(currentState.objects[i].position, currentState.objects[i].sides,
-                          currentState.objects[i].radius, currentState.objects[i].rotation,
-                          currentState.objects[i].color);
+
             DrawPoly(litleTriangle, currentState.objects[i].sides, currentState.objects[i].radius / 2.0f,
                      currentState.objects[i].rotation, RED);
             break;
@@ -283,7 +279,7 @@ void DrawPlaying(void)
             break;
 
         default:
-            TraceLog(LOG_FATAL, "UNREACHABLE");
+            break;
         }
     }
 }
@@ -443,20 +439,20 @@ int main(void)
 }
 
 /*
-* TODO(1): Add subtypes of enemies that will have different AI behavior:
-*             - Attacker -> follow the player at reduced speed, to stress
-*              the player aim.
-*             - Ambusher -> Follow the player very slowly (at least half
-*              the speed of the attacker) and accelerate randomly but
-*              keeping a minimum distance. To create a feeling of ambush.
-*             - Dumb -> Just do random movements. Not following any one.
-*
-* TODO(2): Maybe add different types of gameplay, eg; change the way of
-*          keeping the score, like time to eliminate all enemies, or
-*          survival mode if enemies spawn for ever.
-*
-* TODO(3): Make the game available for other platforms, thinking on
-*          Web and mobile. But I would start with web now.
-*
-* TODO(4): Add sound support.
-*/
+ * TODO(1): Add subtypes of enemies that will have different AI behavior:
+ *             - Attacker -> follow the player at reduced speed, to stress
+ *              the player aim.
+ *             - Ambusher -> Follow the player very slowly (at least half
+ *              the speed of the attacker) and accelerate randomly but
+ *              keeping a minimum distance. To create a feeling of ambush.
+ *             - Dumb -> Just do random movements. Not following any one.
+ *
+ * TODO(2): Maybe add different types of gameplay, eg; change the way of
+ *          keeping the score, like time to eliminate all enemies, or
+ *          survival mode if enemies spawn for ever.
+ *
+ * TODO(3): Make the game available for other platforms, thinking on
+ *          Web and mobile. But I would start with web now.
+ *
+ * TODO(4): Add sound support.
+ */
