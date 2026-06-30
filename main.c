@@ -46,7 +46,6 @@ typedef enum
 
 typedef int Objid;
 
-// TODO(2026-06-23): Add game state, something to react to WIN, LOSE, PLAYING
 typedef struct CurrentState
 {
     int activeObjects;
@@ -59,6 +58,12 @@ typedef struct CurrentState
 } CurrentState;
 
 CurrentState currentState = {0};
+
+int CheckCollisionBetweenObjects(Object a, Object b)
+{
+    return (a.type != b.type && a.type != T_none && b.type != T_none) &&
+           CheckCollisionCircles(a.position, a.radius, b.position, b.radius);
+}
 
 Objid InitObject(ObjType type)
 {
@@ -151,6 +156,14 @@ void InitEnemies(void)
         currentState.objects[objid].rotation = 0;
         currentState.objects[objid].color = PURPLE;
         currentState.objects[objid].sides = GetRandomValue(1, 10);
+
+        // Prevent a newly spawn enemy to collide with the player
+        while (CheckCollisionBetweenObjects(*currentState.player, currentState.objects[objid])) {
+            currentState.objects[objid].position.x =
+            GetRandomValue(0 + currentState.objects[objid].radius, WINDOW_WIDTH - currentState.objects[objid].radius);
+        currentState.objects[objid].position.y =
+            GetRandomValue(0 + currentState.objects[objid].radius, WINDOW_HEIGHT - currentState.objects[objid].radius);
+       }
     }
 }
 
@@ -315,12 +328,6 @@ void Render(void)
     EndDrawing();
 }
 
-int CheckCollisionBetweenObjects(Object a, Object b)
-{
-    return (a.type != b.type && a.type != T_none && b.type != T_none) &&
-           CheckCollisionCircles(a.position, a.radius, b.position, b.radius);
-}
-
 void UpdatePlayingGameState(void)
 {
     int i = 1;
@@ -332,9 +339,6 @@ void UpdatePlayingGameState(void)
 
     for (i = 1; i < MAX_OBJECTS; ++i)
     {
-        // TODO: look a way to make it lose, maybe when the player collide with an
-        // enemy
-
         switch (currentState.objects[i].type)
         {
         case T_none:
