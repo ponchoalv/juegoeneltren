@@ -29,7 +29,6 @@ typedef enum
     OS_camper
 } ObjSubType;
 
-
 typedef struct Object
 {
     Vector2 position;
@@ -487,5 +486,5 @@ int main(void)
  * TODO(3): Make the game available for other platforms, thinking on
  *          Web and mobile. But I would start with web now.
  *
- * TODO(4): Add sound support.
+ * TODO(43423): Add sound support.
  */
