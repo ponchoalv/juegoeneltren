@@ -6,5 +6,6 @@ TAGS
 /nob
 deps/nob 
 deps/raylib/**
+deps/libraylib.a
 /deps/raylib/
 /deps/nob.old

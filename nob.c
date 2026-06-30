@@ -25,7 +25,7 @@
 #define BUILD_FOLDER "build/"
 #define SRC_FOLDER "./"
 #define DEPS "./deps/"
-#define RAYLIB DEPS "raylib/src/libraylib.a"
+#define RAYLIB_STATIC DEPS "libraylib.a"
 
 int main(int argc, char **argv)
 {
@@ -70,12 +70,12 @@ int main(int argc, char **argv)
     /// "-framework", "Cocoa", "-framework", "GLUT", "-framework", "OpenGL", "libraylib.a", "main.c", "-o",
     /// "build/juego_en_el_tren"
     nob_cmd_append(&cmd, "clang", "-std=c99", "-Wall", "-Wextra", "-Wpedantic", "-framework", "CoreVideo", "-framework",
-                   "IOKit", "-framework", "Cocoa", "-framework", "GLUT", "-framework", "OpenGL", RAYLIB,
+                   "IOKit", "-framework", "Cocoa", "-framework", "GLUT", "-framework", "OpenGL", RAYLIB_STATIC,
                    SRC_FOLDER "main.c", "-o", BUILD_FOLDER "juego_en_el_tren");
 #else
     // On MSVC
     nob_cmd_append(&cmd, "cl", "-std=c99", "-Wall", "-Wextra", "-Wpedantic", "-framework", "CoreVideo", "-framework",
-                   "IOKit", "-framework", "Cocoa", "-framework", "GLUT", "-framework", "OpenGL", RAYLIB,
+                   "IOKit", "-framework", "Cocoa", "-framework", "GLUT", "-framework", "OpenGL", RAYLIB_STATIC,
                    SRC_FOLDER "main.c", "-o", BUILD_FOLDER "juego_en_el_tren");
 #endif // _MSC_VER
 
@@ -101,7 +101,7 @@ int main(int argc, char **argv)
             // future, and thats not great
             nob_cmd_append(&cmd, "clang", "-g", "-std=c99", "-Wall", "-Wextra", "-Wpedantic", "-framework", "CoreVideo",
                            "-framework", "IOKit", "-framework", "Cocoa", "-framework", "GLUT", "-framework", "OpenGL",
-                           RAYLIB, SRC_FOLDER "main.c", "-o", BUILD_FOLDER "juego_en_el_tren");
+                           RAYLIB_STATIC, SRC_FOLDER "main.c", "-o", BUILD_FOLDER "juego_en_el_tren");
             if (!nob_cmd_run(&cmd))
                 return 1;
 

@@ -23,6 +23,7 @@
 
 // Some folder paths that we use throughout the build process.
 #define RAYLIB_SRC "./raylib/src/"
+#define RAYLIB_STATIC "libraylib.a"
 
 int main(int argc, char **argv)
 {
@@ -30,7 +31,7 @@ int main(int argc, char **argv)
     // runs it again.
     NOB_GO_REBUILD_URSELF(argc, argv);
 
-    if (nob_file_exists(RAYLIB_SRC "libraylib.a"))
+    if (nob_file_exists(RAYLIB_STATIC))
     {
         return 0;
     }
@@ -53,9 +54,6 @@ int main(int argc, char **argv)
     // Let's append the command line arguments
 #if !defined(_MSC_VER)
     // On POSIX
-    /// "clang", "-std=c99", "-Wall", "-Wextra", "-Wpedantic", "-framework", "CoreVideo", "-framework", "IOKit",
-    /// "-framework", "Cocoa", "-framework", "GLUT", "-framework", "OpenGL", "libraylib.a", "main.c", "-o",
-    /// "build/juego_en_el_tren"
     nob_cmd_append(&cmd, "make", "PLATFORM=PLATFORM_DESKTOP", "RAYLIB_LIBTYPE=STATIC");
 #else
     // On MSVC
@@ -65,6 +63,20 @@ int main(int argc, char **argv)
     // Let's execute the command.
     if (!nob_cmd_run(&cmd))
         return 1;
+
+    if (nob_file_exists(RAYLIB_STATIC))
+    {
+        nob_cmd_append(&cmd, "cp", RAYLIB_STATIC, "../../");
+    } else
+    {
+        nob_log(NOB_ERROR, "Not found: "RAYLIB_STATIC);
+        return 1;
+    }
+
+    // Let's execute the command.
+    if (!nob_cmd_run(&cmd))
+        return 1;
+
     /* // nob_cmd_run() automatically resets the cmd array, so you can nob_cmd_append() more strings */
     /* // into it. */
 
