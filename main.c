@@ -9,8 +9,6 @@
 
 #define MAX_OBJECTS 32000
 #define TOTAL_ENEMIES 20
-#define BULLETS_VISIBLE_SECONDS 1
-#define BULLETS_SPEED 3
 
 #define NULL 0
 
@@ -24,6 +22,14 @@ typedef enum
     T_bullet
 } ObjType;
 
+typedef enum
+{
+    OS_none,
+    OS_attacker,
+    OS_camper
+} ObjSubType;
+
+
 typedef struct Object
 {
     Vector2 position;
@@ -34,7 +40,10 @@ typedef struct Object
     int radius;
     Vector2 vel;
     double timeVisible;
+    double duration;
+    float speedMultiplier;
     int isVisible;
+    ObjSubType subType;
 } Object;
 
 typedef enum
@@ -65,7 +74,7 @@ int CheckCollisionBetweenObjects(Object a, Object b)
            CheckCollisionCircles(a.position, a.radius, b.position, b.radius);
 }
 
-Objid InitObject(ObjType type)
+Objid InitObject(ObjType type, ObjSubType subType)
 {
     int i;
     for (i = 1; i < MAX_OBJECTS; ++i)
@@ -73,6 +82,7 @@ Objid InitObject(ObjType type)
         if (currentState.objects[i].type == T_none)
         {
             currentState.objects[i].type = type;
+            currentState.objects[i].subType = subType;
             ++currentState.activeObjects;
             if (type == T_enemy)
                 ++currentState.totalEnemies;
@@ -103,18 +113,24 @@ void InitObjects(void)
     }
 }
 
-void FireBullet(void)
+Vector2 GetOrientationVector(Vector2 from, Vector2 to)
+{
+    return Vector2Normalize(((Vector2){to.x - from.x, to.y - from.y}));
+}
+
+void FireBullet(double duration)
 {
     Vector2 mousePosition = GetMousePosition();
     Vector2 playerTip = Vector2MoveTowards(currentState.player->position, mousePosition, 25);
 
-    Vector2 vel = {mousePosition.x - currentState.player->position.x,
-                   mousePosition.y - currentState.player->position.y};
+    Vector2 vel = GetOrientationVector(currentState.player->position, mousePosition);
 
-    Objid boid = InitObject(T_bullet);
-    currentState.objects[boid].timeVisible = GetTime() + BULLETS_VISIBLE_SECONDS;
+    Objid boid = InitObject(T_bullet, OS_none);
+    currentState.objects[boid].duration = duration;
+    currentState.objects[boid].timeVisible = GetTime() + currentState.objects[boid].duration;
     currentState.objects[boid].position = playerTip;
-    currentState.objects[boid].vel = Vector2Multiply(Vector2Normalize(vel), (Vector2){BULLETS_SPEED, BULLETS_SPEED});
+    currentState.objects[boid].speedMultiplier = 3.0;
+    currentState.objects[boid].vel = Vector2Multiply(vel, (Vector2){currentState.objects[boid].speedMultiplier, currentState.objects[boid].speedMultiplier});
     currentState.objects[boid].color = BLUE;
     currentState.objects[boid].radius = 4;
     currentState.objects[boid].sides = 10;
@@ -124,7 +140,7 @@ void FireBullet(void)
 
 void InitPlayer(void)
 {
-    currentState.poid = InitObject(T_player);
+    currentState.poid = InitObject(T_player, OS_none);
     if (currentState.poid == NULL)
         TraceLog(LOG_FATAL, "failed allocating player object");
     currentState.player = &currentState.objects[currentState.poid];
@@ -144,7 +160,7 @@ void InitEnemies(void)
     // InitObject()
     for (i = 1; i < TOTAL_ENEMIES + 1 && currentState.totalEnemies <= TOTAL_ENEMIES; ++i)
     {
-        Objid objid = InitObject(T_enemy);
+        Objid objid = InitObject(T_enemy, OS_attacker);
         if (objid == NULL)
             TraceLog(LOG_FATAL, "failed allocating enemy object");
 
@@ -156,6 +172,7 @@ void InitEnemies(void)
         currentState.objects[objid].rotation = 0;
         currentState.objects[objid].color = PURPLE;
         currentState.objects[objid].sides = GetRandomValue(1, 10);
+        currentState.objects[objid].speedMultiplier = 1.1;
 
         // Prevent a newly spawn enemy to collide with the player
         while (CheckCollisionBetweenObjects(*currentState.player, currentState.objects[objid])) {
@@ -230,7 +247,7 @@ void ProcessPlayingInput(void)
 
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
     {
-        FireBullet();
+        FireBullet(1.0);
     }
 
     // capture the mouse within the window
@@ -328,13 +345,22 @@ void Render(void)
     EndDrawing();
 }
 
+void MoveObject(Object *obj)
+{
+    obj->position.x += obj->vel.x;
+    obj->position.y += obj->vel.y;
+}
+
+void SetObjectDirAndSpeed(Object *obj, Vector2 to)
+{
+    obj->vel = Vector2Multiply(GetOrientationVector(obj->position, to), (Vector2){ obj->speedMultiplier, obj->speedMultiplier});
+}
+
 void UpdatePlayingGameState(void)
 {
     int i = 1;
     int j = 1;
-    // int makeObjectInvisible;
 
-    // makeObjectInvisible = GetRandomValue(1, TOTAL_ENEMIES);
     double timeNow = GetTime();
 
     for (i = 1; i < MAX_OBJECTS; ++i)
@@ -346,11 +372,14 @@ void UpdatePlayingGameState(void)
             break;
         case T_enemy:
             // TODO implement proper AI / logic to move and attack the player
+            // this is not a good experience, we need to find a way to make it
+            // feel more real, now is like converging all T_enemies attacker into one point
             currentState.objects[i].rotation += GetRandomValue(-10, 10);
+            SetObjectDirAndSpeed(&currentState.objects[i], currentState.player->position);
+            MoveObject(&currentState.objects[i]);
             break;
         case T_bullet:
-            currentState.objects[i].position.x += currentState.objects[i].vel.x;
-            currentState.objects[i].position.y += currentState.objects[i].vel.y;
+            MoveObject(&currentState.objects[i]);
 
             // destroy the bullet
             if (currentState.objects[i].timeVisible < timeNow)
