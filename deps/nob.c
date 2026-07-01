@@ -36,7 +36,10 @@ int main(int argc, char **argv)
         return 0;
     }
 
-    nob_set_current_dir(RAYLIB_SRC);
+    if(!nob_set_current_dir(RAYLIB_SRC))
+    {
+        nob_log(NOB_ERROR, "Folder not found: "RAYLIB_SRC" remember to clone last raylib repo");
+    }
 
     // It's better to keep all the building artifacts in a separate build folder. Let's create it if it
     // does not exist yet.
