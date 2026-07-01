@@ -38,6 +38,7 @@ typedef struct Object
     int sides;
     int radius;
     Vector2 vel;
+    bool isColliding;
     double timeVisible;
     double duration;
     float speedMultiplier;
@@ -69,7 +70,7 @@ CurrentState currentState = {0};
 
 int CheckCollisionBetweenObjects(Object a, Object b)
 {
-    return (a.type != b.type && a.type != T_none && b.type != T_none) &&
+    return (a.type != T_none && b.type != T_none) &&
            CheckCollisionCircles(a.position, a.radius, b.position, b.radius);
 }
 
@@ -82,6 +83,8 @@ Objid InitObject(ObjType type, ObjSubType subType)
         {
             currentState.objects[i].type = type;
             currentState.objects[i].subType = subType;
+            currentState.objects[i].isColliding = false;
+            currentState.objects[i].duration = 0.0;
             ++currentState.activeObjects;
             if (type == T_enemy)
                 ++currentState.totalEnemies;
@@ -133,8 +136,6 @@ void FireBullet(double duration)
     currentState.objects[boid].color = BLUE;
     currentState.objects[boid].radius = 4;
     currentState.objects[boid].sides = 10;
-    // TraceLog(LOG_INFO, "bullet fired with (%f, %f) with direction: (%f,%f)",
-    // playerTip.x, playerTip.y, player->vel.x, player->vel.y);
 }
 
 void InitPlayer(void)
@@ -159,7 +160,7 @@ void InitEnemies(void)
     // InitObject()
     for (i = 1; i < TOTAL_ENEMIES + 1 && currentState.totalEnemies <= TOTAL_ENEMIES; ++i)
     {
-        Objid objid = InitObject(T_enemy, OS_attacker);
+        Objid objid = InitObject(T_enemy, (ObjSubType)GetRandomValue(0, 2));
         if (objid == NULL)
             TraceLog(LOG_FATAL, "failed allocating enemy object");
 
@@ -172,6 +173,7 @@ void InitEnemies(void)
         currentState.objects[objid].color = PURPLE;
         currentState.objects[objid].sides = GetRandomValue(1, 10);
         currentState.objects[objid].speedMultiplier = 1.1;
+        currentState.objects[objid].duration = 1.0;
 
         // Prevent a newly spawn enemy to collide with the player
         while (CheckCollisionBetweenObjects(*currentState.player, currentState.objects[objid])) {
@@ -197,6 +199,21 @@ void InitGame(void)
     InitObjects();
     InitPlayer();
     InitEnemies();
+}
+
+void CaptureMouseWithinWindow(void)
+{
+    // added an extra 20 pixels to prevent the mouse to bounce out of
+    // the window, not sure if this the right thing to do, was the
+    // simplest work around I found
+    if (WINDOW_WIDTH - 20 < GetMouseX())
+        SetMousePosition(WINDOW_WIDTH-20, GetMouseY());
+    if (20 >= GetMouseX())
+        SetMousePosition(20, GetMouseY());
+    if (20 >= GetMouseY())
+        SetMousePosition(GetMouseX(), 0);
+    if (WINDOW_HEIGHT - 20 <= GetMouseY())
+        SetMousePosition(GetMouseX(), WINDOW_HEIGHT - 20);
 }
 
 void ProcessPlayingInput(void)
@@ -248,16 +265,6 @@ void ProcessPlayingInput(void)
     {
         FireBullet(1.0);
     }
-
-    // capture the mouse within the window
-    if (WINDOW_WIDTH < GetMouseX())
-        SetMousePosition(WINDOW_WIDTH, GetMouseY());
-    if (0 >= GetMouseX())
-        SetMousePosition(0, GetMouseY());
-    if (0 >= GetMouseY())
-        SetMousePosition(GetMouseX(), 0);
-    if (WINDOW_HEIGHT <= GetMouseY())
-        SetMousePosition(GetMouseX(), WINDOW_HEIGHT);
 }
 
 void ProcessInput(void)
@@ -265,6 +272,7 @@ void ProcessInput(void)
     switch (currentState.status)
     {
     case S_playing:
+        CaptureMouseWithinWindow();
         ProcessPlayingInput();
         break;
     default:
@@ -369,14 +377,41 @@ void UpdatePlayingGameState(void)
         case T_none:
             continue;
             break;
-        case T_enemy:
-            // TODO implement proper AI / logic to move and attack the player
+        case T_enemy: {
+            Object *enemy = &currentState.objects[i];
+            Vector2 otherEnemyPos = {0};
+            // Todo implement proper AI / logic to move and attack the player
             // this is not a good experience, we need to find a way to make it
             // feel more real, now is like converging all T_enemies attacker into one point
-            currentState.objects[i].rotation += GetRandomValue(-10, 10);
-            SetObjectDirAndSpeed(&currentState.objects[i], currentState.player->position);
-            MoveObject(&currentState.objects[i]);
+            enemy->rotation += GetRandomValue(-10, 10);
+            if (enemy->subType == OS_attacker)
+            {
+                for (j = 1; j < MAX_OBJECTS; ++j)
+                {
+                    if (j == i || j == currentState.poid || currentState.objects[j].type != T_enemy)
+                        continue;
+                    // this should only be two enemies
+                    if (CheckCollisionBetweenObjects(*enemy, currentState.objects[j]))
+                    {
+                        enemy->isColliding = true;
+                        enemy->timeVisible = GetTime() + enemy->duration;
+                        otherEnemyPos = currentState.objects[j].position;
+                        break;
+                    }
+                }
+
+                if (enemy->isColliding && enemy->timeVisible >= GetTime())
+                {
+                    SetObjectDirAndSpeed(enemy, Vector2Multiply(otherEnemyPos, (Vector2){1.0, -1.0}));
+                } else
+                {
+                    enemy->isColliding = false;
+                    SetObjectDirAndSpeed(enemy, currentState.player->position);
+                }
+                MoveObject(enemy);
+            }
             break;
+        }
         case T_bullet:
             MoveObject(&currentState.objects[i]);
 
@@ -389,7 +424,7 @@ void UpdatePlayingGameState(void)
 
             for (j = 1; j < MAX_OBJECTS; ++j)
             {
-                if (j == i || j == currentState.poid)
+                if (j == i || j == currentState.poid || currentState.objects[i].type == currentState.objects[j].type)
                     continue;
                 if (CheckCollisionBetweenObjects(currentState.objects[i], currentState.objects[j]))
                 {
