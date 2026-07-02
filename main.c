@@ -9,6 +9,7 @@
 
 #define MAX_OBJECTS 32000
 #define TOTAL_ENEMIES 20
+#define ENEMY_COLLISION_REFLECT_SCALE 0.55f
 
 #define NULL 0
 
@@ -70,8 +71,7 @@ CurrentState currentState = {0};
 
 int CheckCollisionBetweenObjects(Object a, Object b)
 {
-    return (a.type != T_none && b.type != T_none) &&
-           CheckCollisionCircles(a.position, a.radius, b.position, b.radius);
+    return (a.type != T_none && b.type != T_none) && CheckCollisionCircles(a.position, a.radius, b.position, b.radius);
 }
 
 Objid InitObject(ObjType type, ObjSubType subType)
@@ -132,7 +132,8 @@ void FireBullet(double duration)
     currentState.objects[boid].timeVisible = GetTime() + currentState.objects[boid].duration;
     currentState.objects[boid].position = playerTip;
     currentState.objects[boid].speedMultiplier = 3.0;
-    currentState.objects[boid].vel = Vector2Multiply(vel, (Vector2){currentState.objects[boid].speedMultiplier, currentState.objects[boid].speedMultiplier});
+    currentState.objects[boid].vel = Vector2Multiply(
+        vel, (Vector2){currentState.objects[boid].speedMultiplier, currentState.objects[boid].speedMultiplier});
     currentState.objects[boid].color = BLUE;
     currentState.objects[boid].radius = 4;
     currentState.objects[boid].sides = 10;
@@ -153,6 +154,14 @@ void InitPlayer(void)
     currentState.player->vel = (Vector2){10, 7};
 }
 
+void SpawnObject(Objid objid)
+{
+    currentState.objects[objid].position.x =
+        GetRandomValue(0 + currentState.objects[objid].radius, WINDOW_WIDTH - currentState.objects[objid].radius);
+    currentState.objects[objid].position.y =
+        GetRandomValue(0 + currentState.objects[objid].radius, WINDOW_HEIGHT - currentState.objects[objid].radius);
+}
+
 void InitEnemies(void)
 {
     int i;
@@ -165,23 +174,18 @@ void InitEnemies(void)
             TraceLog(LOG_FATAL, "failed allocating enemy object");
 
         currentState.objects[objid].radius = GetRandomValue(8, 15);
-        currentState.objects[objid].position.x =
-            GetRandomValue(0 + currentState.objects[objid].radius, WINDOW_WIDTH - currentState.objects[objid].radius);
-        currentState.objects[objid].position.y =
-            GetRandomValue(0 + currentState.objects[objid].radius, WINDOW_HEIGHT - currentState.objects[objid].radius);
         currentState.objects[objid].rotation = 0;
         currentState.objects[objid].color = PURPLE;
         currentState.objects[objid].sides = GetRandomValue(1, 10);
         currentState.objects[objid].speedMultiplier = 1.1;
-        currentState.objects[objid].duration = 1.0;
+        currentState.objects[objid].duration = 2.0;
 
         // Prevent a newly spawn enemy to collide with the player
-        while (CheckCollisionBetweenObjects(*currentState.player, currentState.objects[objid])) {
-            currentState.objects[objid].position.x =
-            GetRandomValue(0 + currentState.objects[objid].radius, WINDOW_WIDTH - currentState.objects[objid].radius);
-        currentState.objects[objid].position.y =
-            GetRandomValue(0 + currentState.objects[objid].radius, WINDOW_HEIGHT - currentState.objects[objid].radius);
-       }
+        SpawnObject(objid);
+        while (CheckCollisionBetweenObjects(*currentState.player, currentState.objects[objid]))
+        {
+            SpawnObject(objid);
+        }
     }
 }
 
@@ -203,17 +207,32 @@ void InitGame(void)
 
 void CaptureMouseWithinWindow(void)
 {
-    // added an extra 20 pixels to prevent the mouse to bounce out of
+    // added an extra 5 pixels to prevent the mouse to bounce out of
     // the window, not sure if this the right thing to do, was the
     // simplest work around I found
-    if (WINDOW_WIDTH - 20 < GetMouseX())
-        SetMousePosition(WINDOW_WIDTH-20, GetMouseY());
-    if (20 >= GetMouseX())
-        SetMousePosition(20, GetMouseY());
-    if (20 >= GetMouseY())
+    if (WINDOW_WIDTH - 5 < GetMouseX())
+        SetMousePosition(WINDOW_WIDTH - 5, GetMouseY());
+    if (5 >= GetMouseX())
+        SetMousePosition(5, GetMouseY());
+    if (5 >= GetMouseY())
         SetMousePosition(GetMouseX(), 0);
-    if (WINDOW_HEIGHT - 20 <= GetMouseY())
-        SetMousePosition(GetMouseX(), WINDOW_HEIGHT - 20);
+    if (WINDOW_HEIGHT - 5 <= GetMouseY())
+        SetMousePosition(GetMouseX(), WINDOW_HEIGHT - 5);
+}
+
+void WrapObjectPosition(Object *obj)
+{
+    if (obj->position.x < 0)
+        obj->position.x = WINDOW_WIDTH;
+
+    if (obj->position.x > WINDOW_WIDTH)
+        obj->position.x = 0;
+
+    if (obj->position.y > WINDOW_HEIGHT)
+        obj->position.y = 0;
+
+    if (obj->position.y < 0)
+        obj->position.y = WINDOW_HEIGHT;
 }
 
 void ProcessPlayingInput(void)
@@ -228,38 +247,24 @@ void ProcessPlayingInput(void)
     if (IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT))
     {
         currentState.player->position.x -= currentState.player->vel.x;
-        if (currentState.player->position.x < 0)
-        {
-            currentState.player->position.x = WINDOW_WIDTH;
-        }
     }
 
     if (IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT))
     {
         currentState.player->position.x += currentState.player->vel.x;
-        if (currentState.player->position.x > WINDOW_WIDTH)
-        {
-            currentState.player->position.x = 0;
-        }
     }
 
     if (IsKeyDown(KEY_S) || IsKeyDown(KEY_DOWN))
     {
         currentState.player->position.y += currentState.player->vel.y;
-        if (currentState.player->position.y > WINDOW_HEIGHT)
-        {
-            currentState.player->position.y = 0;
-        }
     }
 
     if (IsKeyDown(KEY_W) || IsKeyDown(KEY_UP))
     {
         currentState.player->position.y -= currentState.player->vel.y;
-        if (currentState.player->position.y < 0)
-        {
-            currentState.player->position.y = WINDOW_HEIGHT;
-        }
     }
+
+    WrapObjectPosition(currentState.player);
 
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
     {
@@ -360,7 +365,8 @@ void MoveObject(Object *obj)
 
 void SetObjectDirAndSpeed(Object *obj, Vector2 to)
 {
-    obj->vel = Vector2Multiply(GetOrientationVector(obj->position, to), (Vector2){ obj->speedMultiplier, obj->speedMultiplier});
+    obj->vel =
+        Vector2Multiply(GetOrientationVector(obj->position, to), (Vector2){obj->speedMultiplier, obj->speedMultiplier});
 }
 
 void UpdatePlayingGameState(void)
@@ -379,7 +385,6 @@ void UpdatePlayingGameState(void)
             break;
         case T_enemy: {
             Object *enemy = &currentState.objects[i];
-            Vector2 otherEnemyPos = {0};
             // Todo implement proper AI / logic to move and attack the player
             // this is not a good experience, we need to find a way to make it
             // feel more real, now is like converging all T_enemies attacker into one point
@@ -395,25 +400,30 @@ void UpdatePlayingGameState(void)
                     {
                         enemy->isColliding = true;
                         enemy->timeVisible = GetTime() + enemy->duration;
-                        otherEnemyPos = currentState.objects[j].position;
+
+                        Vector2 normal = Vector2Normalize(Vector2Subtract(enemy->position, currentState.objects[j].position));
+                        Vector2 relativeVel = Vector2Subtract(enemy->vel, currentState.objects[j].vel);
+                        Vector2 reflctVel = Vector2Reflect(relativeVel, normal);
+
+                        enemy->vel = Vector2Scale(reflctVel, -ENEMY_COLLISION_REFLECT_SCALE);
+                        currentState.objects[j].vel = Vector2Scale(reflctVel, ENEMY_COLLISION_REFLECT_SCALE);
                         break;
                     }
                 }
 
-                if (enemy->isColliding && enemy->timeVisible >= GetTime())
-                {
-                    SetObjectDirAndSpeed(enemy, Vector2Multiply(otherEnemyPos, (Vector2){1.0, -1.0}));
-                } else
+                if (!enemy->isColliding || !(enemy->timeVisible >= GetTime()))
                 {
                     enemy->isColliding = false;
                     SetObjectDirAndSpeed(enemy, currentState.player->position);
                 }
                 MoveObject(enemy);
+                WrapObjectPosition(&currentState.objects[i]);
             }
             break;
         }
         case T_bullet:
             MoveObject(&currentState.objects[i]);
+            WrapObjectPosition(&currentState.objects[i]);
 
             // destroy the bullet
             if (currentState.objects[i].timeVisible < timeNow)
