@@ -340,19 +340,24 @@ void Render(void)
     case S_playing:
         DrawPlaying();
         break;
-    case S_lose:
+    case S_lose: {
+        const char *score_text = TextFormat("YOUR SCORE WAS: %2i", currentState.score);
+        DrawText(score_text, WINDOW_WIDTH / 2.0 - MeasureText(score_text, 20), WINDOW_HEIGHT / 2 - 100, 20, RED);
         DrawText("YOU LOOSED", WINDOW_WIDTH / 2.0 - MeasureText("YOU LOOSED", 30), WINDOW_HEIGHT / 2 - 40, 60, RED);
         DrawText("Press [SPACE] to start again",
                  WINDOW_WIDTH / 2.0 - MeasureText("Press [SPACE] to start again", 30) / 2.0, WINDOW_HEIGHT / 2.0 + 30,
                  30, RED);
         break;
-    case S_win:
+    }
+    case S_win: {
+        const char *score_text = TextFormat("YOUR SCORE WAS: %2i", currentState.score);
+        DrawText(score_text, WINDOW_WIDTH / 2.0 - MeasureText(score_text, 20), WINDOW_HEIGHT / 2 - 100, 20, GREEN);
         DrawText("YOU WON", WINDOW_WIDTH / 2.0 - MeasureText("YOU WON", 30), WINDOW_HEIGHT / 2 - 40, 60, GREEN);
         DrawText("Press [SPACE] to start again",
                  WINDOW_WIDTH / 2.0 - MeasureText("Press [SPACE] to start again", 30) / 2.0, WINDOW_HEIGHT / 2.0 + 30,
                  30, GREEN);
         break;
-    }
+    }}
 
     EndDrawing();
 }
@@ -395,13 +400,18 @@ void UpdatePlayingGameState(void)
                 {
                     if (j == i || j == currentState.poid || currentState.objects[j].type != T_enemy)
                         continue;
-                    // this should only be two enemies
+                    // this should only be between two enemies
                     if (CheckCollisionBetweenObjects(*enemy, currentState.objects[j]))
                     {
+                        // we need to tell the object had collied and
+                        // the ammount of time we want him to be in a
+                        // different trajectory than the default one
+                        // (chasing the player)
                         enemy->isColliding = true;
-                        enemy->timeVisible = GetTime() + enemy->duration;
+                        enemy->timeVisible = timeNow + enemy->duration;
 
-                        Vector2 normal = Vector2Normalize(Vector2Subtract(enemy->position, currentState.objects[j].position));
+                        Vector2 normal =
+                            Vector2Normalize(Vector2Subtract(enemy->position, currentState.objects[j].position));
                         Vector2 relativeVel = Vector2Subtract(enemy->vel, currentState.objects[j].vel);
                         Vector2 reflctVel = Vector2Reflect(relativeVel, normal);
 
@@ -411,12 +421,18 @@ void UpdatePlayingGameState(void)
                     }
                 }
 
+                // when we are not colliding we make sure is being set
+                // state to not colliding and also that the attackers
+                // are chasing the player.
                 if (!enemy->isColliding || !(enemy->timeVisible >= GetTime()))
                 {
                     enemy->isColliding = false;
                     SetObjectDirAndSpeed(enemy, currentState.player->position);
                 }
+
                 MoveObject(enemy);
+
+                // if the move out of the window show up in the opposite side.
                 WrapObjectPosition(&currentState.objects[i]);
             }
             break;
