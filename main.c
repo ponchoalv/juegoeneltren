@@ -10,6 +10,9 @@
 #define MAX_OBJECTS 32000
 #define TOTAL_ENEMIES 20
 #define ENEMY_COLLISION_REFLECT_SCALE 0.55f
+#define PLAYER_SPEED 0.5f
+#define MOUSE_MARGIN 20
+
 
 #define NULL 0
 
@@ -151,7 +154,7 @@ void InitPlayer(void)
     currentState.player->rotation = 0;
     currentState.player->sides = 3;
     currentState.player->radius = 20;
-    currentState.player->vel = (Vector2){10, 7};
+    currentState.player->vel = (Vector2){0, 0};
 }
 
 void SpawnObject(Objid objid)
@@ -210,14 +213,18 @@ void CaptureMouseWithinWindow(void)
     // added an extra 5 pixels to prevent the mouse to bounce out of
     // the window, not sure if this the right thing to do, was the
     // simplest work around I found
-    if (WINDOW_WIDTH - 5 < GetMouseX())
-        SetMousePosition(WINDOW_WIDTH - 5, GetMouseY());
-    if (5 >= GetMouseX())
-        SetMousePosition(5, GetMouseY());
-    if (5 >= GetMouseY())
-        SetMousePosition(GetMouseX(), 0);
-    if (WINDOW_HEIGHT - 5 <= GetMouseY())
-        SetMousePosition(GetMouseX(), WINDOW_HEIGHT - 5);
+    int x = GetMouseX();
+    int y = GetMouseY();
+
+    // this logic to capture the mouse is not working properly and make gameplay a bit awkward
+    if (WINDOW_WIDTH - MOUSE_MARGIN < x)
+        SetMousePosition(WINDOW_WIDTH - MOUSE_MARGIN, y);
+    if (MOUSE_MARGIN >= x)
+        SetMousePosition(MOUSE_MARGIN, y);
+    if (MOUSE_MARGIN >= y)
+        SetMousePosition(x, MOUSE_MARGIN);
+    if (WINDOW_HEIGHT - MOUSE_MARGIN <= y)
+        SetMousePosition(x, WINDOW_HEIGHT - MOUSE_MARGIN);
 }
 
 void WrapObjectPosition(Object *obj)
@@ -246,22 +253,22 @@ void ProcessPlayingInput(void)
 
     if (IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT))
     {
-        currentState.player->position.x -= currentState.player->vel.x;
+        currentState.player->vel.x -= PLAYER_SPEED;
     }
 
     if (IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT))
     {
-        currentState.player->position.x += currentState.player->vel.x;
+        currentState.player->vel.x += PLAYER_SPEED;
     }
 
     if (IsKeyDown(KEY_S) || IsKeyDown(KEY_DOWN))
     {
-        currentState.player->position.y += currentState.player->vel.y;
+        currentState.player->vel.y += PLAYER_SPEED;
     }
 
     if (IsKeyDown(KEY_W) || IsKeyDown(KEY_UP))
     {
-        currentState.player->position.y -= currentState.player->vel.y;
+        currentState.player->vel.y -= PLAYER_SPEED;
     }
 
     WrapObjectPosition(currentState.player);
@@ -281,6 +288,7 @@ void ProcessInput(void)
         ProcessPlayingInput();
         break;
     default:
+        CaptureMouseWithinWindow();
         if (IsKeyPressed(KEY_SPACE))
         {
             InitGame();
@@ -465,6 +473,7 @@ void UpdatePlayingGameState(void)
             // currentState.activeObjects);w
             break;
         case T_player:
+            MoveObject(currentState.player);
             for (j = 1; j < MAX_OBJECTS; ++j)
             {
                 // bullest won't destroyed the player for now
