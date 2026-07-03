@@ -250,18 +250,8 @@ void ProcessPlayingInput(void)
     float rot = atan2f(dy, dx) * RAD2DEG;
     Vector2 dirToMouse = GetOrientationVector(currentState.player->position, mousePosition);
     dirToMouse = Vector2Scale(dirToMouse, PLAYER_SPEED);
-    // float rot = -Vector2LineAngle(player->position, mousePosition) * RAD2DEG;
+
     currentState.player->rotation = rot;
-
-    /* if (IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT)) */
-    /* { */
-    /*     currentState.player->vel.x -= PLAYER_SPEED ; */
-    /* } */
-
-    /* if (IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT)) */
-    /* { */
-    /*     currentState.player->vel.x += PLAYER_SPEED; */
-    /* } */
 
     if (IsKeyDown(KEY_S) || IsKeyDown(KEY_DOWN))
     {
