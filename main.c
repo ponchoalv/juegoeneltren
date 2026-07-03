@@ -1,8 +1,8 @@
 #include "raylib.h"
 #include "raymath.h"
 
-#define WINDOW_WIDTH 860
-#define WINDOW_HEIGHT 480
+#define WINDOW_WIDTH 1024
+#define WINDOW_HEIGHT 720
 
 #define WINDOW_CENTRE_H WINDOW_WIDTH / 2
 #define WINDOW_CENTRE_V WINDOW_HEIGHT / 2
@@ -253,12 +253,7 @@ void ProcessPlayingInput(void)
 
     currentState.player->rotation = rot;
 
-    if (IsKeyDown(KEY_S) || IsKeyDown(KEY_DOWN))
-    {
-        currentState.player->vel = Vector2Subtract(currentState.player->vel, dirToMouse);
-    }
-
-    if (IsKeyDown(KEY_W) || IsKeyDown(KEY_UP))
+    if (IsKeyDown(KEY_SPACE))
     {
         currentState.player->vel = Vector2Add(currentState.player->vel, dirToMouse);
     }
