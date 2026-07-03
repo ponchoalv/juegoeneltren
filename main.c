@@ -248,27 +248,29 @@ void ProcessPlayingInput(void)
     float dx = mousePosition.x - currentState.player->position.x;
     float dy = mousePosition.y - currentState.player->position.y;
     float rot = atan2f(dy, dx) * RAD2DEG;
+    Vector2 dirToMouse = GetOrientationVector(currentState.player->position, mousePosition);
+    dirToMouse = Vector2Scale(dirToMouse, PLAYER_SPEED);
     // float rot = -Vector2LineAngle(player->position, mousePosition) * RAD2DEG;
     currentState.player->rotation = rot;
 
-    if (IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT))
-    {
-        currentState.player->vel.x -= PLAYER_SPEED;
-    }
+    /* if (IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT)) */
+    /* { */
+    /*     currentState.player->vel.x -= PLAYER_SPEED ; */
+    /* } */
 
-    if (IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT))
-    {
-        currentState.player->vel.x += PLAYER_SPEED;
-    }
+    /* if (IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT)) */
+    /* { */
+    /*     currentState.player->vel.x += PLAYER_SPEED; */
+    /* } */
 
     if (IsKeyDown(KEY_S) || IsKeyDown(KEY_DOWN))
     {
-        currentState.player->vel.y += PLAYER_SPEED;
+        currentState.player->vel = Vector2Subtract(currentState.player->vel, dirToMouse);
     }
 
     if (IsKeyDown(KEY_W) || IsKeyDown(KEY_UP))
     {
-        currentState.player->vel.y -= PLAYER_SPEED;
+        currentState.player->vel = Vector2Add(currentState.player->vel, dirToMouse);
     }
 
     WrapObjectPosition(currentState.player);
