@@ -11,8 +11,7 @@
 #define TOTAL_ENEMIES 20
 #define ENEMY_COLLISION_REFLECT_SCALE 0.55f
 #define PLAYER_SPEED 0.5f
-#define MOUSE_MARGIN 20
-
+#define MOUSE_MARGIN 30
 
 #define NULL 0
 
@@ -268,14 +267,14 @@ void ProcessPlayingInput(void)
 
 void ProcessInput(void)
 {
+    CaptureMouseWithinWindow();
+
     switch (currentState.status)
     {
     case S_playing:
-        CaptureMouseWithinWindow();
         ProcessPlayingInput();
         break;
     default:
-        CaptureMouseWithinWindow();
         if (IsKeyPressed(KEY_SPACE))
         {
             InitGame();
@@ -352,7 +351,8 @@ void Render(void)
                  WINDOW_WIDTH / 2.0 - MeasureText("Press [SPACE] to start again", 30) / 2.0, WINDOW_HEIGHT / 2.0 + 30,
                  30, GREEN);
         break;
-    }}
+    }
+    }
 
     EndDrawing();
 }
