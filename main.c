@@ -543,5 +543,11 @@ int main(void)
  * TODO(3): Make the game available for other platforms, thinking on
  *          Web and mobile. But I would start with web now.
  *
- * TODO(43423): Add sound support.
+ * TODO(4): Add sound support.
+ *
+ * TODO(5): Define more clear modules and expose them in their
+ *          respective header files, like, player.h, enemies.h, etc. and maybe
+ *          implement the logic within the same file by using the stb single
+ *          header strategy, this will allow me to define different constants
+ *          for prototyping different gameplay, etc behind gates
  */
