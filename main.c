@@ -14,8 +14,6 @@
 #define PLAYER_SPEED 0.5f
 #define MOUSE_MARGIN 30
 
-#define NULL 0
-
 #define SHOW_FPS
 
 
@@ -24,47 +22,6 @@ CurrentState currentState = {0};
 int CheckCollisionBetweenObjects(Object a, Object b)
 {
     return (a.type != T_none && b.type != T_none) && CheckCollisionCircles(a.position, a.radius, b.position, b.radius);
-}
-
-Objid InitObject(ObjType type, ObjSubType subType)
-{
-    int i;
-    for (i = 1; i < MAX_OBJECTS; ++i)
-    {
-        if (currentState.objects[i].type == T_none)
-        {
-            currentState.objects[i].type = type;
-            currentState.objects[i].subType = subType;
-            currentState.objects[i].isColliding = false;
-            currentState.objects[i].duration = 0.0;
-            ++currentState.activeObjects;
-            if (type == T_enemy)
-                ++currentState.totalEnemies;
-            return i;
-        }
-    }
-    return NULL;
-}
-
-void DestroyObject(Objid objid)
-{
-    if (objid < MAX_OBJECTS)
-    {
-        if (currentState.objects[objid].type == T_enemy)
-            --currentState.totalEnemies;
-        currentState.objects[objid].type = T_none;
-        --currentState.activeObjects;
-    }
-}
-
-void InitObjects(void)
-{
-    int i;
-    // 0 is null / not allocated
-    for (i = 1; i < MAX_OBJECTS; ++i)
-    {
-        currentState.objects[i].type = T_none;
-    }
 }
 
 Vector2 GetOrientationVector(Vector2 from, Vector2 to)
@@ -79,7 +36,7 @@ void FireBullet(double duration)
 
     Vector2 vel = GetOrientationVector(currentState.player->position, mousePosition);
 
-    Objid boid = InitObject(T_bullet, OS_none);
+    Objid boid = InitObject(&currentState, T_bullet, OS_none);
     currentState.objects[boid].duration = duration;
     currentState.objects[boid].timeVisible = GetTime() + currentState.objects[boid].duration;
     currentState.objects[boid].position = playerTip;
@@ -93,7 +50,7 @@ void FireBullet(double duration)
 
 void InitPlayer(void)
 {
-    currentState.poid = InitObject(T_player, OS_none);
+    currentState.poid = InitObject(&currentState, T_player, OS_none);
     if (currentState.poid == NULL)
         TraceLog(LOG_FATAL, "failed allocating player object");
     currentState.player = &currentState.objects[currentState.poid];
@@ -121,7 +78,7 @@ void InitEnemies(void)
     // InitObject()
     for (i = 1; i < TOTAL_ENEMIES + 1 && currentState.totalEnemies <= TOTAL_ENEMIES; ++i)
     {
-        Objid objid = InitObject(T_enemy, (ObjSubType)GetRandomValue(0, 2));
+        Objid objid = InitObject(&currentState, T_enemy, (ObjSubType)GetRandomValue(0, 2));
         if (objid == NULL)
             TraceLog(LOG_FATAL, "failed allocating enemy object");
 
@@ -152,7 +109,7 @@ void InitGame(void)
 
     // here we create all the object.
     // this objects should be visible during playing status.
-    InitObjects();
+    InitObjects(&currentState);
     InitPlayer();
     InitEnemies();
 }
@@ -389,7 +346,7 @@ void UpdatePlayingGameState(void)
             // destroy the bullet
             if (currentState.objects[i].timeVisible < timeNow)
             {
-                DestroyObject(i);
+                DestroyObject(&currentState, i);
                 continue;
             }
 
@@ -399,8 +356,8 @@ void UpdatePlayingGameState(void)
                     continue;
                 if (CheckCollisionBetweenObjects(currentState.objects[i], currentState.objects[j]))
                 {
-                    DestroyObject(i);
-                    DestroyObject(j);
+                    DestroyObject(&currentState, i);
+                    DestroyObject(&currentState, j );
                     ++currentState.score;
                     break;
                 }

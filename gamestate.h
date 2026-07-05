@@ -1,6 +1,7 @@
 #ifndef _H_GAME_STATE_
 #define _H_GAME_STATE_
 #define MAX_OBJECTS 32000
+#define NULL 0
 
 typedef enum
 {
@@ -53,5 +54,46 @@ typedef struct CurrentState
     int score;
     int totalEnemies;
 } CurrentState;
+
+Objid InitObject(CurrentState *currentState, ObjType type, ObjSubType subType)
+{
+    int i;
+    for (i = 1; i < MAX_OBJECTS; ++i)
+    {
+        if (currentState->objects[i].type == T_none)
+        {
+            currentState->objects[i].type = type;
+            currentState->objects[i].subType = subType;
+            currentState->objects[i].isColliding = false;
+            currentState->objects[i].duration = 0.0;
+            ++currentState->activeObjects;
+            if (type == T_enemy)
+                ++currentState->totalEnemies;
+            return i;
+        }
+    }
+    return NULL;
+}
+
+void DestroyObject(CurrentState *currentState, Objid objid)
+{
+    if (objid < MAX_OBJECTS)
+    {
+        if (currentState->objects[objid].type == T_enemy)
+            --currentState->totalEnemies;
+        currentState->objects[objid].type = T_none;
+        --currentState->activeObjects;
+    }
+}
+
+void InitObjects(CurrentState *currentState)
+{
+    int i;
+    // 0 is null / not allocated
+    for (i = 1; i < MAX_OBJECTS; ++i)
+    {
+        currentState->objects[i].type = T_none;
+    }
+}
 
 #endif
