@@ -1,5 +1,7 @@
-#include "raylib.h"
-#include "raymath.h"
+#include <raylib.h>
+#include <raymath.h>
+
+#include "gamestate.h"
 
 #define WINDOW_WIDTH 1024
 #define WINDOW_HEIGHT 720
@@ -7,7 +9,6 @@
 #define WINDOW_CENTRE_H WINDOW_WIDTH / 2
 #define WINDOW_CENTRE_V WINDOW_HEIGHT / 2
 
-#define MAX_OBJECTS 32000
 #define TOTAL_ENEMIES 20
 #define ENEMY_COLLISION_REFLECT_SCALE 0.55f
 #define PLAYER_SPEED 0.5f
@@ -17,57 +18,6 @@
 
 #define SHOW_FPS
 
-typedef enum
-{
-    T_none,
-    T_player,
-    T_enemy,
-    T_bullet
-} ObjType;
-
-typedef enum
-{
-    OS_none,
-    OS_attacker,
-    OS_camper
-} ObjSubType;
-
-typedef struct Object
-{
-    Vector2 position;
-    float rotation;
-    ObjType type;
-    Color color;
-    int sides;
-    int radius;
-    Vector2 vel;
-    bool isColliding;
-    double timeVisible;
-    double duration;
-    float speedMultiplier;
-    int isVisible;
-    ObjSubType subType;
-} Object;
-
-typedef enum
-{
-    S_playing,
-    S_lose,
-    S_win
-} GameState;
-
-typedef int Objid;
-
-typedef struct CurrentState
-{
-    int activeObjects;
-    GameState status;
-    Object *player;
-    Object objects[MAX_OBJECTS];
-    Objid poid;
-    int score;
-    int totalEnemies;
-} CurrentState;
 
 CurrentState currentState = {0};
 

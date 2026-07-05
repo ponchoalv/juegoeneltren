@@ -25,7 +25,7 @@
 #define BUILD_FOLDER "build/"
 #define SRC_FOLDER "./"
 #define DEPS "./deps/"
-#define RAYLIB_STATIC DEPS "libraylib.a"
+#define INCL_FOLDER DEPS "include/"
 
 int main(int argc, char **argv)
 {
@@ -69,13 +69,13 @@ int main(int argc, char **argv)
     /// "clang", "-std=c99", "-Wall", "-Wextra", "-Wpedantic", "-framework", "CoreVideo", "-framework", "IOKit",
     /// "-framework", "Cocoa", "-framework", "GLUT", "-framework", "OpenGL", "libraylib.a", "main.c", "-o",
     /// "build/juego_en_el_tren"
-    nob_cmd_append(&cmd, "clang", "-std=c99", "-Wall", "-Wextra", "-Wpedantic", "-framework", "CoreVideo", "-framework",
-                   "IOKit", "-framework", "Cocoa", "-framework", "GLUT", "-framework", "OpenGL", RAYLIB_STATIC,
+    nob_cmd_append(&cmd, "clang", "-std=c99", "-Wall", "-Wextra", "-Wpedantic", "-I" INCL_FOLDER, "-L" DEPS, "-framework", "CoreVideo", "-framework",
+                   "IOKit", "-framework", "Cocoa", "-framework", "GLUT", "-framework", "OpenGL", "-lraylib",
                    SRC_FOLDER "main.c", "-o", BUILD_FOLDER "juego_en_el_tren");
 #else
     // On MSVC
-    nob_cmd_append(&cmd, "cl", "-std=c99", "-Wall", "-Wextra", "-Wpedantic", "-framework", "CoreVideo", "-framework",
-                   "IOKit", "-framework", "Cocoa", "-framework", "GLUT", "-framework", "OpenGL", RAYLIB_STATIC,
+    nob_cmd_append(&cmd, "cl", "-std=c99", "-Wall", "-Wextra", "-Wpedantic", "-I" INCL_FOLDER, "-L" DEPS, "-framework", "CoreVideo", "-framework",
+                   "IOKit", "-framework", "Cocoa", "-framework", "GLUT", "-framework", "OpenGL", "-lraylib",
                    SRC_FOLDER "main.c", "-o", BUILD_FOLDER "juego_en_el_tren");
 #endif // _MSC_VER
 
@@ -99,9 +99,9 @@ int main(int argc, char **argv)
             // I can see one problem  here which is the need of changes
             // in the  path builders  if we change  the SRC_FOLDER  in the
             // future, and thats not great
-            nob_cmd_append(&cmd, "clang", "-g", "-std=c99", "-Wall", "-Wextra", "-Wpedantic", "-framework", "CoreVideo",
+            nob_cmd_append(&cmd, "clang", "-g", "-std=c99", "-Wall", "-Wextra", "-Wpedantic", "-I" INCL_FOLDER, "-L" DEPS, "-framework", "CoreVideo",
                            "-framework", "IOKit", "-framework", "Cocoa", "-framework", "GLUT", "-framework", "OpenGL",
-                           RAYLIB_STATIC, SRC_FOLDER "main.c", "-o", BUILD_FOLDER "juego_en_el_tren");
+                           "-lraylib", SRC_FOLDER "main.c", "-o", BUILD_FOLDER "juego_en_el_tren");
             if (!nob_cmd_run(&cmd))
                 return 1;
 
