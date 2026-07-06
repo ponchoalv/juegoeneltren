@@ -16,7 +16,6 @@
 
 #define SHOW_FPS
 
-
 CurrentState currentState = {0};
 
 int CheckCollisionBetweenObjects(Object a, Object b)
@@ -242,21 +241,21 @@ void Render(void)
         DrawPlaying();
         break;
     case S_lose: {
+        // TODO(): All text here is hardcoded and will need to be adjustable to the screen size / ratio.
         const char *score_text = TextFormat("YOUR SCORE WAS: %2i", currentState.score);
-        DrawText(score_text, WINDOW_WIDTH / 2.0 - MeasureText(score_text, 20), WINDOW_HEIGHT / 2 - 100, 20, RED);
-        DrawText("YOU LOOSED", WINDOW_WIDTH / 2.0 - MeasureText("YOU LOOSED", 30), WINDOW_HEIGHT / 2 - 40, 60, RED);
-        DrawText("Press [SPACE] to start again",
-                 WINDOW_WIDTH / 2.0 - MeasureText("Press [SPACE] to start again", 30) / 2.0, WINDOW_HEIGHT / 2.0 + 30,
-                 30, RED);
+        DrawText(score_text, (WINDOW_WIDTH - MeasureText(score_text, 20)) / 2.0, WINDOW_HEIGHT / 2 - 100, 20, RED);
+        DrawText("YOU LOOSED", (WINDOW_WIDTH - MeasureText("YOU LOOSED", 60)) / 2.0, WINDOW_HEIGHT / 2 - 40, 60, RED);
+        DrawText("Press [SPACE] to start again", (WINDOW_WIDTH - MeasureText("Press [SPACE] to start again", 30)) / 2.0,
+                 WINDOW_HEIGHT / 2.0 + 30, 30, RED);
         break;
     }
     case S_win: {
+        // TODO(): All text here is hardcoded and will need to be adjustable to the screen size / ratio.
         const char *score_text = TextFormat("YOUR SCORE WAS: %2i", currentState.score);
-        DrawText(score_text, WINDOW_WIDTH / 2.0 - MeasureText(score_text, 20), WINDOW_HEIGHT / 2 - 100, 20, GREEN);
-        DrawText("YOU WON", WINDOW_WIDTH / 2.0 - MeasureText("YOU WON", 30), WINDOW_HEIGHT / 2 - 40, 60, GREEN);
-        DrawText("Press [SPACE] to start again",
-                 WINDOW_WIDTH / 2.0 - MeasureText("Press [SPACE] to start again", 30) / 2.0, WINDOW_HEIGHT / 2.0 + 30,
-                 30, GREEN);
+        DrawText(score_text, (WINDOW_WIDTH - MeasureText(score_text, 20)) / 2.0, WINDOW_HEIGHT / 2 - 100, 20, GREEN);
+        DrawText("YOU WON", (WINDOW_WIDTH - MeasureText("YOU WON", 60)) / 2.0, WINDOW_HEIGHT / 2 - 40, 60, GREEN);
+        DrawText("Press [SPACE] to start again", (WINDOW_WIDTH - MeasureText("Press [SPACE] to start again", 30)) / 2.0,
+                 WINDOW_HEIGHT / 2.0 + 30, 30, GREEN);
         break;
     }
     }
@@ -357,7 +356,7 @@ void UpdatePlayingGameState(void)
                 if (CheckCollisionBetweenObjects(currentState.objects[i], currentState.objects[j]))
                 {
                     DestroyObject(&currentState, i);
-                    DestroyObject(&currentState, j );
+                    DestroyObject(&currentState, j);
                     ++currentState.score;
                     break;
                 }
