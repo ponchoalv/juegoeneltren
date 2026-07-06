@@ -3,9 +3,6 @@
 
 #include "gamestate.h"
 
-#define WINDOW_WIDTH 1024
-#define WINDOW_HEIGHT 720
-
 #define WINDOW_CENTRE_H WINDOW_WIDTH / 2
 #define WINDOW_CENTRE_V WINDOW_HEIGHT / 2
 
@@ -63,14 +60,6 @@ void InitPlayer(void)
     currentState.player->sides = 3;
     currentState.player->radius = 20;
     currentState.player->vel = (Vector2){0, 0};
-}
-
-void SetRandomObjectPosition(Object *obj)
-{
-    obj->position.x =
-        GetRandomValue(0 + obj->radius, WINDOW_WIDTH - obj->radius);
-    obj->position.y =
-        GetRandomValue(0 + obj->radius, WINDOW_HEIGHT - obj->radius);
 }
 
 void InitEnemies(void)
@@ -133,21 +122,6 @@ void CaptureMouseWithinWindow(void)
         SetMousePosition(x, MOUSE_MARGIN);
     if (WINDOW_HEIGHT - MOUSE_MARGIN <= y)
         SetMousePosition(x, WINDOW_HEIGHT - MOUSE_MARGIN);
-}
-
-void WrapObjectPosition(Object *obj)
-{
-    if (obj->position.x < 0)
-        obj->position.x = WINDOW_WIDTH;
-
-    if (obj->position.x > WINDOW_WIDTH)
-        obj->position.x = 0;
-
-    if (obj->position.y > WINDOW_HEIGHT)
-        obj->position.y = 0;
-
-    if (obj->position.y < 0)
-        obj->position.y = WINDOW_HEIGHT;
 }
 
 void ProcessPlayingInput(void)
@@ -247,7 +221,7 @@ void Render(void)
         // TODO(): All text here is hardcoded and will need to be adjustable to the screen size / ratio.
         const char *score_text = TextFormat("YOUR SCORE WAS: %2i", currentState.score);
         DrawText(score_text, (WINDOW_WIDTH - MeasureText(score_text, 20)) / 2.0, WINDOW_HEIGHT / 2 - 100, 20, RED);
-        DrawText("YOU LOOSED", (WINDOW_WIDTH - MeasureText("YOU LOOSED", 60)) / 2.0, WINDOW_HEIGHT / 2 - 40, 60, RED);
+        DrawText("YOU LOST", (WINDOW_WIDTH - MeasureText("YOU LOST", 60)) / 2.0, WINDOW_HEIGHT / 2 - 40, 60, RED);
         DrawText("Press [SPACE] to start again", (WINDOW_WIDTH - MeasureText("Press [SPACE] to start again", 30)) / 2.0,
                  WINDOW_HEIGHT / 2.0 + 30, 30, RED);
         break;
