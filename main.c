@@ -28,6 +28,9 @@ Vector2 GetOrientationVector(Vector2 from, Vector2 to)
     return Vector2Normalize(((Vector2){to.x - from.x, to.y - from.y}));
 }
 
+
+// I think we need to re-think this to also take into account the current speed of the player
+// TODO(player): Tale into account the currnt speed to calculate the speed the bullet will have once fired (vel).
 void FireBullet(double duration)
 {
     Vector2 mousePosition = GetMousePosition();
@@ -62,12 +65,12 @@ void InitPlayer(void)
     currentState.player->vel = (Vector2){0, 0};
 }
 
-void SpawnObject(Objid objid)
+void SetRandomObjectPosition(Object *obj)
 {
-    currentState.objects[objid].position.x =
-        GetRandomValue(0 + currentState.objects[objid].radius, WINDOW_WIDTH - currentState.objects[objid].radius);
-    currentState.objects[objid].position.y =
-        GetRandomValue(0 + currentState.objects[objid].radius, WINDOW_HEIGHT - currentState.objects[objid].radius);
+    obj->position.x =
+        GetRandomValue(0 + obj->radius, WINDOW_WIDTH - obj->radius);
+    obj->position.y =
+        GetRandomValue(0 + obj->radius, WINDOW_HEIGHT - obj->radius);
 }
 
 void InitEnemies(void)
@@ -89,10 +92,10 @@ void InitEnemies(void)
         currentState.objects[objid].duration = 2.0;
 
         // Prevent a newly spawn enemy to collide with the player
-        SpawnObject(objid);
+        SetRandomObjectPosition(&currentState.objects[objid]);
         while (CheckCollisionBetweenObjects(*currentState.player, currentState.objects[objid]))
         {
-            SpawnObject(objid);
+            SetRandomObjectPosition(&currentState.objects[objid]);
         }
     }
 }
