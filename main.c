@@ -89,18 +89,18 @@ void InitEnemies(void)
     }
 }
 
-void InitGame(void)
+void SetInitialGameState(CurrentState *currentState)
 {
     // first we reset the state of the game to be in playing mode.
     // then we set the counters to the initial status.
-    currentState.status = S_playing;
-    currentState.activeObjects = 0;
-    currentState.score = 0;
-    currentState.totalEnemies = 0;
+    currentState->status = S_playing;
+    currentState->activeObjects = 0;
+    currentState->score = 0;
+    currentState->totalEnemies = 0;
 
     // here we create all the object.
     // this objects should be visible during playing status.
-    InitObjects(&currentState);
+    InitObjects(currentState);
     InitPlayer();
     InitEnemies();
 }
@@ -160,7 +160,7 @@ void ProcessInput(void)
     default:
         if (IsKeyPressed(KEY_SPACE))
         {
-            InitGame();
+            SetInitialGameState(&currentState);
         }
         break;
     }
@@ -203,6 +203,12 @@ void DrawPlaying(void)
     }
 }
 
+void DrawScoreColor(int score, Color color)
+{
+    const char *score_text = TextFormat("YOUR SCORE WAS: %2i", score);
+    DrawText(score_text, (WINDOW_WIDTH - MeasureText(score_text, 20)) / 2.0, WINDOW_HEIGHT / 2 - 100, 20, color);
+}
+
 void Render(void)
 {
     BeginDrawing();
@@ -219,18 +225,18 @@ void Render(void)
         break;
     case S_lose: {
         // TODO(): All text here is hardcoded and will need to be adjustable to the screen size / ratio.
-        const char *score_text = TextFormat("YOUR SCORE WAS: %2i", currentState.score);
-        DrawText(score_text, (WINDOW_WIDTH - MeasureText(score_text, 20)) / 2.0, WINDOW_HEIGHT / 2 - 100, 20, RED);
-        DrawText("YOU LOST", (WINDOW_WIDTH - MeasureText("YOU LOST", 60)) / 2.0, WINDOW_HEIGHT / 2 - 40, 60, RED);
+        const char *youLost = "YOU LOST";
+        DrawScoreColor(currentState.score, RED);
+        DrawText(youLost, (WINDOW_WIDTH - MeasureText(youLost, 60)) / 2.0, WINDOW_HEIGHT / 2 - 40, 60, RED);
         DrawText("Press [SPACE] to start again", (WINDOW_WIDTH - MeasureText("Press [SPACE] to start again", 30)) / 2.0,
                  WINDOW_HEIGHT / 2.0 + 30, 30, RED);
         break;
     }
     case S_win: {
         // TODO(): All text here is hardcoded and will need to be adjustable to the screen size / ratio.
-        const char *score_text = TextFormat("YOUR SCORE WAS: %2i", currentState.score);
-        DrawText(score_text, (WINDOW_WIDTH - MeasureText(score_text, 20)) / 2.0, WINDOW_HEIGHT / 2 - 100, 20, GREEN);
-        DrawText("YOU WON", (WINDOW_WIDTH - MeasureText("YOU WON", 60)) / 2.0, WINDOW_HEIGHT / 2 - 40, 60, GREEN);
+        const char *youWon = "YOU WON";
+        DrawScoreColor(currentState.score, GREEN);
+        DrawText(youWon, (WINDOW_WIDTH - MeasureText(youWon, 60)) / 2.0, WINDOW_HEIGHT / 2 - 40, 60, GREEN);
         DrawText("Press [SPACE] to start again", (WINDOW_WIDTH - MeasureText("Press [SPACE] to start again", 30)) / 2.0,
                  WINDOW_HEIGHT / 2.0 + 30, 30, GREEN);
         break;
@@ -398,7 +404,7 @@ int main(void)
 {
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Juego en el tren");
     SetTargetFPS(60);
-    InitGame();
+    SetInitialGameState(&currentState);
 
     while (!WindowShouldClose())
     {
