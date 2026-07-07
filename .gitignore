@@ -1,11 +1,11 @@
 build/**
 tags
 TAGS
-/nob.old
-/#nob.c#
-/nob
-deps/nob 
+/buildgame.old
+/buildgame
+deps/nob
+deps/deps
 deps/raylib/**
 deps/libraylib.a
 /deps/raylib/
-/deps/nob.old
+/deps/deps.old

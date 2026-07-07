@@ -256,7 +256,7 @@ void UpdatePlayingGameState(void)
             break;
         case T_player:
             MoveObject(currentState.player);
-            WrapObjectPosition(currentState->player);
+            WrapObjectPosition(currentState.player);
 
             for (j = 1; j < MAX_OBJECTS; ++j)
             {

@@ -49,15 +49,15 @@ int main(int argc, char **argv)
 
     nob_set_current_dir(DEPS);
 
-    if (!nob_file_exists("nob"))
+    if (!nob_file_exists("deps"))
     {
         nob_cc(&cmd);
-        nob_cmd_append(&cmd, "nob.c", "-o", "nob");
+        nob_cmd_append(&cmd, "deps.c", "-o", "deps");
         if (!nob_cmd_run(&cmd))
             return 1;
     }
 
-    nob_cmd_append(&cmd, "./nob");
+    nob_cmd_append(&cmd, "./deps");
     if (!nob_cmd_run(&cmd))
         return 1;
 
