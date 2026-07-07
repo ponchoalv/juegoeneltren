@@ -2,65 +2,14 @@
 #include <raymath.h>
 
 #include "gamestate.h"
-
-#define WINDOW_CENTRE_H WINDOW_WIDTH / 2
-#define WINDOW_CENTRE_V WINDOW_HEIGHT / 2
+#include "player.h"
 
 #define TOTAL_ENEMIES 20
 #define ENEMY_COLLISION_REFLECT_SCALE 0.55f
-#define PLAYER_SPEED 0.5f
-#define MOUSE_MARGIN 30
 
 #define SHOW_FPS
 
 CurrentState currentState = {0};
-
-int CheckCollisionBetweenObjects(Object a, Object b)
-{
-    return (a.type != T_none && b.type != T_none) && CheckCollisionCircles(a.position, a.radius, b.position, b.radius);
-}
-
-Vector2 GetOrientationVector(Vector2 from, Vector2 to)
-{
-    return Vector2Normalize(((Vector2){to.x - from.x, to.y - from.y}));
-}
-
-
-// I think we need to re-think this to also take into account the current speed of the player
-// TODO(player): Tale into account the currnt speed to calculate the speed the bullet will have once fired (vel).
-void FireBullet(double duration)
-{
-    Vector2 mousePosition = GetMousePosition();
-    Vector2 playerTip = Vector2MoveTowards(currentState.player->position, mousePosition, 25);
-
-    Vector2 vel = GetOrientationVector(currentState.player->position, mousePosition);
-
-    Objid boid = InitObject(&currentState, T_bullet, OS_none);
-    currentState.objects[boid].duration = duration;
-    currentState.objects[boid].timeVisible = GetTime() + currentState.objects[boid].duration;
-    currentState.objects[boid].position = playerTip;
-    currentState.objects[boid].speedMultiplier = 3.0;
-    currentState.objects[boid].vel = Vector2Multiply(
-        vel, (Vector2){currentState.objects[boid].speedMultiplier, currentState.objects[boid].speedMultiplier});
-    currentState.objects[boid].color = BLUE;
-    currentState.objects[boid].radius = 4;
-    currentState.objects[boid].sides = 10;
-}
-
-void InitPlayer(void)
-{
-    currentState.poid = InitObject(&currentState, T_player, OS_none);
-    if (currentState.poid == NULL)
-        TraceLog(LOG_FATAL, "failed allocating player object");
-    currentState.player = &currentState.objects[currentState.poid];
-    currentState.player->position.x = WINDOW_CENTRE_H;
-    currentState.player->position.y = WINDOW_CENTRE_V;
-    currentState.player->color = GREEN;
-    currentState.player->rotation = 0;
-    currentState.player->sides = 3;
-    currentState.player->radius = 20;
-    currentState.player->vel = (Vector2){0, 0};
-}
 
 void InitEnemies(void)
 {
@@ -101,51 +50,8 @@ void SetInitialGameState(CurrentState *currentState)
     // here we create all the object.
     // this objects should be visible during playing status.
     InitObjects(currentState);
-    InitPlayer();
+    InitPlayer(currentState);
     InitEnemies();
-}
-
-void CaptureMouseWithinWindow(void)
-{
-    // added an extra 5 pixels to prevent the mouse to bounce out of
-    // the window, not sure if this the right thing to do, was the
-    // simplest work around I found
-    int x = GetMouseX();
-    int y = GetMouseY();
-
-    // this logic to capture the mouse is not working properly and make gameplay a bit awkward
-    if (WINDOW_WIDTH - MOUSE_MARGIN < x)
-        SetMousePosition(WINDOW_WIDTH - MOUSE_MARGIN, y);
-    if (MOUSE_MARGIN >= x)
-        SetMousePosition(MOUSE_MARGIN, y);
-    if (MOUSE_MARGIN >= y)
-        SetMousePosition(x, MOUSE_MARGIN);
-    if (WINDOW_HEIGHT - MOUSE_MARGIN <= y)
-        SetMousePosition(x, WINDOW_HEIGHT - MOUSE_MARGIN);
-}
-
-void ProcessPlayingInput(void)
-{
-    Vector2 mousePosition = GetMousePosition();
-    float dx = mousePosition.x - currentState.player->position.x;
-    float dy = mousePosition.y - currentState.player->position.y;
-    float rot = atan2f(dy, dx) * RAD2DEG;
-    Vector2 dirToMouse = GetOrientationVector(currentState.player->position, mousePosition);
-    dirToMouse = Vector2Scale(dirToMouse, PLAYER_SPEED);
-
-    currentState.player->rotation = rot;
-
-    if (IsKeyDown(KEY_SPACE))
-    {
-        currentState.player->vel = Vector2Add(currentState.player->vel, dirToMouse);
-    }
-
-    WrapObjectPosition(currentState.player);
-
-    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
-    {
-        FireBullet(1.0);
-    }
 }
 
 void ProcessInput(void)
@@ -155,7 +61,7 @@ void ProcessInput(void)
     switch (currentState.status)
     {
     case S_playing:
-        ProcessPlayingInput();
+        ProcessPlayerInput(&currentState);
         break;
     default:
         if (IsKeyPressed(KEY_SPACE))
@@ -350,6 +256,8 @@ void UpdatePlayingGameState(void)
             break;
         case T_player:
             MoveObject(currentState.player);
+            WrapObjectPosition(currentState->player);
+
             for (j = 1; j < MAX_OBJECTS; ++j)
             {
                 // bullest won't destroyed the player for now

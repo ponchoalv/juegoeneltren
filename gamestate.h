@@ -7,6 +7,11 @@
 #define WINDOW_WIDTH 1024
 #define WINDOW_HEIGHT 720
 
+#define WINDOW_CENTRE_H WINDOW_WIDTH / 2
+#define WINDOW_CENTRE_V WINDOW_HEIGHT / 2
+
+#define MOUSE_MARGIN 30
+
 typedef enum
 {
     T_none,
@@ -123,6 +128,35 @@ void SetRandomObjectPosition(Object *obj)
         GetRandomValue(0 + obj->radius, WINDOW_WIDTH - obj->radius);
     obj->position.y =
         GetRandomValue(0 + obj->radius, WINDOW_HEIGHT - obj->radius);
+}
+
+int CheckCollisionBetweenObjects(Object a, Object b)
+{
+    return (a.type != T_none && b.type != T_none) && CheckCollisionCircles(a.position, a.radius, b.position, b.radius);
+}
+
+Vector2 GetOrientationVector(Vector2 from, Vector2 to)
+{
+    return Vector2Normalize(((Vector2){to.x - from.x, to.y - from.y}));
+}
+
+void CaptureMouseWithinWindow(void)
+{
+    // added an extra 5 pixels to prevent the mouse to bounce out of
+    // the window, not sure if this the right thing to do, was the
+    // simplest work around I found
+    int x = GetMouseX();
+    int y = GetMouseY();
+
+    // this logic to capture the mouse is not working properly and make gameplay a bit awkward
+    if (WINDOW_WIDTH - MOUSE_MARGIN < x)
+        SetMousePosition(WINDOW_WIDTH - MOUSE_MARGIN, y);
+    if (MOUSE_MARGIN >= x)
+        SetMousePosition(MOUSE_MARGIN, y);
+    if (MOUSE_MARGIN >= y)
+        SetMousePosition(x, MOUSE_MARGIN);
+    if (WINDOW_HEIGHT - MOUSE_MARGIN <= y)
+        SetMousePosition(x, WINDOW_HEIGHT - MOUSE_MARGIN);
 }
 
 #endif
