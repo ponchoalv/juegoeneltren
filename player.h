@@ -7,6 +7,7 @@
 
 // I think we need to re-think this to also take into account the current speed of the player
 // TODO(player): Tale into account the currnt speed to calculate the speed the bullet will have once fired (vel).
+// Maybe I solve the above TODO, I need to make some testing on top of this
 void FireBullet(CurrentState *currentState, double duration)
 {
     Vector2 mousePosition = GetMousePosition();
@@ -20,7 +21,7 @@ void FireBullet(CurrentState *currentState, double duration)
     currentState->objects[boid].position = playerTip;
     currentState->objects[boid].speedMultiplier = 3.0;
     currentState->objects[boid].vel = Vector2Multiply(
-        vel, (Vector2){currentState->objects[boid].speedMultiplier, currentState->objects[boid].speedMultiplier});
+        vel, (Vector2){currentState->objects[boid].speedMultiplier + fabs(currentState->player->vel.x), currentState->objects[boid].speedMultiplier + fabs(currentState->player->vel.y)});
     currentState->objects[boid].color = BLUE;
     currentState->objects[boid].radius = 4;
     currentState->objects[boid].sides = 10;
