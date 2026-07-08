@@ -21,7 +21,8 @@ void FireBullet(CurrentState *currentState, double duration)
     currentState->objects[boid].position = playerTip;
     currentState->objects[boid].speedMultiplier = 3.0;
     currentState->objects[boid].vel = Vector2Multiply(
-        vel, (Vector2){currentState->objects[boid].speedMultiplier + fabs(currentState->player->vel.x), currentState->objects[boid].speedMultiplier + fabs(currentState->player->vel.y)});
+        vel, (Vector2){currentState->objects[boid].speedMultiplier + fabs(currentState->player->vel.x),
+                       currentState->objects[boid].speedMultiplier + fabs(currentState->player->vel.y)});
     currentState->objects[boid].color = BLUE;
     currentState->objects[boid].radius = 4;
     currentState->objects[boid].sides = 10;
@@ -67,4 +68,5 @@ void ProcessPlayerInput(CurrentState *currentState)
 #endif
 
 // I think we should add the player controller states.
-// Draw(), Input(), FireBullet() (maybe), Collision against enemies? or maybe should be part of how the enemy updates the word? UpdateCurrentState() (but for the player bits?)
+// Draw(), Input(), FireBullet() (maybe), Collision against enemies? or maybe should be part of how the enemy updates
+// the word? UpdateCurrentState() (but for the player bits?)
