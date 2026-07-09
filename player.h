@@ -48,11 +48,11 @@ void ProcessPlayerInput(CurrentState *currentState)
     Vector2 mousePosition = GetMousePosition();
     float dx = mousePosition.x - currentState->player->position.x;
     float dy = mousePosition.y - currentState->player->position.y;
-    float rot = atan2f(dy, dx) * RAD2DEG;
     Vector2 dirToMouse = GetOrientationVector(currentState->player->position, mousePosition);
-    dirToMouse = Vector2Scale(dirToMouse, PLAYER_SPEED);
 
-    currentState->player->rotation = rot;
+    // add a bit of constant speed
+    dirToMouse = Vector2Scale(dirToMouse, PLAYER_SPEED);
+    currentState->player->rotation = atan2f(dy, dx) * RAD2DEG;
 
     if (IsKeyDown(KEY_SPACE))
     {
@@ -70,3 +70,4 @@ void ProcessPlayerInput(CurrentState *currentState)
 // I think we should add the player controller states.
 // Draw(), Input(), FireBullet() (maybe), Collision against enemies? or maybe should be part of how the enemy updates
 // the word? UpdateCurrentState() (but for the player bits?)
+// trying to figure out what to do with the state

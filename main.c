@@ -3,40 +3,14 @@
 
 #include "gamestate.h"
 #include "player.h"
+#include "enemies.h"
 
-#define TOTAL_ENEMIES 20
 #define ENEMY_COLLISION_REFLECT_SCALE 0.55f
 
 #define SHOW_FPS
 
 CurrentState currentState = {0};
 
-void InitEnemies(void)
-{
-    int i;
-    // we leave 0 (or NULL) to return not found / failure to get a new object for
-    // InitObject()
-    for (i = 1; i < TOTAL_ENEMIES + 1 && currentState.totalEnemies <= TOTAL_ENEMIES; ++i)
-    {
-        Objid objid = InitObject(&currentState, T_enemy, (ObjSubType)GetRandomValue(0, 2));
-        if (objid == NULL)
-            TraceLog(LOG_FATAL, "failed allocating enemy object");
-
-        currentState.objects[objid].radius = GetRandomValue(8, 15);
-        currentState.objects[objid].rotation = 0;
-        currentState.objects[objid].color = PURPLE;
-        currentState.objects[objid].sides = GetRandomValue(1, 10);
-        currentState.objects[objid].speedMultiplier = 1.1;
-        currentState.objects[objid].duration = 2.0;
-
-        // Prevent a newly spawn enemy to collide with the player
-        SetRandomObjectPosition(&currentState.objects[objid]);
-        while (CheckCollisionBetweenObjects(*currentState.player, currentState.objects[objid]))
-        {
-            SetRandomObjectPosition(&currentState.objects[objid]);
-        }
-    }
-}
 
 void SetInitialGameState(CurrentState *currentState)
 {
@@ -51,7 +25,7 @@ void SetInitialGameState(CurrentState *currentState)
     // this objects should be visible during playing status.
     InitObjects(currentState);
     InitPlayer(currentState);
-    InitEnemies();
+    InitEnemies(currentState);
 }
 
 void ProcessInput(void)
@@ -167,31 +141,27 @@ void SetObjectDirAndSpeed(Object *obj, Vector2 to)
 void UpdatePlayingGameState(void)
 {
     int i = 1;
-    int j = 1;
-
     double timeNow = GetTime();
 
     for (i = 1; i < MAX_OBJECTS; ++i)
     {
-        switch (currentState.objects[i].type)
+        int j;
+
+        if (currentState.objects[i].type == T_none) continue;
+
+        for (j = i + 1; j < MAX_OBJECTS; j++)
         {
-        case T_none:
-            continue;
-            break;
-        case T_enemy: {
-            Object *enemy = &currentState.objects[i];
-            // Todo implement proper AI / logic to move and attack the player
-            // this is not a good experience, we need to find a way to make it
-            // feel more real, now is like converging all T_enemies attacker into one point
-            enemy->rotation += GetRandomValue(-10, 10);
-            if (enemy->subType == OS_attacker)
+            Object *otherObject = &currentState.objects[j];
+
+            if (otherObject->type == T_none) continue;
+
+            if (CheckCollisionBetweenObjects(currentState.objects[i], *otherObject))
             {
-                for (j = 1; j < MAX_OBJECTS; ++j)
+                if (currentState.objects[i].type == T_enemy)
                 {
-                    if (j == i || j == currentState.poid || currentState.objects[j].type != T_enemy)
-                        continue;
-                    // this should only be between two enemies
-                    if (CheckCollisionBetweenObjects(*enemy, currentState.objects[j]))
+                    Object *enemy = &currentState.objects[i];
+                    // Enemy -> Enemy x
+                    if (otherObject->type == T_enemy)
                     {
                         // we need to tell the object had collied and
                         // the ammount of time we want him to be in a
@@ -207,65 +177,72 @@ void UpdatePlayingGameState(void)
 
                         enemy->vel = Vector2Scale(reflctVel, -ENEMY_COLLISION_REFLECT_SCALE);
                         currentState.objects[j].vel = Vector2Scale(reflctVel, ENEMY_COLLISION_REFLECT_SCALE);
-                        break;
+                    }
+                    else if (otherObject->type == T_player)
+                    {
+                        // Enemy -> payer
+                        currentState.status = S_lose;
+                    }
+                    else if (otherObject->type == T_bullet)
+                    {
+                        // Enemy -> Bullet
+                        DestroyObject(&currentState, j);
+                        DestroyObject(&currentState, i);
+                        ++currentState.score;
                     }
                 }
-
-                // when we are not colliding we make sure is being set
-                // state to not colliding and also that the attackers
-                // are chasing the player.
-                if (!enemy->isColliding || !(enemy->timeVisible >= GetTime()))
+                else if (currentState.objects[i].type == T_player)
                 {
-                    enemy->isColliding = false;
-                    SetObjectDirAndSpeed(enemy, currentState.player->position);
+                    // Player -> Enemy
+                    if (otherObject->type == T_enemy)
+                    {
+                        currentState.status = S_lose;
+                    }
                 }
+                else if (currentState.objects[i].type == T_bullet)
+                {
+                    // Bullet -> Enemy
+                    if (otherObject->type == T_enemy)
+                    {
+                        DestroyObject(&currentState, j);
+                        DestroyObject(&currentState, i);
+                        ++currentState.score;
+                    }
+                }
+            }
+        }
 
-                MoveObject(enemy);
+        MoveObject(&currentState.objects[i]);
+        WrapObjectPosition(&currentState.objects[i]);
 
-                // if the move out of the window show up in the opposite side.
-                WrapObjectPosition(&currentState.objects[i]);
+        switch (currentState.objects[i].type)
+        {
+        case T_enemy: {
+            Object *enemy = &currentState.objects[i];
+            // Todo implement proper AI / logic to move and attack the player
+            // this is not a good experience, we need to find a way to make it
+            // feel more real, now is like converging all T_enemies attacker into one point
+            enemy->rotation += GetRandomValue(-10, 10);
+
+            // when we are not colliding we make sure is being set
+            // state to not colliding and also that the attackers
+            // are chasing the player.
+            if (enemy->subType == OS_attacker && (!enemy->isColliding || !(enemy->timeVisible >= GetTime())))
+            {
+                enemy->isColliding = false;
+                SetObjectDirAndSpeed(enemy, currentState.player->position);
             }
             break;
         }
         case T_bullet:
-            MoveObject(&currentState.objects[i]);
-            WrapObjectPosition(&currentState.objects[i]);
-
             // destroy the bullet
             if (currentState.objects[i].timeVisible < timeNow)
             {
                 DestroyObject(&currentState, i);
-                continue;
-            }
-
-            for (j = 1; j < MAX_OBJECTS; ++j)
-            {
-                if (j == i || j == currentState.poid || currentState.objects[i].type == currentState.objects[j].type)
-                    continue;
-                if (CheckCollisionBetweenObjects(currentState.objects[i], currentState.objects[j]))
-                {
-                    DestroyObject(&currentState, i);
-                    DestroyObject(&currentState, j);
-                    ++currentState.score;
-                    break;
-                }
             }
 
             // TraceLog(LOG_INFO, "currentState.activeObjects %d",
             // currentState.activeObjects);w
-            break;
-        case T_player:
-            MoveObject(currentState.player);
-            WrapObjectPosition(currentState.player);
-
-            for (j = 1; j < MAX_OBJECTS; ++j)
-            {
-                // bullest won't destroyed the player for now
-                if (j == i || currentState.objects[j].type == T_bullet)
-                    continue;
-                if (CheckCollisionBetweenObjects(currentState.objects[j], currentState.objects[i]))
-                    currentState.status = S_lose;
-            }
             break;
         default:
             continue;

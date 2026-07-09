@@ -77,6 +77,7 @@ Objid InitObject(CurrentState *currentState, ObjType type, ObjSubType subType)
             currentState->objects[i].subType = subType;
             currentState->objects[i].isColliding = false;
             currentState->objects[i].duration = 0.0;
+            currentState->objects[i].vel = (Vector2){0,0};
             ++currentState->activeObjects;
             if (type == T_enemy)
                 ++currentState->totalEnemies;
