@@ -147,6 +147,7 @@ void UpdatePlayingGameState(void)
     {
         int j;
 
+        // TODO(gamestate): Move this out to gamestate.
         if (currentState.objects[i].type == T_none) continue;
 
         for (j = i + 1; j < MAX_OBJECTS; j++)
@@ -157,6 +158,7 @@ void UpdatePlayingGameState(void)
 
             if (CheckCollisionBetweenObjects(currentState.objects[i], *otherObject))
             {
+                // TODO(enemy): Maybe this should be moved to a switch case and then the enemy specific logic to a procedure in enemies.h
                 if (currentState.objects[i].type == T_enemy)
                 {
                     Object *enemy = &currentState.objects[i];
@@ -191,6 +193,7 @@ void UpdatePlayingGameState(void)
                         ++currentState.score;
                     }
                 }
+                // TODO(player.h): we should move this to a player file maybe?
                 else if (currentState.objects[i].type == T_player)
                 {
                     // Player -> Enemy
@@ -199,6 +202,7 @@ void UpdatePlayingGameState(void)
                         currentState.status = S_lose;
                     }
                 }
+                // TODO(player): we might need to move this to player.h maybe? not sure though
                 else if (currentState.objects[i].type == T_bullet)
                 {
                     // Bullet -> Enemy
@@ -212,12 +216,14 @@ void UpdatePlayingGameState(void)
             }
         }
 
+        // TODO(gamestate): this should be moved to gamestate.h (along side with this methods)
         MoveObject(&currentState.objects[i]);
         WrapObjectPosition(&currentState.objects[i]);
 
         switch (currentState.objects[i].type)
         {
         case T_enemy: {
+            // TODO(enemies): should move this to enemies.h I think
             Object *enemy = &currentState.objects[i];
             // Todo implement proper AI / logic to move and attack the player
             // this is not a good experience, we need to find a way to make it
@@ -235,6 +241,7 @@ void UpdatePlayingGameState(void)
             break;
         }
         case T_bullet:
+            // TODO(player): we should move this to the player.h
             // destroy the bullet
             if (currentState.objects[i].timeVisible < timeNow)
             {
