@@ -6,6 +6,7 @@
 #include "enemies.h"
 
 #define ENEMY_COLLISION_REFLECT_SCALE 0.55f
+#define NO_LOSE
 
 #define SHOW_FPS
 
@@ -182,7 +183,9 @@ void UpdateStateWithCollisions(CurrentState *currentState, Objid objid, double t
                 else if (otherObject->type == T_bullet)
                 {
                     // Enemy -> Bullet
+#ifdef B_DEBUG
                     TraceLog(LOG_INFO, "bullet impacted Enemy->Bullet");
+#endif
                     DestroyObject(currentState, j);
                     DestroyObject(currentState, objid);
                     ++currentState->score;
@@ -205,7 +208,9 @@ void UpdateStateWithCollisions(CurrentState *currentState, Objid objid, double t
                 // Bullet -> Enemy
                 if (otherObject->type == T_enemy)
                 {
+#ifdef B_DEBUG
                     TraceLog(LOG_INFO, "bullet impacted Bullet->Enemy");
+#endif
                     DestroyObject(currentState, j);
                     DestroyObject(currentState, objid);
                     ++currentState->score;
