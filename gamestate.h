@@ -166,4 +166,85 @@ void CaptureMouseWithinWindow(void)
         SetMousePosition(x, WINDOW_HEIGHT - MOUSE_MARGIN);
 }
 
+void UpdateStateWithCollisions(CurrentState *currentState, Objid objid, double timeNow)
+{
+    int j;
+
+    // TODO(gamestate): Move this out to gamestate.
+    if (currentState->objects[objid].type == T_none) return;
+
+    for (j = objid + 1; j < MAX_OBJECTS; j++)
+    {
+        Object *otherObject = &currentState->objects[j];
+        if (CheckCollisionBetweenObjects(currentState->objects[objid], *otherObject))
+        {
+            // TODO(enemy): Maybe this should be moved to a switch case and then the enemy specific logic to a procedure in enemies.h
+            if (currentState->objects[objid].type == T_enemy)
+            {
+                Object *enemy = &currentState->objects[objid];
+                // Enemy -> Enemy x
+                if (otherObject->type == T_enemy)
+                {
+                    // we need to tell the object had collied and
+                    // the ammount of time we want him to be in a
+                    // different trajectory than the default one
+                    // (chasing the player)
+                    enemy->isColliding = true;
+                    enemy->timeVisible = timeNow + enemy->duration;
+
+                    Vector2 normal =
+                        Vector2Normalize(Vector2Subtract(enemy->position, currentState->objects[j].position));
+                    Vector2 relativeVel = Vector2Subtract(enemy->vel, currentState->objects[j].vel);
+                    Vector2 reflctVel = Vector2Reflect(relativeVel, normal);
+
+                    enemy->vel = Vector2Scale(reflctVel, -ENEMY_COLLISION_REFLECT_SCALE);
+                    currentState->objects[j].vel = Vector2Scale(reflctVel, ENEMY_COLLISION_REFLECT_SCALE);
+                }
+                else if (otherObject->type == T_player)
+                {
+#ifndef NO_LOSE
+                    // Enemy -> payer
+                    currentState->status = S_lose;
+#endif
+                }
+                else if (otherObject->type == T_bullet)
+                {
+                    // Enemy -> Bullet
+#ifdef B_DEBUG
+                    TraceLog(LOG_INFO, "bullet impacted Enemy->Bullet");
+#endif
+                    DestroyObject(currentState, j);
+                    DestroyObject(currentState, objid);
+                    ++currentState->score;
+                }
+            }
+            // TODO(player.h): we should move this to a player file maybe?
+            else if (currentState->objects[objid].type == T_player)
+            {
+                // Player -> Enemy
+                if (otherObject->type == T_enemy)
+                {
+#ifndef NO_LOSE
+                    currentState->status = S_lose;
+#endif
+                }
+            }
+            // TODO(player): we might need to move this to player.h maybe? not sure though
+            else if (currentState->objects[objid].type == T_bullet)
+            {
+                // Bullet -> Enemy
+                if (otherObject->type == T_enemy)
+                {
+#ifdef B_DEBUG
+                    TraceLog(LOG_INFO, "bullet impacted Bullet->Enemy");
+#endif
+                    DestroyObject(currentState, j);
+                    DestroyObject(currentState, objid);
+                    ++currentState->score;
+                }
+            }
+        }
+    }
+}
+
 #endif
