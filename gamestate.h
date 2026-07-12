@@ -141,6 +141,12 @@ Vector2 GetOrientationVector(Vector2 from, Vector2 to)
     return Vector2Normalize(((Vector2){to.x - from.x, to.y - from.y}));
 }
 
+void SetObjectDirAndSpeed(Object *obj, Vector2 to)
+{
+    obj->vel =
+        Vector2Multiply(GetOrientationVector(obj->position, to), (Vector2){obj->speedMultiplier, obj->speedMultiplier});
+}
+
 void CaptureMouseWithinWindow(void)
 {
     // added an extra 5 pixels to prevent the mouse to bounce out of

@@ -133,12 +133,6 @@ void MoveObject(Object *obj)
     obj->position.y += obj->vel.y;
 }
 
-void SetObjectDirAndSpeed(Object *obj, Vector2 to)
-{
-    obj->vel =
-        Vector2Multiply(GetOrientationVector(obj->position, to), (Vector2){obj->speedMultiplier, obj->speedMultiplier});
-}
-
 void UpdateStateWithCollisions(CurrentState *currentState, Objid objid, double timeNow)
 {
     int j;
