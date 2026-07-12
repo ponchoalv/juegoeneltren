@@ -5,7 +5,7 @@
 #include "player.h"
 #include "enemies.h"
 
-#define ENEMY_COLLISION_REFLECT_SCALE 0.55f
+#define ENEMY_COLLISION_REFLECT_SCALE 0.65f
 #define NO_LOSE
 
 #define SHOW_FPS
@@ -249,7 +249,8 @@ void UpdatePlayingGameState(void)
             if (enemy->subType == OS_attacker && (!enemy->isColliding || !(enemy->timeVisible >= GetTime())))
             {
                 enemy->isColliding = false;
-                SetObjectDirAndSpeed(enemy, currentState.player->position);
+                // WIP: testing if adding some random scalar to the player position would make it more fun
+                SetObjectDirAndSpeed(enemy, Vector2Scale(currentState.player->position, GetRandomValue(1, 2)));
             }
             break;
         }
