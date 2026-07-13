@@ -156,8 +156,8 @@ void CaptureMouseWithinWindow(void)
     // added an extra 5 pixels to prevent the mouse to bounce out of
     // the window, not sure if this the right thing to do, was the
     // simplest work around I found
-    int x = GetMouseX();
-    int y = GetMouseY();
+    const int x = GetMouseX();
+    const int y = GetMouseY();
 
     // this logic to capture the mouse is not working properly and make gameplay a bit awkward
     if (WINDOW_WIDTH - MOUSE_MARGIN < x)
@@ -179,7 +179,7 @@ void UpdateStateWithCollisions(CurrentState *currentState, Objid objid, double t
 
     for (j = objid + 1; j < MAX_OBJECTS; j++)
     {
-        Object *otherObject = &currentState->objects[j];
+        const Object *otherObject = &currentState->objects[j];
         if (CheckCollisionBetweenObjects(currentState->objects[objid], *otherObject))
         {
             // TODO(enemy): Maybe this should be moved to a switch case and then the enemy specific logic to a procedure in enemies.h

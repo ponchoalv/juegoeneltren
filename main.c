@@ -59,9 +59,9 @@ void DrawPlaying(void)
         switch (currentState.objects[i].type)
         {
         case T_player: {
-            float rotationRad = currentState.objects[i].rotation * DEG2RAD;
+            const float rotationRad = currentState.objects[i].rotation * DEG2RAD;
 
-            Vector2 litleTriangle = {
+            const Vector2 litleTriangle = {
                 currentState.objects[i].position.x + cosf(rotationRad) * (currentState.objects[i].radius / 2.0f),
                 currentState.objects[i].position.y + sinf(rotationRad) * (currentState.objects[i].radius / 2.0f)};
 
@@ -133,7 +133,7 @@ void MoveObject(Object *obj)
 void UpdatePlayingGameState(void)
 {
     int i = 1;
-    double timeNow = GetTime();
+    const double timeNow = GetTime();
 
     for (i = 1; i < MAX_OBJECTS; ++i)
     {
@@ -209,7 +209,7 @@ void UpdateAndDrawFrame(void)
 void TestRandNumbers(void)
 {
     int i;
-    int *numbers = LoadRandomSequence(10, 0, 100);
+    const int *numbers = LoadRandomSequence(10, 0, 100);
     for (i = 0; i < 10; ++i)
     {
         TraceLog(LOG_INFO, "The random number at %d is %d", i, numbers[i]);

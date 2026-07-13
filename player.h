@@ -10,12 +10,12 @@
 // Maybe I solve the above TODO, I need to make some testing on top of this
 void FireBullet(CurrentState *currentState, double duration)
 {
-    Vector2 mousePosition = GetMousePosition();
-    Vector2 playerTip = Vector2MoveTowards(currentState->player->position, mousePosition, 25);
+    const Vector2 mousePosition = GetMousePosition();
+    const Vector2 playerTip = Vector2MoveTowards(currentState->player->position, mousePosition, 25);
 
     Vector2 vel = GetOrientationVector(currentState->player->position, mousePosition);
 
-    Objid boid = InitObject(currentState, T_bullet, OS_none);
+    const Objid boid = InitObject(currentState, T_bullet, OS_none);
     currentState->objects[boid].duration = duration;
     currentState->objects[boid].timeVisible = GetTime() + currentState->objects[boid].duration;
     currentState->objects[boid].position = playerTip;
@@ -45,9 +45,9 @@ void InitPlayer(CurrentState *currentState)
 
 void ProcessPlayerInput(CurrentState *currentState)
 {
-    Vector2 mousePosition = GetMousePosition();
-    float dx = mousePosition.x - currentState->player->position.x;
-    float dy = mousePosition.y - currentState->player->position.y;
+    const Vector2 mousePosition = GetMousePosition();
+    const float dx = mousePosition.x - currentState->player->position.x;
+    const float dy = mousePosition.y - currentState->player->position.y;
     Vector2 dirToMouse = GetOrientationVector(currentState->player->position, mousePosition);
 
     // add a bit of constant speed
