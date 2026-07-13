@@ -5,9 +5,6 @@
 #include "player.h"
 #include "enemies.h"
 
-#define ENEMY_COLLISION_REFLECT_SCALE 0.65f
-#define NO_LOSE
-
 #define SHOW_FPS
 
 CurrentState currentState = {0};

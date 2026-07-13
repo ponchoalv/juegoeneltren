@@ -12,6 +12,10 @@
 
 #define MOUSE_MARGIN 30
 
+#define ENEMY_COLLISION_REFLECT_SCALE 0.65f
+
+// #define NO_LOSE
+
 typedef enum
 {
     T_none,
