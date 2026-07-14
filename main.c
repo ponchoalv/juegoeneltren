@@ -9,7 +9,6 @@
 
 CurrentState currentState = {0};
 
-
 void SetInitialGameState(CurrentState *currentState)
 {
     // first we reset the state of the game to be in playing mode.

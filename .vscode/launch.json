@@ -1,0 +1,18 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug game",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/juego_en_el_tren",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb",
+            "preLaunchTask": "Build game (debug)"
+        }
+    ]
+}
