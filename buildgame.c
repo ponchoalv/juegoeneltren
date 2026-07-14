@@ -27,6 +27,38 @@
 #define DEPS "./deps/"
 #define INCL_FOLDER DEPS "include/"
 
+static void append_json_string(Nob_String_Builder *sb, const char *value)
+{
+    nob_sb_append(sb, '"');
+    for (; *value != '\0'; value++)
+    {
+        if (*value == '"' || *value == '\\')
+            nob_sb_append(sb, '\\');
+        nob_sb_append(sb, *value);
+    }
+    nob_sb_append(sb, '"');
+}
+
+static bool write_compile_commands(Nob_Cmd command)
+{
+    Nob_String_Builder database = {0};
+    nob_sb_append_cstr(&database, "[\n  {\n    \"directory\": ");
+    append_json_string(&database, nob_get_current_dir_temp());
+    nob_sb_append_cstr(&database, ",\n    \"file\": \"./main.c\",\n    \"arguments\": [\n");
+
+    for (size_t i = 0; i < command.count; i++)
+    {
+        nob_sb_append_cstr(&database, "      ");
+        append_json_string(&database, command.items[i]);
+        nob_sb_append_cstr(&database, i + 1 < command.count ? ",\n" : "\n");
+    }
+    nob_sb_append_cstr(&database, "    ]\n  }\n]\n");
+
+    bool result = nob_write_entire_file("compile_commands.json", database.items, database.count);
+    nob_sb_free(database);
+    return result;
+}
+
 int main(int argc, char **argv)
 {
     // This line enables the self-rebuilding. It detects when nob.c is updated and auto rebuilds it then
@@ -46,6 +78,8 @@ int main(int argc, char **argv)
     // The working horse of nob is the Nob_Cmd structure. It's a Dynamic Array of strings which represent
     // command line that you want to execute.
     Nob_Cmd cmd = {0};
+    bool debug = argc > 1 && strcmp(argv[1], "-debug") == 0;
+    bool run = argc > 1 && strcmp(argv[1], "-run") == 0;
 
     nob_set_current_dir(DEPS);
 
@@ -69,7 +103,10 @@ int main(int argc, char **argv)
     /// "clang", "-std=c99", "-Wall", "-Wextra", "-Wpedantic", "-framework", "CoreVideo", "-framework", "IOKit",
     /// "-framework", "Cocoa", "-framework", "GLUT", "-framework", "OpenGL", "libraylib.a", "main.c", "-o",
     /// "build/juego_en_el_tren"
-    nob_cmd_append(&cmd, "clang", "-std=c99", "-Wall", "-Wextra", "-Wpedantic", "-I" INCL_FOLDER, "-L" DEPS, "-framework", "CoreVideo", "-framework",
+    nob_cmd_append(&cmd, "clang");
+    if (debug)
+        nob_cmd_append(&cmd, "-g");
+    nob_cmd_append(&cmd, "-std=c99", "-Wall", "-Wextra", "-Wpedantic", "-I" INCL_FOLDER, "-L" DEPS, "-framework", "CoreVideo", "-framework",
                    "IOKit", "-framework", "Cocoa", "-framework", "GLUT", "-framework", "OpenGL", "-lraylib",
                    SRC_FOLDER "main.c", "-o", BUILD_FOLDER "juego_en_el_tren");
 #else
@@ -80,39 +117,21 @@ int main(int argc, char **argv)
 #endif // _MSC_VER
 
     // Let's execute the command.
+    Nob_Cmd compile_command = cmd;
     if (!nob_cmd_run(&cmd))
         return 1;
+#if !defined(_MSC_VER)
+    if (!write_compile_commands(compile_command))
+        return 1;
+#endif
     // nob_cmd_run() automatically resets the cmd array, so you can nob_cmd_append() more strings
     // into it.
 
-    if (argc > 1)
+    if (run)
     {
-        if (strncmp(argv[1], "-run", 4) == 0)
-        {
-            nob_cmd_append(&cmd, "./" BUILD_FOLDER "juego_en_el_tren");
-            if (!nob_cmd_run(&cmd))
-                return 1;
-        }
-        if (strncmp(argv[1], "-debug", 6) == 0)
-        {
-            // I'm not sure if this  the best way to do it... Basically
-            // I can see one problem  here which is the need of changes
-            // in the  path builders  if we change  the SRC_FOLDER  in the
-            // future, and thats not great
-            nob_cmd_append(&cmd, "clang", "-g", "-std=c99", "-Wall", "-Wextra", "-Wpedantic", "-I" INCL_FOLDER, "-L" DEPS, "-framework", "CoreVideo",
-                           "-framework", "IOKit", "-framework", "Cocoa", "-framework", "GLUT", "-framework", "OpenGL",
-                           "-lraylib", SRC_FOLDER "main.c", "-o", BUILD_FOLDER "juego_en_el_tren");
-            if (!nob_cmd_run(&cmd))
-                return 1;
-
-            // const char *currentDir = nob_get_current_dir_temp();
-            // const char *bpath = nob_temp_sprintf("%s/%s", currentDir, BUILD_FOLDER "juego_en_el_tren");
-            // const char *spath = nob_temp_sprintf("%s/%s", currentDir, "main.c");
-
-            // nob_cmd_append(&cmd, "open", "-a", "Qt Creator", "--args", spath, "-debug", bpath);
-            // if (!nob_cmd_run(&cmd))
-            //     return 1;
-        }
+        nob_cmd_append(&cmd, "./" BUILD_FOLDER "juego_en_el_tren");
+        if (!nob_cmd_run(&cmd))
+            return 1;
     }
 
     return 0;
