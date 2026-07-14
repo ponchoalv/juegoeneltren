@@ -105,13 +105,13 @@ int main(int argc, char **argv)
             if (!nob_cmd_run(&cmd))
                 return 1;
 
-            const char *currentDir = nob_get_current_dir_temp();
-            const char *bpath = nob_temp_sprintf("%s/%s", currentDir, BUILD_FOLDER "juego_en_el_tren");
-            const char *spath = nob_temp_sprintf("%s/%s", currentDir, "main.c");
+            // const char *currentDir = nob_get_current_dir_temp();
+            // const char *bpath = nob_temp_sprintf("%s/%s", currentDir, BUILD_FOLDER "juego_en_el_tren");
+            // const char *spath = nob_temp_sprintf("%s/%s", currentDir, "main.c");
 
-            nob_cmd_append(&cmd, "open", "-a", "Qt Creator", "--args", spath, "-debug", bpath);
-            if (!nob_cmd_run(&cmd))
-                return 1;
+            // nob_cmd_append(&cmd, "open", "-a", "Qt Creator", "--args", spath, "-debug", bpath);
+            // if (!nob_cmd_run(&cmd))
+            //     return 1;
         }
     }
 
