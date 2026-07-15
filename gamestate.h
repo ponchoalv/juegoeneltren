@@ -1,5 +1,5 @@
-#ifndef _H_GAME_STATE_
-#define _H_GAME_STATE_
+#ifndef H_GAME_STATE
+#define H_GAME_STATE
 
 #define MAX_OBJECTS 32000
 #define NULL 0
@@ -7,8 +7,8 @@
 #define WINDOW_WIDTH 1024
 #define WINDOW_HEIGHT 720
 
-#define WINDOW_CENTRE_H (WINDOW_WIDTH / 2)
-#define WINDOW_CENTRE_V (WINDOW_HEIGHT / 2)
+#define WINDOW_CENTRE_H (WINDOW_WIDTH / 2.0)
+#define WINDOW_CENTRE_V (WINDOW_HEIGHT / 2.0)
 
 #define MOUSE_MARGIN 30
 
@@ -69,7 +69,18 @@ typedef struct CurrentState
 } CurrentState;
 
 Objid InitObject(CurrentState *currentState, ObjType type, ObjSubType subType);
+void DestroyObject(CurrentState *currentState, Objid objid);
+void InitObjects(CurrentState *currentState);
+void WrapObjectPosition(Object *obj);
+void SetRandomObjectPosition(Object *obj);
+int CheckCollisionBetweenObjects(Object a, Object b);
+Vector2 GetOrientationVector(Vector2 from, Vector2 to);
+void SetObjectDirAndSpeed(Object *obj, Vector2 to);
+void CaptureMouseWithinWindow(void);
+void UpdateStateWithCollisions(CurrentState *currentState, Objid objid, double timeNow);
+#endif
 
+#ifdef GAME_STATE_IMPLEMENTATION
 // TODO(gamestate): Maybe I should have the prototype vs implementation under a constant if we I would like to tests different versions?
 inline Objid InitObject(CurrentState *currentState, ObjType type, ObjSubType subType)
 {
@@ -92,7 +103,7 @@ inline Objid InitObject(CurrentState *currentState, ObjType type, ObjSubType sub
     return NULL;
 }
 
-void DestroyObject(CurrentState *currentState, Objid objid)
+inline void DestroyObject(CurrentState *currentState, Objid objid)
 {
     if (objid < MAX_OBJECTS)
     {
@@ -103,7 +114,7 @@ void DestroyObject(CurrentState *currentState, Objid objid)
     }
 }
 
-void InitObjects(CurrentState *currentState)
+inline void InitObjects(CurrentState *currentState)
 {
     int i;
     // 0 is null / not allocated
@@ -113,7 +124,7 @@ void InitObjects(CurrentState *currentState)
     }
 }
 
-void WrapObjectPosition(Object *obj)
+inline void WrapObjectPosition(Object *obj)
 {
     if (obj->position.x < 0)
         obj->position.x = WINDOW_WIDTH;
@@ -128,7 +139,7 @@ void WrapObjectPosition(Object *obj)
         obj->position.y = WINDOW_HEIGHT;
 }
 
-void SetRandomObjectPosition(Object *obj)
+inline void SetRandomObjectPosition(Object *obj)
 {
     obj->position.x =
         (float)GetRandomValue(0 + (int)obj->radius, WINDOW_WIDTH - obj->radius);
@@ -136,23 +147,23 @@ void SetRandomObjectPosition(Object *obj)
         (float)GetRandomValue(0 + (int)obj->radius, WINDOW_HEIGHT - obj->radius);
 }
 
-int CheckCollisionBetweenObjects(Object a, Object b)
+inline int CheckCollisionBetweenObjects(Object a, Object b)
 {
     return (a.type != T_none && b.type != T_none) && CheckCollisionCircles(a.position, a.radius, b.position, b.radius);
 }
 
-Vector2 GetOrientationVector(Vector2 from, Vector2 to)
+inline Vector2 GetOrientationVector(Vector2 from, Vector2 to)
 {
     return Vector2Normalize(((Vector2){to.x - from.x, to.y - from.y}));
 }
 
-void SetObjectDirAndSpeed(Object *obj, Vector2 to)
+inline void SetObjectDirAndSpeed(Object *obj, Vector2 to)
 {
     obj->vel =
         Vector2Multiply(GetOrientationVector(obj->position, to), (Vector2){obj->speedMultiplier, obj->speedMultiplier});
 }
 
-void CaptureMouseWithinWindow(void)
+inline void CaptureMouseWithinWindow(void)
 {
     // added an extra 5 pixels to prevent the mouse to bounce out of
     // the window, not sure if this the right thing to do, was the
@@ -171,7 +182,7 @@ void CaptureMouseWithinWindow(void)
         SetMousePosition(x, WINDOW_HEIGHT - MOUSE_MARGIN);
 }
 
-void UpdateStateWithCollisions(CurrentState *currentState, Objid objid, double timeNow)
+inline void UpdateStateWithCollisions(CurrentState *currentState, Objid objid, double timeNow)
 {
     int j;
 
@@ -251,5 +262,4 @@ void UpdateStateWithCollisions(CurrentState *currentState, Objid objid, double t
         }
     }
 }
-
 #endif

@@ -1,14 +1,16 @@
-#ifndef _H_PLAYER_
-#define _H_PLAYER_
-
-#include "gamestate.h"
+#ifndef H_PLAYER
+#define H_PLAYER
 
 #define PLAYER_SPEED 0.5f
+
+void FireBullet(CurrentState *currentState, double duration);
+void InitPlayer(CurrentState *currentState);
+void ProcessPlayerInput(CurrentState *currentState);
 
 // I think we need to re-think this to also take into account the current speed of the player
 // TODO(player): Tale into account the currnt speed to calculate the speed the bullet will have once fired (vel).
 // Maybe I solve the above TODO, I need to make some testing on top of this
-void FireBullet(CurrentState *currentState, double duration)
+inline void FireBullet(CurrentState *currentState, double duration)
 {
     const Vector2 mousePosition = GetMousePosition();
     const Vector2 playerTip = Vector2MoveTowards(currentState->player->position, mousePosition, 25);
@@ -21,14 +23,14 @@ void FireBullet(CurrentState *currentState, double duration)
     currentState->objects[boid].position = playerTip;
     currentState->objects[boid].speedMultiplier = 3.0;
     currentState->objects[boid].vel = Vector2Multiply(
-        vel, (Vector2){currentState->objects[boid].speedMultiplier + fabs(currentState->player->vel.x),
-                       currentState->objects[boid].speedMultiplier + fabs(currentState->player->vel.y)});
+        vel, (Vector2){currentState->objects[boid].speedMultiplier + fabsf(currentState->player->vel.x),
+                       currentState->objects[boid].speedMultiplier + fabsf(currentState->player->vel.y)});
     currentState->objects[boid].color = BLUE;
     currentState->objects[boid].radius = 4;
     currentState->objects[boid].sides = 10;
 }
 
-void InitPlayer(CurrentState *currentState)
+inline void InitPlayer(CurrentState *currentState)
 {
     currentState->poid = InitObject(currentState, T_player, OS_none);
     if (currentState->poid == NULL)
@@ -43,7 +45,7 @@ void InitPlayer(CurrentState *currentState)
     currentState->player->vel = (Vector2){0, 0};
 }
 
-void ProcessPlayerInput(CurrentState *currentState)
+inline void ProcessPlayerInput(CurrentState *currentState)
 {
     const Vector2 mousePosition = GetMousePosition();
     const float dx = mousePosition.x - currentState->player->position.x;

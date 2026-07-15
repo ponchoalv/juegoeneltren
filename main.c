@@ -1,7 +1,9 @@
 #include <raylib.h>
 #include <raymath.h>
 
+#define GAME_STATE_IMPLEMENTATION
 #include "gamestate.h"
+
 #include "player.h"
 #include "enemies.h"
 
@@ -9,20 +11,20 @@
 
 CurrentState currentState = {0};
 
-void SetInitialGameState(CurrentState *currentState)
+void SetInitialGameState(CurrentState *currState)
 {
     // first we reset the state of the game to be in playing mode.
     // then we set the counters to the initial status.
-    currentState->status = S_playing;
-    currentState->activeObjects = 0;
-    currentState->score = 0;
-    currentState->totalEnemies = 0;
+    currState->status = S_playing;
+    currState->activeObjects = 0;
+    currState->score = 0;
+    currState->totalEnemies = 0;
 
     // here we create all the object.
     // this objects should be visible during playing status.
-    InitObjects(currentState);
-    InitPlayer(currentState);
-    InitEnemies(currentState);
+    InitObjects(currState);
+    InitPlayer(currState);
+    InitEnemies(currState);
 }
 
 void ProcessInput(void)
@@ -83,7 +85,7 @@ void DrawPlaying(void)
 void DrawScoreColor(int score, Color color)
 {
     const char *score_text = TextFormat("YOUR SCORE WAS: %2i", score);
-    DrawText(score_text, (WINDOW_WIDTH - MeasureText(score_text, 20)) / 2.0, WINDOW_HEIGHT / 2 - 100, 20, color);
+    DrawText(score_text, (WINDOW_WIDTH - MeasureText(score_text, 20)) / 2, WINDOW_HEIGHT / 2 - 100, 20, color);
 }
 
 void Render(void)
@@ -104,8 +106,8 @@ void Render(void)
         // TODO(): All text here is hardcoded and will need to be adjustable to the screen size / ratio.
         const char *youLost = "YOU LOST";
         DrawScoreColor(currentState.score, RED);
-        DrawText(youLost, (WINDOW_WIDTH - MeasureText(youLost, 60)) / 2.0, WINDOW_HEIGHT / 2 - 40, 60, RED);
-        DrawText("Press [SPACE] to start again", (WINDOW_WIDTH - MeasureText("Press [SPACE] to start again", 30)) / 2.0,
+        DrawText(youLost, (WINDOW_WIDTH - MeasureText(youLost, 60)) / 2, WINDOW_HEIGHT / 2 - 40, 60, RED);
+        DrawText("Press [SPACE] to start again", (WINDOW_WIDTH - MeasureText("Press [SPACE] to start again", 30)) / 2,
                  WINDOW_HEIGHT / 2.0 + 30, 30, RED);
         break;
     }
@@ -113,8 +115,8 @@ void Render(void)
         // TODO(): All text here is hardcoded and will need to be adjustable to the screen size / ratio.
         const char *youWon = "YOU WON";
         DrawScoreColor(currentState.score, GREEN);
-        DrawText(youWon, (WINDOW_WIDTH - MeasureText(youWon, 60)) / 2.0, WINDOW_HEIGHT / 2 - 40, 60, GREEN);
-        DrawText("Press [SPACE] to start again", (WINDOW_WIDTH - MeasureText("Press [SPACE] to start again", 30)) / 2.0,
+        DrawText(youWon, (WINDOW_WIDTH - MeasureText(youWon, 60)) / 2, WINDOW_HEIGHT / 2 - 40, 60, GREEN);
+        DrawText("Press [SPACE] to start again", (WINDOW_WIDTH - MeasureText("Press [SPACE] to start again", 30)) / 2,
                  WINDOW_HEIGHT / 2.0 + 30, 30, GREEN);
         break;
     }
@@ -150,7 +152,7 @@ void UpdatePlayingGameState(void)
             // Todo implement proper AI / logic to move and attack the player
             // this is not a good experience, we need to find a way to make it
             // feel more real, now is like converging all T_enemies attacker into one point
-            enemy->rotation += GetRandomValue(-10, 10);
+            enemy->rotation += (float)GetRandomValue(-10, 10);
 
             bool enemyNotCollidingOrVisibilityTimeOut = (!enemy->isColliding || !(enemy->timeVisible >= GetTime()));
             // when we are not colliding we make sure is being set
@@ -160,7 +162,7 @@ void UpdatePlayingGameState(void)
             {
                 enemy->isColliding = false;
                 // WIP: testing if adding some random scalar to the player position would make it more fun
-                SetObjectDirAndSpeed(enemy, Vector2Scale(currentState.player->position, GetRandomValue(1, 2)));
+                SetObjectDirAndSpeed(enemy, Vector2Scale(currentState.player->position, (float)GetRandomValue(1, 2)));
             }
             break;
         }

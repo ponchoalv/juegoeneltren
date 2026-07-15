@@ -1,8 +1,6 @@
 #ifndef _H_ENEMIES_
 #define _H_ENEMIES_
 
-#include "gamestate.h"
-
 #define TOTAL_ENEMIES 20
 
 void InitEnemies(CurrentState *currentState)
