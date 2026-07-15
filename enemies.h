@@ -19,7 +19,7 @@ inline void InitEnemies(CurrentState *currentState)
         currentState->objects[objid].rotation = 0;
         currentState->objects[objid].color = PURPLE;
         currentState->objects[objid].sides = GetRandomValue(1, 10);
-        currentState->objects[objid].speedMultiplier = 1.1;
+        currentState->objects[objid].speedMultiplier = (float)1.1;
         currentState->objects[objid].duration = 2.0;
 
         // Prevent a new spawn enemy to collide with the player

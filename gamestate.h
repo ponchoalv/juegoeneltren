@@ -1,6 +1,9 @@
 #ifndef H_GAME_STATE
 #define H_GAME_STATE
 
+#include <raylib.h>
+#include <raymath.h>
+
 #define MAX_OBJECTS 32000
 #define NULL 0
 

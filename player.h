@@ -21,7 +21,7 @@ inline void FireBullet(CurrentState *currentState, double duration)
     currentState->objects[boid].duration = duration;
     currentState->objects[boid].timeVisible = GetTime() + currentState->objects[boid].duration;
     currentState->objects[boid].position = playerTip;
-    currentState->objects[boid].speedMultiplier = 3.0;
+    currentState->objects[boid].speedMultiplier = (float)3.0;
     currentState->objects[boid].vel = Vector2Multiply(
         vel, (Vector2){currentState->objects[boid].speedMultiplier + fabsf(currentState->player->vel.x),
                        currentState->objects[boid].speedMultiplier + fabsf(currentState->player->vel.y)});

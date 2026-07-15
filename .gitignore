@@ -10,4 +10,5 @@ deps/libraylib.a
 /deps/raylib/
 /deps/deps.old
 .idea/
+.cache/clangd/
 compile_commands.json
