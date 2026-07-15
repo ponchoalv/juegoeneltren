@@ -221,12 +221,18 @@ int main(void)
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Juego en el tren");
     SetTargetFPS(60);
     SetInitialGameState(&currentState);
+    InitAudioDevice();      // Initialize audio device
+    // aca debería cargar los audios LoadSound()
 
     while (!WindowShouldClose())
     {
+
+        // en alguna parte del loop hacer PlaySound()
         UpdateAndDrawFrame();
     }
 
+    // tengo que unload los audios acá UnloadSound()
+    CloseAudioDevice();     // Close audio device
     CloseWindow();
 
     return 0;
