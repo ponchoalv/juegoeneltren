@@ -38,7 +38,7 @@ typedef struct Object
     ObjType type;
     Color color;
     int sides;
-    int radius;
+    float radius;
     Vector2 vel;
     bool isColliding;
     double timeVisible;
@@ -68,6 +68,7 @@ typedef struct CurrentState
     int totalEnemies;
 } CurrentState;
 
+Objid InitObject(CurrentState *currentState, ObjType type, ObjSubType subType);
 
 // TODO(gamestate): Maybe I should have the prototype vs implementation under a constant if we I would like to tests different versions?
 Objid InitObject(CurrentState *currentState, ObjType type, ObjSubType subType)
@@ -130,9 +131,9 @@ void WrapObjectPosition(Object *obj)
 void SetRandomObjectPosition(Object *obj)
 {
     obj->position.x =
-        GetRandomValue(0 + obj->radius, WINDOW_WIDTH - obj->radius);
+        (float)GetRandomValue(0 + (int)obj->radius, WINDOW_WIDTH - obj->radius);
     obj->position.y =
-        GetRandomValue(0 + obj->radius, WINDOW_HEIGHT - obj->radius);
+        (float)GetRandomValue(0 + (int)obj->radius, WINDOW_HEIGHT - obj->radius);
 }
 
 int CheckCollisionBetweenObjects(Object a, Object b)
