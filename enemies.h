@@ -2,8 +2,9 @@
 #define _H_ENEMIES_
 
 #define TOTAL_ENEMIES 20
+void InitEnemies(CurrentState *currentState);
 
-void InitEnemies(CurrentState *currentState)
+inline void InitEnemies(CurrentState *currentState)
 {
     int i;
     // we leave 0 (or NULL) to return not found / failure to get a new object for
@@ -14,14 +15,14 @@ void InitEnemies(CurrentState *currentState)
         if (objid == NULL)
             TraceLog(LOG_FATAL, "failed allocating enemy object");
 
-        currentState->objects[objid].radius = GetRandomValue(8, 15);
+        currentState->objects[objid].radius = (float)GetRandomValue(8, 15);
         currentState->objects[objid].rotation = 0;
         currentState->objects[objid].color = PURPLE;
         currentState->objects[objid].sides = GetRandomValue(1, 10);
         currentState->objects[objid].speedMultiplier = 1.1;
         currentState->objects[objid].duration = 2.0;
 
-        // Prevent a newly spawn enemy to collide with the player
+        // Prevent a new spawn enemy to collide with the player
         SetRandomObjectPosition(&currentState->objects[objid]);
         while (CheckCollisionBetweenObjects(*currentState->player, currentState->objects[objid]))
         {
