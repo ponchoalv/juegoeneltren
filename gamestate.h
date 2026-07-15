@@ -7,8 +7,8 @@
 #define WINDOW_WIDTH 1024
 #define WINDOW_HEIGHT 720
 
-#define WINDOW_CENTRE_H WINDOW_WIDTH / 2
-#define WINDOW_CENTRE_V WINDOW_HEIGHT / 2
+#define WINDOW_CENTRE_H (WINDOW_WIDTH / 2)
+#define WINDOW_CENTRE_V (WINDOW_HEIGHT / 2)
 
 #define MOUSE_MARGIN 30
 
@@ -71,7 +71,7 @@ typedef struct CurrentState
 Objid InitObject(CurrentState *currentState, ObjType type, ObjSubType subType);
 
 // TODO(gamestate): Maybe I should have the prototype vs implementation under a constant if we I would like to tests different versions?
-Objid InitObject(CurrentState *currentState, ObjType type, ObjSubType subType)
+inline Objid InitObject(CurrentState *currentState, ObjType type, ObjSubType subType)
 {
     int i;
     for (i = 1; i < MAX_OBJECTS; ++i)
