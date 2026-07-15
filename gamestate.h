@@ -6,6 +6,7 @@
 
 #define MAX_OBJECTS 32000
 #define NULL 0
+// #define B_DEBUG
 
 #define WINDOW_WIDTH 1024
 #define WINDOW_HEIGHT 720
