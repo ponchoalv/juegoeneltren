@@ -228,7 +228,6 @@ int main(void)
 
     while (!WindowShouldClose())
     {
-
         // en alguna parte del loop hacer PlaySound()
         UpdateAndDrawFrame();
     }
