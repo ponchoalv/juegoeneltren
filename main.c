@@ -152,10 +152,11 @@ void UpdatePlayingGameState(void)
             // feel more real, now is like converging all T_enemies attacker into one point
             enemy->rotation += GetRandomValue(-10, 10);
 
+            bool enemyNotCollidingOrVisibilityTimeOut = (!enemy->isColliding || !(enemy->timeVisible >= GetTime()));
             // when we are not colliding we make sure is being set
             // state to not colliding and also that the attackers
             // are chasing the player.
-            if (enemy->subType == OS_attacker && (!enemy->isColliding || !(enemy->timeVisible >= GetTime())))
+            if (enemy->subType == OS_attacker && enemyNotCollidingOrVisibilityTimeOut)
             {
                 enemy->isColliding = false;
                 // WIP: testing if adding some random scalar to the player position would make it more fun
