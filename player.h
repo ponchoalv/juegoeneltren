@@ -10,7 +10,7 @@ void ProcessPlayerInput(CurrentState *currentState);
 // I think we need to re-think this to also take into account the current speed of the player
 // TODO(player): Tale into account the currnt speed to calculate the speed the bullet will have once fired (vel).
 // Maybe I solve the above TODO, I need to make some testing on top of this
-inline void FireBullet(CurrentState *currentState, double duration)
+void FireBullet(CurrentState *currentState, double duration)
 {
     const Vector2 mousePosition = GetMousePosition();
     const Vector2 playerTip = Vector2MoveTowards(currentState->player->position, mousePosition, 25);
@@ -30,7 +30,7 @@ inline void FireBullet(CurrentState *currentState, double duration)
     currentState->objects[boid].sides = 10;
 }
 
-inline void InitPlayer(CurrentState *currentState)
+void InitPlayer(CurrentState *currentState)
 {
     currentState->poid = InitObject(currentState, T_player, OS_none);
     if (currentState->poid == NULL)
@@ -45,7 +45,7 @@ inline void InitPlayer(CurrentState *currentState)
     currentState->player->vel = (Vector2){0, 0};
 }
 
-inline void ProcessPlayerInput(CurrentState *currentState)
+void ProcessPlayerInput(CurrentState *currentState)
 {
     const Vector2 mousePosition = GetMousePosition();
     const float dx = mousePosition.x - currentState->player->position.x;

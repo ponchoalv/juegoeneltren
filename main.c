@@ -59,7 +59,8 @@ void DrawPlaying(void)
                       currentState.objects[i].rotation, currentState.objects[i].color);
         switch (currentState.objects[i].type)
         {
-        case T_player: {
+        case T_player:
+        {
             const float rotationRad = currentState.objects[i].rotation * DEG2RAD;
 
             const Vector2 litleTriangle = {
@@ -102,7 +103,8 @@ void Render(void)
     case S_playing:
         DrawPlaying();
         break;
-    case S_lose: {
+    case S_lose:
+    {
         // TODO(): All text here is hardcoded and will need to be adjustable to the screen size / ratio.
         const char *youLost = "YOU LOST";
         DrawScoreColor(currentState.score, RED);
@@ -111,7 +113,8 @@ void Render(void)
                  WINDOW_HEIGHT / 2.0 + 30, 30, RED);
         break;
     }
-    case S_win: {
+    case S_win:
+    {
         // TODO(): All text here is hardcoded and will need to be adjustable to the screen size / ratio.
         const char *youWon = "YOU WON";
         DrawScoreColor(currentState.score, GREEN);
@@ -146,7 +149,8 @@ void UpdatePlayingGameState(void)
 
         switch (currentState.objects[i].type)
         {
-        case T_enemy: {
+        case T_enemy:
+        {
             // TODO(enemies): should move this to enemies.h I think
             Object *enemy = &currentState.objects[i];
             // Todo implement proper AI / logic to move and attack the player
@@ -223,7 +227,7 @@ int main(void)
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Juego en el tren");
     SetTargetFPS(60);
     SetInitialGameState(&currentState);
-    InitAudioDevice();      // Initialize audio device
+    InitAudioDevice(); // Initialize audio device
     // aca debería cargar los audios LoadSound()
 
     while (!WindowShouldClose())
@@ -233,7 +237,7 @@ int main(void)
     }
 
     // tengo que unload los audios acá UnloadSound()
-    CloseAudioDevice();     // Close audio device
+    CloseAudioDevice(); // Close audio device
     CloseWindow();
 
     return 0;

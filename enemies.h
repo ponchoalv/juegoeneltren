@@ -4,12 +4,12 @@
 #define TOTAL_ENEMIES 20
 void InitEnemies(CurrentState *currentState);
 
-inline void InitEnemies(CurrentState *currentState)
+void InitEnemies(CurrentState *currentState)
 {
     int i;
     // we leave 0 (or NULL) to return not found / failure to get a new object for
     // InitObject()
-   for (i = 1; i < TOTAL_ENEMIES + 1 && currentState->totalEnemies <= TOTAL_ENEMIES; ++i)
+    for (i = 1; i < TOTAL_ENEMIES + 1 && currentState->totalEnemies <= TOTAL_ENEMIES; ++i)
     {
         Objid objid = InitObject(currentState, T_enemy, (ObjSubType)GetRandomValue(0, 2));
         if (objid == NULL)

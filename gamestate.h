@@ -86,7 +86,7 @@ void UpdateStateWithCollisions(CurrentState *currentState, Objid objid, double t
 
 #ifdef GAME_STATE_IMPLEMENTATION
 // TODO(gamestate): Maybe I should have the prototype vs implementation under a constant if we I would like to tests different versions?
-inline Objid InitObject(CurrentState *currentState, ObjType type, ObjSubType subType)
+Objid InitObject(CurrentState *currentState, ObjType type, ObjSubType subType)
 {
     int i;
     for (i = 1; i < MAX_OBJECTS; ++i)
@@ -97,7 +97,7 @@ inline Objid InitObject(CurrentState *currentState, ObjType type, ObjSubType sub
             currentState->objects[i].subType = subType;
             currentState->objects[i].isColliding = false;
             currentState->objects[i].duration = 0.0;
-            currentState->objects[i].vel = (Vector2){0,0};
+            currentState->objects[i].vel = (Vector2){0, 0};
             ++currentState->activeObjects;
             if (type == T_enemy)
                 ++currentState->totalEnemies;
@@ -107,7 +107,7 @@ inline Objid InitObject(CurrentState *currentState, ObjType type, ObjSubType sub
     return NULL;
 }
 
-inline void DestroyObject(CurrentState *currentState, Objid objid)
+void DestroyObject(CurrentState *currentState, Objid objid)
 {
     if (objid < MAX_OBJECTS)
     {
@@ -118,7 +118,7 @@ inline void DestroyObject(CurrentState *currentState, Objid objid)
     }
 }
 
-inline void InitObjects(CurrentState *currentState)
+void InitObjects(CurrentState *currentState)
 {
     int i;
     // 0 is null / not allocated
@@ -128,7 +128,7 @@ inline void InitObjects(CurrentState *currentState)
     }
 }
 
-inline void WrapObjectPosition(Object *obj)
+void WrapObjectPosition(Object *obj)
 {
     if (obj->position.x < 0)
         obj->position.x = WINDOW_WIDTH;
@@ -143,7 +143,7 @@ inline void WrapObjectPosition(Object *obj)
         obj->position.y = WINDOW_HEIGHT;
 }
 
-inline void SetRandomObjectPosition(Object *obj)
+void SetRandomObjectPosition(Object *obj)
 {
     obj->position.x =
         (float)GetRandomValue(0 + (int)obj->radius, WINDOW_WIDTH - obj->radius);
@@ -151,23 +151,23 @@ inline void SetRandomObjectPosition(Object *obj)
         (float)GetRandomValue(0 + (int)obj->radius, WINDOW_HEIGHT - obj->radius);
 }
 
-inline int CheckCollisionBetweenObjects(Object a, Object b)
+int CheckCollisionBetweenObjects(Object a, Object b)
 {
     return (a.type != T_none && b.type != T_none) && CheckCollisionCircles(a.position, a.radius, b.position, b.radius);
 }
 
-inline Vector2 GetOrientationVector(Vector2 from, Vector2 to)
+Vector2 GetOrientationVector(Vector2 from, Vector2 to)
 {
     return Vector2Normalize(((Vector2){to.x - from.x, to.y - from.y}));
 }
 
-inline void SetObjectDirAndSpeed(Object *obj, Vector2 to)
+void SetObjectDirAndSpeed(Object *obj, Vector2 to)
 {
     obj->vel =
         Vector2Multiply(GetOrientationVector(obj->position, to), (Vector2){obj->speedMultiplier, obj->speedMultiplier});
 }
 
-inline void CaptureMouseWithinWindow(void)
+void CaptureMouseWithinWindow(void)
 {
     // added an extra 5 pixels to prevent the mouse to bounce out of
     // the window, not sure if this the right thing to do, was the
@@ -186,12 +186,13 @@ inline void CaptureMouseWithinWindow(void)
         SetMousePosition(x, WINDOW_HEIGHT - MOUSE_MARGIN);
 }
 
-inline void UpdateStateWithCollisions(CurrentState *currentState, Objid objid, double timeNow)
+void UpdateStateWithCollisions(CurrentState *currentState, Objid objid, double timeNow)
 {
     int j;
 
     // TODO(gamestate): Move this out to gamestate.
-    if (currentState->objects[objid].type == T_none) return;
+    if (currentState->objects[objid].type == T_none)
+        return;
 
     for (j = objid + 1; j < MAX_OBJECTS; j++)
     {
