@@ -8,9 +8,9 @@ void InitPlayer(CurrentState *currentState);
 void ProcessPlayerInput(CurrentState *currentState);
 #endif
 
-#ifdef H_PLAYER_IMPLEMENTATION 
+#ifdef H_PLAYER_IMPLEMENTATION
 // I think we need to re-think this to also take into account the current speed of the player
-// TODO(player): Tale into account the currnt speed to calculate the speed the bullet will have once fired (vel).
+// TODO(player): Tale into account the current speed to calculate the speed the bullet will have once fired (vel).
 // Maybe I solve the above TODO, I need to make some testing on top of this
 void FireBullet(CurrentState *currentState, double duration)
 {

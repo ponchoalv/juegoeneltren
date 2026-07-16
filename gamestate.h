@@ -4,7 +4,7 @@
 #include <raylib.h>
 #include <raymath.h>
 
-#define MAX_OBJECTS 32000
+#define MAX_OBJECTS 1024
 #define NULL 0
 // #define B_DEBUG
 
