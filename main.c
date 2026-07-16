@@ -1,10 +1,13 @@
 #include <raylib.h>
 #include <raymath.h>
 
-#define GAME_STATE_IMPLEMENTATION
+#define H_GAME_STATE_IMPLEMENTATION
 #include "gamestate.h"
 
+#define H_PLAYER_IMPLEMENTATION
 #include "player.h"
+
+#define H_ENEMIES_IMPLEMENTATION
 #include "enemies.h"
 
 #define SHOW_FPS

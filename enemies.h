@@ -1,9 +1,11 @@
-#ifndef _H_ENEMIES_
-#define _H_ENEMIES_
+#ifndef H_ENEMIES
+#define H_ENEMIES
 
 #define TOTAL_ENEMIES 20
 void InitEnemies(CurrentState *currentState);
+#endif
 
+#ifdef H_ENEMIES_IMPLEMENTATION
 void InitEnemies(CurrentState *currentState)
 {
     int i;

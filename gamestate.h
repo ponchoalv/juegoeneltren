@@ -84,7 +84,7 @@ void CaptureMouseWithinWindow(void);
 void UpdateStateWithCollisions(CurrentState *currentState, Objid objid, double timeNow);
 #endif
 
-#ifdef GAME_STATE_IMPLEMENTATION
+#ifdef H_GAME_STATE_IMPLEMENTATION
 // TODO(gamestate): Maybe I should have the prototype vs implementation under a constant if we I would like to tests different versions?
 Objid InitObject(CurrentState *currentState, ObjType type, ObjSubType subType)
 {
