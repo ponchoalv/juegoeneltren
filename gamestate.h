@@ -23,7 +23,6 @@ typedef enum
 {
     SO_bullet,
     SO_collide,
-    SO_music,
     SO_total
 } SoundTs;
 
@@ -71,6 +70,8 @@ typedef int Objid;
 typedef struct CurrentState
 {
     int activeObjects;
+    Sound sounds[SO_total];
+    Music music;
     GameState status;
     Object *player;
     Object objects[MAX_OBJECTS];
@@ -78,8 +79,6 @@ typedef struct CurrentState
     int score;
     int totalEnemies;
     bool soundsLoaded;
-    bool playingMusic;
-    Sound sounds[SO_total];
 } CurrentState;
 
 Objid InitObject(CurrentState *currentState, ObjType type, ObjSubType subType);
@@ -205,6 +204,7 @@ void UnloadGameSounds(CurrentState *currentState)
         {
             UnloadSound(currentState->sounds[i]);
         }
+        UnloadMusicStream(currentState->music);
     }
 }
 

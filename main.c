@@ -22,13 +22,13 @@ void SetInitialGameState(CurrentState *currState, bool loadSound)
     currState->activeObjects = 0;
     currState->score = 0;
     currState->totalEnemies = 0;
-    currState->playingMusic = false;
 
     if (loadSound)
     {
         currState->sounds[SO_bullet] = LoadSound("./sounds/slimeball.wav");
         currState->sounds[SO_collide] = LoadSound("./sounds/boom.wav");
-        currState->sounds[SO_music] = LoadSound("./sounds/music.mp3");
+        currState->music = LoadMusicStream("./sounds/music.mp3");
+        SetMusicVolume(currentState.music, (float)1.0);
         currState->soundsLoaded = true;
     }
 
@@ -209,18 +209,17 @@ void UpdateGameState(void)
     switch (currentState.status)
     {
     case S_playing:
-        if (!currentState.playingMusic)
+        if (!IsMusicStreamPlaying(currentState.music))
         {
-            PlaySound(currentState.sounds[SO_music]);
-            currentState.playingMusic = true;
+            PlayMusicStream(currentState.music);
         }
         UpdatePlayingGameState();
         break;
     case S_lose:
-        if (currentState.playingMusic)
+    case S_win:
+        if (IsMusicStreamPlaying(currentState.music))
         {
-            StopSound(currentState.sounds[SO_music]);
-            currentState.playingMusic = false;
+            PauseMusicStream(currentState.music);
         }
         break;
     default:
@@ -233,6 +232,7 @@ void UpdateAndDrawFrame(void)
 {
     ProcessInput();
     UpdateGameState();
+    UpdateMusicStream(currentState.music);
     Render();
 }
 
@@ -291,6 +291,6 @@ int main(void)
  *          header strategy, this will allow me to define different constants
  *          for prototyping different gameplay, etc behind gates
  * 
- * TODO(6): Move the Sound SO_music to a music stream, this way I could pause, 
- *          resume and keep it running in a loop.
+ * TODO(6): Add a Menu screen to control soundFX and music volume. 
+ *
  */
