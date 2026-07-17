@@ -68,6 +68,11 @@ void ProcessPlayerInput(CurrentState *currentState)
     {
         FireBullet(currentState, 1.0);
     }
+
+    if (IsKeyDown(KEY_M))
+    {
+        currentState->status = S_menu;
+    }
 }
 
 #endif

@@ -62,6 +62,7 @@ typedef enum
 {
     S_playing,
     S_lose,
+    S_menu,
     S_win
 } GameState;
 
@@ -95,7 +96,8 @@ void UpdateStateWithCollisions(CurrentState *currentState, Objid objid, double t
 #endif
 
 #ifdef H_GAME_STATE_IMPLEMENTATION
-// TODO(gamestate): Maybe I should have the prototype vs implementation under a constant if we I would like to tests different versions?
+// TODO(gamestate): Maybe I should have the prototype vs implementation under a constant if we I would like to tests
+// different versions?
 Objid InitObject(CurrentState *currentState, ObjType type, ObjSubType subType)
 {
     int i;
@@ -155,10 +157,8 @@ void WrapObjectPosition(Object *obj)
 
 void SetRandomObjectPosition(Object *obj)
 {
-    obj->position.x =
-        (float)GetRandomValue(0 + (int)obj->radius, WINDOW_WIDTH - obj->radius);
-    obj->position.y =
-        (float)GetRandomValue(0 + (int)obj->radius, WINDOW_HEIGHT - obj->radius);
+    obj->position.x = (float)GetRandomValue(0 + (int)obj->radius, WINDOW_WIDTH - obj->radius);
+    obj->position.y = (float)GetRandomValue(0 + (int)obj->radius, WINDOW_HEIGHT - obj->radius);
 }
 
 int CheckCollisionBetweenObjects(Object a, Object b)
@@ -221,7 +221,8 @@ void UpdateStateWithCollisions(CurrentState *currentState, Objid objid, double t
         const Object *otherObject = &currentState->objects[j];
         if (CheckCollisionBetweenObjects(currentState->objects[objid], *otherObject))
         {
-            // TODO(enemy): Maybe this should be moved to a switch case and then the enemy specific logic to a procedure in enemies.h
+            // TODO(enemy): Maybe this should be moved to a switch case and then the enemy specific logic to a procedure
+            // in enemies.h
             if (currentState->objects[objid].type == T_enemy)
             {
                 Object *enemy = &currentState->objects[objid];

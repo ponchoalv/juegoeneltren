@@ -135,6 +135,9 @@ void Render(void)
                  WINDOW_HEIGHT / 2.0 + 30, 30, GREEN);
         break;
     }
+    case S_menu:
+    // TODO show menu
+        break;
     }
 
     EndDrawing();
@@ -290,7 +293,7 @@ int main(void)
  *          implement the logic within the same file by using the stb single
  *          header strategy, this will allow me to define different constants
  *          for prototyping different gameplay, etc behind gates
- * 
- * TODO(6): Add a Menu screen to control soundFX and music volume. 
+ *
+ * TODO(6): Add a Menu screen to control soundFX and music volume.
  *
  */
