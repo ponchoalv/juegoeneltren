@@ -22,11 +22,13 @@ void SetInitialGameState(CurrentState *currState, bool loadSound)
     currState->activeObjects = 0;
     currState->score = 0;
     currState->totalEnemies = 0;
+    currState->playingMusic = false;
 
     if (loadSound)
     {
-        currState->sounds[S_bullet] = LoadSound("./sounds/slimeball.wav");
-        currState->sounds[S_collide] = LoadSound("./sounds/boom.wav");
+        currState->sounds[SO_bullet] = LoadSound("./sounds/slimeball.wav");
+        currState->sounds[SO_collide] = LoadSound("./sounds/boom.wav");
+        currState->sounds[SO_music] = LoadSound("./sounds/music.mp3");
         currState->soundsLoaded = true;
     }
 
@@ -207,7 +209,19 @@ void UpdateGameState(void)
     switch (currentState.status)
     {
     case S_playing:
+        if (!currentState.playingMusic)
+        {
+            PlaySound(currentState.sounds[SO_music]);
+            currentState.playingMusic = true;
+        }
         UpdatePlayingGameState();
+        break;
+    case S_lose:
+        if (currentState.playingMusic)
+        {
+            StopSound(currentState.sounds[SO_music]);
+            currentState.playingMusic = false;
+        }
         break;
     default:
         // TraceLog(LOG_INFO, "State %s not implemented", currentState.status);
@@ -237,7 +251,6 @@ int main(void)
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Juego en el tren");
     SetTargetFPS(60);
     InitAudioDevice(); // Initialize audio device
-    currentState.soundsLoaded = false;
     SetInitialGameState(&currentState, true);
 
     while (!WindowShouldClose())
@@ -277,4 +290,7 @@ int main(void)
  *          implement the logic within the same file by using the stb single
  *          header strategy, this will allow me to define different constants
  *          for prototyping different gameplay, etc behind gates
+ * 
+ * TODO(6): Move the Sound SO_music to a music stream, this way I could pause, 
+ *          resume and keep it running in a loop.
  */

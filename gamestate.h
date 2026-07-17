@@ -21,9 +21,10 @@
 // #define NO_LOSE
 typedef enum
 {
-    S_bullet,
-    S_collide,
-    S_total
+    SO_bullet,
+    SO_collide,
+    SO_music,
+    SO_total
 } SoundTs;
 
 typedef enum
@@ -77,7 +78,8 @@ typedef struct CurrentState
     int score;
     int totalEnemies;
     bool soundsLoaded;
-    Sound sounds[S_total];
+    bool playingMusic;
+    Sound sounds[SO_total];
 } CurrentState;
 
 Objid InitObject(CurrentState *currentState, ObjType type, ObjSubType subType);
@@ -199,7 +201,7 @@ void UnloadGameSounds(CurrentState *currentState)
 {
     if (currentState->soundsLoaded)
     {
-        for (int i = 0; i < S_total; i++)
+        for (int i = 0; i < SO_total; i++)
         {
             UnloadSound(currentState->sounds[i]);
         }
@@ -254,7 +256,7 @@ void UpdateStateWithCollisions(CurrentState *currentState, Objid objid, double t
 #ifdef B_DEBUG
                     TraceLog(LOG_INFO, "bullet impacted Enemy->Bullet");
 #endif
-                    PlaySound(currentState->sounds[S_collide]);
+                    PlaySound(currentState->sounds[SO_collide]);
                     DestroyObject(currentState, j);
                     DestroyObject(currentState, objid);
                     ++currentState->score;
@@ -280,7 +282,7 @@ void UpdateStateWithCollisions(CurrentState *currentState, Objid objid, double t
 #ifdef B_DEBUG
                     TraceLog(LOG_INFO, "bullet impacted Bullet->Enemy");
 #endif
-                    PlaySound(currentState->sounds[S_collide]);
+                    PlaySound(currentState->sounds[SO_collide]);
                     DestroyObject(currentState, j);
                     DestroyObject(currentState, objid);
                     ++currentState->score;
