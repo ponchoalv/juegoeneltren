@@ -19,6 +19,12 @@
 #define ENEMY_COLLISION_REFLECT_SCALE 0.65f
 
 // #define NO_LOSE
+typedef enum
+{
+    S_bullet,
+    S_collide,
+    S_total
+} SoundTs;
 
 typedef enum
 {
@@ -70,8 +76,8 @@ typedef struct CurrentState
     Objid poid;
     int score;
     int totalEnemies;
-    Sound fireBulletSound;
-    Sound boom;
+    bool soundsLoaded;
+    Sound sounds[S_total];
 } CurrentState;
 
 Objid InitObject(CurrentState *currentState, ObjType type, ObjSubType subType);
@@ -83,6 +89,7 @@ int CheckCollisionBetweenObjects(Object a, Object b);
 Vector2 GetOrientationVector(Vector2 from, Vector2 to);
 void SetObjectDirAndSpeed(Object *obj, Vector2 to);
 void CaptureMouseWithinWindow(void);
+void UnloadGameSounds(CurrentState *currentState);
 void UpdateStateWithCollisions(CurrentState *currentState, Objid objid, double timeNow);
 #endif
 
@@ -188,6 +195,17 @@ void CaptureMouseWithinWindow(void)
         SetMousePosition(x, WINDOW_HEIGHT - MOUSE_MARGIN);
 }
 
+void UnloadGameSounds(CurrentState *currentState)
+{
+    if (currentState->soundsLoaded)
+    {
+        for (int i = 0; i < S_total; i++)
+        {
+            UnloadSound(currentState->sounds[i]);
+        }
+    }
+}
+
 void UpdateStateWithCollisions(CurrentState *currentState, Objid objid, double timeNow)
 {
     int j;
@@ -236,7 +254,7 @@ void UpdateStateWithCollisions(CurrentState *currentState, Objid objid, double t
 #ifdef B_DEBUG
                     TraceLog(LOG_INFO, "bullet impacted Enemy->Bullet");
 #endif
-                    PlaySound(currentState->boom);
+                    PlaySound(currentState->sounds[S_collide]);
                     DestroyObject(currentState, j);
                     DestroyObject(currentState, objid);
                     ++currentState->score;
@@ -262,7 +280,7 @@ void UpdateStateWithCollisions(CurrentState *currentState, Objid objid, double t
 #ifdef B_DEBUG
                     TraceLog(LOG_INFO, "bullet impacted Bullet->Enemy");
 #endif
-                    PlaySound(currentState->boom);
+                    PlaySound(currentState->sounds[S_collide]);
                     DestroyObject(currentState, j);
                     DestroyObject(currentState, objid);
                     ++currentState->score;

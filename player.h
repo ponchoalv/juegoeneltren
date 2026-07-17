@@ -30,7 +30,7 @@ void FireBullet(CurrentState *currentState, double duration)
     currentState->objects[boid].color = BLUE;
     currentState->objects[boid].radius = 4;
     currentState->objects[boid].sides = 10;
-    PlaySound(currentState->fireBulletSound);
+    PlaySound(currentState->sounds[S_bullet]);
 }
 
 void InitPlayer(CurrentState *currentState)
