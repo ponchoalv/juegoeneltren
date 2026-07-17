@@ -70,6 +70,8 @@ typedef struct CurrentState
     Objid poid;
     int score;
     int totalEnemies;
+    Sound fireBulletSound;
+    Sound boom;
 } CurrentState;
 
 Objid InitObject(CurrentState *currentState, ObjType type, ObjSubType subType);
@@ -234,6 +236,7 @@ void UpdateStateWithCollisions(CurrentState *currentState, Objid objid, double t
 #ifdef B_DEBUG
                     TraceLog(LOG_INFO, "bullet impacted Enemy->Bullet");
 #endif
+                    PlaySound(currentState->boom);
                     DestroyObject(currentState, j);
                     DestroyObject(currentState, objid);
                     ++currentState->score;
@@ -259,6 +262,7 @@ void UpdateStateWithCollisions(CurrentState *currentState, Objid objid, double t
 #ifdef B_DEBUG
                     TraceLog(LOG_INFO, "bullet impacted Bullet->Enemy");
 #endif
+                    PlaySound(currentState->boom);
                     DestroyObject(currentState, j);
                     DestroyObject(currentState, objid);
                     ++currentState->score;

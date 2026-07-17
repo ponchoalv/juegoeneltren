@@ -13,6 +13,19 @@
             "externalConsole": false,
             "MIMode": "lldb",
             "preLaunchTask": "Build game (debug)"
+        },
+        {
+            "name": "C/C++: clang-22 build and debug active file",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${fileDirname}/${fileBasenameNoExtension}",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb",
+            "preLaunchTask": "C/C++: clang-22 build active file"
         }
     ]
 }

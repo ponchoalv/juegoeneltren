@@ -22,6 +22,8 @@ void SetInitialGameState(CurrentState *currState)
     currState->activeObjects = 0;
     currState->score = 0;
     currState->totalEnemies = 0;
+    currState->fireBulletSound = LoadSound("./sounds/slimeball.wav");
+    currState->boom = LoadSound("./sounds/boom.wav");
 
     // here we create all the object.
     // this objects should be visible during playing status.
@@ -229,9 +231,8 @@ int main(void)
 {
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Juego en el tren");
     SetTargetFPS(60);
-    SetInitialGameState(&currentState);
     InitAudioDevice(); // Initialize audio device
-    // aca debería cargar los audios LoadSound()
+    SetInitialGameState(&currentState);
 
     while (!WindowShouldClose())
     {
@@ -240,6 +241,8 @@ int main(void)
     }
 
     // tengo que unload los audios acá UnloadSound()
+    UnloadSound(currentState.fireBulletSound);
+    UnloadSound(currentState.boom);
     CloseAudioDevice(); // Close audio device
     CloseWindow();
 
