@@ -87,7 +87,7 @@ void DestroyObject(CurrentState *currentState, Objid objid);
 void InitObjects(CurrentState *currentState);
 void WrapObjectPosition(Object *obj);
 void SetRandomObjectPosition(Object *obj);
-int CheckCollisionBetweenObjects(Object a, Object b);
+int CheckCollisionBetweenObjects(const Object *a, const Object *b);
 Vector2 GetOrientationVector(Vector2 from, Vector2 to);
 void SetObjectDirAndSpeed(Object *obj, Vector2 to);
 void CaptureMouseWithinWindow(void);
@@ -163,9 +163,10 @@ void SetRandomObjectPosition(Object *obj)
     obj->position.y = (float)GetRandomValue(0 + (int)obj->radius, WINDOW_HEIGHT - obj->radius);
 }
 
-int CheckCollisionBetweenObjects(Object a, Object b)
+int CheckCollisionBetweenObjects(const Object *a, const Object *b)
 {
-    return (a.type != T_none && b.type != T_none) && CheckCollisionCircles(a.position, a.radius, b.position, b.radius);
+    if (!a || !b) return 0;
+    return (a->type != T_none && b->type != T_none) && CheckCollisionCircles(a->position, a->radius, b->position, b->radius);
 }
 
 Vector2 GetOrientationVector(Vector2 from, Vector2 to)
@@ -221,7 +222,7 @@ void UpdateStateWithCollisions(CurrentState *currentState, Objid objid, double t
     for (j = objid + 1; j < MAX_OBJECTS; j++)
     {
         const Object *otherObject = &currentState->objects[j];
-        if (CheckCollisionBetweenObjects(currentState->objects[objid], *otherObject))
+        if (CheckCollisionBetweenObjects(&currentState->objects[objid], otherObject))
         {
             // TODO(enemy): Maybe this should be moved to a switch case and then the enemy specific logic to a procedure
             // in enemies.h

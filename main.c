@@ -10,6 +10,8 @@
 #define H_ENEMIES_IMPLEMENTATION
 #include "enemies.h"
 
+#include "menu.h"
+
 #define SHOW_FPS
 
 CurrentState currentState = {0};

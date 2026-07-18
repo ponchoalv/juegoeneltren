@@ -1,22 +1,31 @@
 #ifndef H_MENU
 #define H_MENU
 
-typedef enum
-{
-    SP_FX,
-    SP_music,
-    SP_total
-} SoundOpt;
+#include <stdint.h>
 
-typedef struct Menu
+typedef struct
+{
+    const char *name;
+    Vector2 position;
+    void (*Action)(CurrentState);
+} MenuItem;
+
+typedef struct
 {
     char *title;
-    char *volumeOptions[SP_total];
+    uint8_t selectedItem;
+    uint8_t itemCount;
+    MenuItem **items;
+    Color background;
+    Color foreground;
+    Color activeForeground;
 } Menu;
 
-inline void DrawMenu()
-{
-    // static const char *optio
-}
+void ProcessMenuInput(Menu *menu);
+void DrawMenu(Menu *menu);
 
+void ProcessMenuInput(Menu *menu)
+{
+    if(menu->itemCount < 1) return;
+}
 #endif
