@@ -75,11 +75,11 @@ void DrawPlaying(void)
         {
             const float rotationRad = currentState.objects[i].rotation * DEG2RAD;
 
-            const Vector2 litleTriangle = {
+            const Vector2 littleTriangle = {
                 currentState.objects[i].position.x + cosf(rotationRad) * (currentState.objects[i].radius / 2.0f),
                 currentState.objects[i].position.y + sinf(rotationRad) * (currentState.objects[i].radius / 2.0f)};
 
-            DrawPoly(litleTriangle, currentState.objects[i].sides, currentState.objects[i].radius / 2.0f,
+            DrawPoly(littleTriangle, currentState.objects[i].sides, currentState.objects[i].radius / 2.0f,
                      currentState.objects[i].rotation, RED);
             break;
         }
