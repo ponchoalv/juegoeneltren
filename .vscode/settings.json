@@ -5,5 +5,9 @@
     "--background-index",
     "--clang-tidy",
     "--compile-commands-dir=."
+  ],
+  "cSpell.words": [
+    "DARKGRAY",
+    "slimeball"
   ]
 }
