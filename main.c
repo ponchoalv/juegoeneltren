@@ -14,9 +14,9 @@
 
 #define SHOW_FPS
 
-CurrentState currentState = {0};
+GameState currentState = {0};
 
-void SetInitialGameState(CurrentState *currState, bool loadSound)
+void SetInitialGameState(GameState *currState, bool loadSound)
 {
     // first we reset the state of the game to be in playing mode.
     // then we set the counters to the initial status.

@@ -3,16 +3,16 @@
 
 #define PLAYER_SPEED 0.5f
 
-void FireBullet(CurrentState *currentState, double duration);
-void InitPlayer(CurrentState *currentState);
-void ProcessPlayerInput(CurrentState *currentState);
+void FireBullet(GameState *currentState, double duration);
+void InitPlayer(GameState *currentState);
+void ProcessPlayerInput(GameState *currentState);
 #endif
 
 #ifdef H_PLAYER_IMPLEMENTATION
 // I think we need to re-think this to also take into account the current speed of the player
 // TODO(player): Tale into account the current speed to calculate the speed the bullet will have once fired (vel).
 // Maybe I solve the above TODO, I need to make some testing on top of this
-void FireBullet(CurrentState *currentState, double duration)
+void FireBullet(GameState *currentState, double duration)
 {
     const Vector2 mousePosition = GetMousePosition();
     const Vector2 playerTip = Vector2MoveTowards(currentState->player->position, mousePosition, 25);
@@ -33,7 +33,7 @@ void FireBullet(CurrentState *currentState, double duration)
     PlaySound(currentState->sounds[SO_bullet]);
 }
 
-void InitPlayer(CurrentState *currentState)
+void InitPlayer(GameState *currentState)
 {
     currentState->poid = InitObject(currentState, T_player, OS_none);
     if (currentState->poid == NULL)
@@ -48,7 +48,7 @@ void InitPlayer(CurrentState *currentState)
     currentState->player->vel = (Vector2){0, 0};
 }
 
-void ProcessPlayerInput(CurrentState *currentState)
+void ProcessPlayerInput(GameState *currentState)
 {
     const Vector2 mousePosition = GetMousePosition();
     const float dx = mousePosition.x - currentState->player->position.x;

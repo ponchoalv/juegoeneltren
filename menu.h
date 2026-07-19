@@ -7,7 +7,7 @@ typedef struct
 {
     const char *name;
     Vector2 position;
-    void (*Action)(CurrentState);
+    void (*Action)(GameState);
 } MenuItem;
 
 typedef struct

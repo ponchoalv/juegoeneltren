@@ -2,11 +2,11 @@
 #define H_ENEMIES
 
 #define TOTAL_ENEMIES 20
-void InitEnemies(CurrentState *currentState);
+void InitEnemies(GameState *currentState);
 #endif
 
 #ifdef H_ENEMIES_IMPLEMENTATION
-void InitEnemies(CurrentState *currentState)
+void InitEnemies(GameState *currentState)
 {
     int i;
     // we leave 0 (or NULL) to return not found / failure to get a new object for

@@ -64,43 +64,43 @@ typedef enum
     S_lose,
     S_menu,
     S_win
-} GameState;
+} GameStatus;
 
 typedef int Objid;
 
-typedef struct CurrentState
+typedef struct
 {
     int activeObjects;
     Sound sounds[SO_total];
     Music music;
-    GameState status;
+    GameStatus status;
     Object *player;
     Object objects[MAX_OBJECTS];
     Objid poid;
     int score;
     int totalEnemies;
     bool soundsLoaded;
-} CurrentState;
+} GameState;
 
-Objid InitObject(CurrentState *currentState, ObjType type, ObjSubType subType);
-void DestroyObject(CurrentState *currentState, Objid objid);
-void InitObjects(CurrentState *currentState);
+Objid InitObject(GameState *currentState, ObjType type, ObjSubType subType);
+void DestroyObject(GameState *currentState, Objid objid);
+void InitObjects(GameState *currentState);
 void WrapObjectPosition(Object *obj);
 void SetRandomObjectPosition(Object *obj);
 int CheckCollisionBetweenObjects(const Object *a, const Object *b);
 Vector2 GetOrientationVector(Vector2 from, Vector2 to);
 void SetObjectDirAndSpeed(Object *obj, Vector2 to);
 void CaptureMouseWithinWindow(void);
-void UnloadGameSounds(CurrentState *currentState);
-void UpdateStateWithCollisions(CurrentState *currentState, Objid objid, double timeNow);
-void DrawPlayingGameState(CurrentState *currentState);
-void UpdatePlayingGameState(CurrentState *currentState);
+void UnloadGameSounds(GameState *currentState);
+void UpdateStateWithCollisions(GameState *currentState, Objid objid, double timeNow);
+void DrawPlayingGameState(GameState *currentState);
+void UpdatePlayingGameState(GameState *currentState);
 #endif
 
 #ifdef H_GAME_STATE_IMPLEMENTATION
 // TODO(gamestate): Maybe I should have the prototype vs implementation under a constant if we I would like to tests
 // different versions?
-Objid InitObject(CurrentState *currentState, ObjType type, ObjSubType subType)
+Objid InitObject(GameState *currentState, ObjType type, ObjSubType subType)
 {
     int i;
     for (i = 1; i < MAX_OBJECTS; ++i)
@@ -121,7 +121,7 @@ Objid InitObject(CurrentState *currentState, ObjType type, ObjSubType subType)
     return NULL;
 }
 
-void DestroyObject(CurrentState *currentState, Objid objid)
+void DestroyObject(GameState *currentState, Objid objid)
 {
     if (objid < MAX_OBJECTS)
     {
@@ -132,7 +132,7 @@ void DestroyObject(CurrentState *currentState, Objid objid)
     }
 }
 
-void InitObjects(CurrentState *currentState)
+void InitObjects(GameState *currentState)
 {
     int i;
     // 0 is null / not allocated
@@ -199,7 +199,7 @@ void CaptureMouseWithinWindow(void)
         SetMousePosition(x, WINDOW_HEIGHT - MOUSE_MARGIN);
 }
 
-void UnloadGameSounds(CurrentState *currentState)
+void UnloadGameSounds(GameState *currentState)
 {
     if (currentState->soundsLoaded)
     {
@@ -211,7 +211,7 @@ void UnloadGameSounds(CurrentState *currentState)
     }
 }
 
-void UpdateStateWithCollisions(CurrentState *currentState, Objid objid, double timeNow)
+void UpdateStateWithCollisions(GameState *currentState, Objid objid, double timeNow)
 {
     int j;
 
@@ -296,7 +296,7 @@ void UpdateStateWithCollisions(CurrentState *currentState, Objid objid, double t
     }
 }
 
-void DrawPlayingGameState(CurrentState *currentState)
+void DrawPlayingGameState(GameState *currentState)
 {
     int i;
     DrawText(TextFormat("SCORE: %2i", currentState->score), 90, 0, 20, GREEN);
@@ -340,7 +340,7 @@ void MoveObject(Object *obj)
     obj->position.y += obj->vel.y;
 }
 
-void UpdatePlayingGameState(CurrentState *currentState)
+void UpdatePlayingGameState(GameState *currentState)
 {
     int i = 1;
     const double timeNow = GetTime();
