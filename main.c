@@ -68,7 +68,6 @@ void DrawScoreColor(int score, Color color)
 void Render(void)
 {
     BeginDrawing();
-    ClearBackground(DARKGRAY);
 
 #ifdef SHOW_FPS
     DrawFPS(0, 0);
@@ -77,22 +76,25 @@ void Render(void)
     switch (currentState.status)
     {
     case S_playing:
+        ClearBackground(DARKGRAY);
         DrawPlayingGameState(&currentState);
         break;
-    case S_lose:
-    {
+    case S_lose: {
         // TODO(): All text here is hardcoded and will need to be adjustable to the screen size / ratio.
         const char *youLost = "YOU LOST";
+
+        ClearBackground(DARKGRAY);
         DrawScoreColor(currentState.score, RED);
         DrawText(youLost, (WINDOW_WIDTH - MeasureText(youLost, 60)) / 2, WINDOW_HEIGHT / 2 - 40, 60, RED);
         DrawText("Press [SPACE] to start again", (WINDOW_WIDTH - MeasureText("Press [SPACE] to start again", 30)) / 2,
                  WINDOW_HEIGHT / 2.0 + 30, 30, RED);
         break;
     }
-    case S_win:
-    {
+    case S_win: {
         // TODO(): All text here is hardcoded and will need to be adjustable to the screen size / ratio.
         const char *youWon = "YOU WON";
+        
+        ClearBackground(DARKGRAY);
         DrawScoreColor(currentState.score, GREEN);
         DrawText(youWon, (WINDOW_WIDTH - MeasureText(youWon, 60)) / 2, WINDOW_HEIGHT / 2 - 40, 60, GREEN);
         DrawText("Press [SPACE] to start again", (WINDOW_WIDTH - MeasureText("Press [SPACE] to start again", 30)) / 2,
@@ -100,7 +102,7 @@ void Render(void)
         break;
     }
     case S_menu:
-    // TODO show menu
+        MenuDrawVolMenu(menuVolume);
         break;
     }
 
