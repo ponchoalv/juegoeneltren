@@ -24,13 +24,17 @@ void SetInitialGameState(GameState *currState, bool loadSound)
     currState->activeObjects = 0;
     currState->score = 0;
     currState->totalEnemies = 0;
+    currState->soundsVol = 0.1f;
+    currState->musicVol = 0.1f;
 
     if (loadSound)
     {
         currState->sounds[SO_bullet] = LoadSound("./sounds/slimeball.wav");
+        SetSoundVolume(currState->sounds[SO_bullet], currState->soundsVol);
         currState->sounds[SO_collide] = LoadSound("./sounds/boom.wav");
+        SetSoundVolume(currState->sounds[SO_collide], currState->soundsVol);
         currState->music = LoadMusicStream("./sounds/music.mp3");
-        SetMusicVolume(currentState.music, (float)1.0);
+        SetMusicVolume(currentState.music, currState->musicVol);
         currState->soundsLoaded = true;
     }
 
@@ -49,6 +53,10 @@ void ProcessInput(void)
     {
     case S_playing:
         ProcessPlayerInput(&currentState);
+        break;
+    case S_menu:
+        MenuVolProcessInput(&menuVolume, &currentState);
+
         break;
     default:
         if (IsKeyPressed(KEY_SPACE))
@@ -102,7 +110,7 @@ void Render(void)
         break;
     }
     case S_menu:
-        MenuDrawVolMenu(menuVolume);
+        MenuDrawVolMenu(&menuVolume, &currentState);
         break;
     }
 

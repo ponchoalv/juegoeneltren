@@ -73,6 +73,8 @@ typedef struct
     int activeObjects;
     Sound sounds[SO_total];
     Music music;
+    float musicVol;
+    float soundsVol;
     GameStatus status;
     Object *player;
     Object objects[MAX_OBJECTS];
