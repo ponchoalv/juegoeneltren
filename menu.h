@@ -38,7 +38,7 @@ void MenuItemSFXVolume(GameState *currentState) {
     {
         SetSoundVolume(currentState->sounds[i], sfxVol);
     }
-    
+
     TraceLog(LOG_INFO, "SFX vol is: %d", sfxVol);
 }
 
@@ -55,7 +55,7 @@ Menu menuVolume = { "Set Volume", 0, 2,  menuItemVolItems, BLACK, WHITE, YELLOW}
 
 void MenuDrawVolMenu(Menu menu)
 {
-    ClearBackground(menu.background);    
+    ClearBackground(menu.background);
     DrawText(menu.title, WINDOW_CENTRE_H - MeasureText(menu.title, 40)/2.0, 30, 40, menu.foreground);
 
     for (int i = 0; i < menu.count; i++)
