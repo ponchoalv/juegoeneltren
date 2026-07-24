@@ -46,6 +46,12 @@ void ProcessInputMenu(Menu *menu, GameState *currentState)
         menu->items[menu->selected]->action(currentState);
         PlaySound(currentState->sounds[SO_menu]);
     }
+
+    if (IsKeyPressed(KEY_M))
+    {
+        currentState->status = S_playing;
+        PlaySound(currentState->sounds[SO_menu]);
+    }
 }
 
 #endif
