@@ -58,7 +58,6 @@ void ProcessInput(void)
         break;
     case S_menu:
         MenuVolProcessInput(&menuVolume, &currentState);
-
         break;
     default:
         if (IsKeyPressed(KEY_SPACE))
