@@ -47,7 +47,7 @@ void ProcessInputMenu(Menu *menu, GameState *currentState)
         PlaySound(currentState->sounds[SO_menu]);
     }
 
-    if (IsKeyPressed(KEY_M))
+    if (IsKeyPressed(KEY_SPACE))
     {
         currentState->status = S_playing;
         PlaySound(currentState->sounds[SO_menu]);
