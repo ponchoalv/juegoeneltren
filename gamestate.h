@@ -23,6 +23,7 @@ typedef enum
 {
     SO_bullet,
     SO_collide,
+    SO_menu,
     SO_total
 } SoundTs;
 

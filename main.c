@@ -33,6 +33,8 @@ void SetInitialGameState(GameState *currState, bool loadSound)
         SetSoundVolume(currState->sounds[SO_bullet], currState->soundsVol);
         currState->sounds[SO_collide] = LoadSound("./sounds/boom.wav");
         SetSoundVolume(currState->sounds[SO_collide], currState->soundsVol);
+        currState->sounds[SO_menu] = LoadSound("./sounds/menu.wav");
+        SetSoundVolume(currState->sounds[SO_menu], currState->soundsVol);
         currState->music = LoadMusicStream("./sounds/music.mp3");
         SetMusicVolume(currentState.music, currState->musicVol);
         currState->soundsLoaded = true;
@@ -84,14 +86,14 @@ void Render(void)
     switch (currentState.status)
     {
     case S_playing:
-        ClearBackground(DARKGRAY);
+        ClearBackground(BLACK);
         DrawPlayingGameState(&currentState);
         break;
     case S_lose: {
         // TODO(): All text here is hardcoded and will need to be adjustable to the screen size / ratio.
         const char *youLost = "YOU LOST";
 
-        ClearBackground(DARKGRAY);
+        ClearBackground(BLACK);
         DrawScoreColor(currentState.score, RED);
         DrawText(youLost, (WINDOW_WIDTH - MeasureText(youLost, 60)) / 2, WINDOW_HEIGHT / 2 - 40, 60, RED);
         DrawText("Press [SPACE] to start again", (WINDOW_WIDTH - MeasureText("Press [SPACE] to start again", 30)) / 2,
@@ -102,7 +104,7 @@ void Render(void)
         // TODO(): All text here is hardcoded and will need to be adjustable to the screen size / ratio.
         const char *youWon = "YOU WON";
         
-        ClearBackground(DARKGRAY);
+        ClearBackground(BLACK);
         DrawScoreColor(currentState.score, GREEN);
         DrawText(youWon, (WINDOW_WIDTH - MeasureText(youWon, 60)) / 2, WINDOW_HEIGHT / 2 - 40, 60, GREEN);
         DrawText("Press [SPACE] to start again", (WINDOW_WIDTH - MeasureText("Press [SPACE] to start again", 30)) / 2,
