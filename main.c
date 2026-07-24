@@ -10,7 +10,7 @@
 #define H_ENEMIES_IMPLEMENTATION
 #include "enemies.h"
 
-#include "menu.h"
+#include "musicmenu.h"
 
 #define SHOW_FPS
 
@@ -57,7 +57,7 @@ void ProcessInput(void)
         ProcessPlayerInput(&currentState);
         break;
     case S_menu:
-        MenuVolProcessInput(&menuVolume, &currentState);
+        ProcessInputMenu(&menuVolume, &currentState);
         break;
     default:
         if (IsKeyPressed(KEY_SPACE))
