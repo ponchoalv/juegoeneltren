@@ -15,7 +15,7 @@
             "compilerArgs": [
                 "--std=c99"
             ]
-        },
+    },
     {
       "name": "macos-clang-arm64",
       "includePath": [
