@@ -45,8 +45,12 @@ void MenuItemMusicVolume(GameState *currentState)
 // we must always implement this one, I think is always related to what are you trying to do with the menu
 // Maybe in the future I could find a way to describe it with data and create a generic draw.
 // But I suspect that we would need to use dynamic arrays to / maps to store more information.
+// Maybe we could add a callback function to every item to tell how it should draw.
+// This way we could keep the generic menu render and each item is responsible for defining how the should render (similar to the action).
 void DrawMenu(const Menu *menu, const GameState *currentState)
 {
+    const char * exitMessage = "Press [SPACE] to exit the menu.";
+    
     ClearBackground(menu->background);
     DrawText(menu->title, WINDOW_CENTRE_H - MeasureText(menu->title, 40) / 2.0, 30, 40, menu->foreground);
 
@@ -57,6 +61,8 @@ void DrawMenu(const Menu *menu, const GameState *currentState)
         DrawText(buff, (int)menu->items[i]->position.x - MeasureText(buff, 30) / 2, (int)menu->items[i]->position.y, 30,
                  menu->selected == i ? menu->activeForeground : menu->foreground);
     }
+
+    DrawText(exitMessage, WINDOW_CENTRE_H - MeasureText(exitMessage, 20) / 2.0, WINDOW_HEIGHT - 60, 20, menu->foreground);
 }
 
 #endif // H_MUSIC_MENU_IMPLEMENTATION
