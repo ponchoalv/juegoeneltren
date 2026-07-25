@@ -51,27 +51,30 @@ void InitPlayer(GameState *currentState)
 void ProcessPlayerInput(GameState *currentState)
 {
     const Vector2 mousePosition = GetMousePosition();
-    const float dx = mousePosition.x - currentState->player->position.x;
-    const float dy = mousePosition.y - currentState->player->position.y;
-    Vector2 dirToMouse = GetOrientationVector(currentState->player->position, mousePosition);
-
-    // add a bit of constant speed
-    dirToMouse = Vector2Scale(dirToMouse, PLAYER_SPEED);
-    currentState->player->rotation = atan2f(dy, dx) * RAD2DEG;
-
-    if (IsKeyDown(KEY_SPACE))
+    if (currentState != NULL && currentState->player != NULL)
     {
-        currentState->player->vel = Vector2Add(currentState->player->vel, dirToMouse);
-    }
+        const float dx = mousePosition.x - currentState->player->position.x;
+        const float dy = mousePosition.y - currentState->player->position.y;
+        Vector2 dirToMouse = GetOrientationVector(currentState->player->position, mousePosition);
 
-    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
-    {
-        FireBullet(currentState, 1.0);
-    }
+        // add a bit of constant speed
+        dirToMouse = Vector2Scale(dirToMouse, PLAYER_SPEED);
+        currentState->player->rotation = atan2f(dy, dx) * RAD2DEG;
 
-    if (IsKeyDown(KEY_M))
-    {
-        currentState->status = S_menu;
+        if (IsKeyDown(KEY_SPACE))
+        {
+            currentState->player->vel = Vector2Add(currentState->player->vel, dirToMouse);
+        }
+
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+        {
+            FireBullet(currentState, 1.0);
+        }
+
+        if (IsKeyDown(KEY_M))
+        {
+            currentState->status = S_menu;
+        }
     }
 }
 

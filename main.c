@@ -102,7 +102,7 @@ void Render(void)
     case S_win: {
         // TODO(): All text here is hardcoded and will need to be adjustable to the screen size / ratio.
         const char *youWon = "YOU WON";
-        
+
         ClearBackground(BLACK);
         DrawScoreColor(currentState.score, GREEN);
         DrawText(youWon, (WINDOW_WIDTH - MeasureText(youWon, 60)) / 2, WINDOW_HEIGHT / 2 - 40, 60, GREEN);
@@ -174,7 +174,7 @@ int main(void)
     }
 
     // tengo que unload los audios acá UnloadSound()
-    UnloadGameSounds(&currentState);
+    UnloadGameFXSoundsAndMusic(&currentState);
     CloseAudioDevice(); // Close audio device
     CloseWindow();
 

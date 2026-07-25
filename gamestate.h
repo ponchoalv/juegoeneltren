@@ -94,10 +94,15 @@ int CheckCollisionBetweenObjects(const Object *a, const Object *b);
 Vector2 GetOrientationVector(Vector2 from, Vector2 to);
 void SetObjectDirAndSpeed(Object *obj, Vector2 to);
 void CaptureMouseWithinWindow(void);
-void UnloadGameSounds(GameState *currentState);
-void UpdateStateWithCollisions(GameState *currentState, Objid objid, double timeNow);
+void UnloadGameFXSoundsAndMusic(GameState *currentState);
+void UpdateStateWithCollisions(GameState *currentState, Objid objid);
+void CheckBulletToObjectCollisions(const Object *otherObject, GameState *currentState, int j, Objid objid);
+void CheckPlayerToObjectCollisions(const Object *otherObject, GameState *currentState);
+void CheckEnemyToObjectCollisions(GameState *currentState, Objid objid, const Object *otherObject, int j);
 void DrawPlayingGameState(GameState *currentState);
 void UpdatePlayingGameState(GameState *currentState);
+void UpdateWithEnemyAI(GameState *currentState, int i);
+void DestroyBulletObjectIfTimeOut(GameState *currentState, int i);
 #endif
 
 #ifdef H_GAME_STATE_IMPLEMENTATION
@@ -168,7 +173,8 @@ void SetRandomObjectPosition(Object *obj)
 
 int CheckCollisionBetweenObjects(const Object *a, const Object *b)
 {
-    if (!a || !b) return 0;
+    if (!a || !b)
+        return 0;
     return (a->type != T_none && b->type != T_none) && CheckCollisionCircles(a->position, a->radius, b->position, b->radius);
 }
 
@@ -202,7 +208,7 @@ void CaptureMouseWithinWindow(void)
         SetMousePosition(x, WINDOW_HEIGHT - MOUSE_MARGIN);
 }
 
-void UnloadGameSounds(GameState *currentState)
+void UnloadGameFXSoundsAndMusic(GameState *currentState)
 {
     if (currentState->soundsLoaded)
     {
@@ -214,11 +220,10 @@ void UnloadGameSounds(GameState *currentState)
     }
 }
 
-void UpdateStateWithCollisions(GameState *currentState, Objid objid, double timeNow)
+void UpdateStateWithCollisions(GameState *currentState, Objid objid)
 {
     int j;
 
-    // TODO(gamestate): Move this out to gamestate.
     if (currentState->objects[objid].type == T_none)
         return;
 
@@ -231,71 +236,83 @@ void UpdateStateWithCollisions(GameState *currentState, Objid objid, double time
             // in enemies.h
             if (currentState->objects[objid].type == T_enemy)
             {
-                Object *enemy = &currentState->objects[objid];
-                // Enemy -> Enemy x
-                if (otherObject->type == T_enemy)
-                {
-                    // we need to tell the object had collied and
-                    // the amount of time we want him to be in a
-                    // different trajectory than the default one
-                    // (chasing the player)
-                    enemy->isColliding = true;
-                    enemy->timeVisible = timeNow + enemy->duration;
-
-                    Vector2 normal =
-                        Vector2Normalize(Vector2Subtract(enemy->position, currentState->objects[j].position));
-                    Vector2 relativeVel = Vector2Subtract(enemy->vel, currentState->objects[j].vel);
-                    Vector2 reflectVel = Vector2Reflect(relativeVel, normal);
-
-                    enemy->vel = Vector2Scale(reflectVel, -ENEMY_COLLISION_REFLECT_SCALE);
-                    currentState->objects[j].vel = Vector2Scale(reflectVel, ENEMY_COLLISION_REFLECT_SCALE);
-                }
-                else if (otherObject->type == T_player)
-                {
-#ifndef NO_LOSE
-                    // Enemy -> payer
-                    currentState->status = S_lose;
-#endif
-                }
-                else if (otherObject->type == T_bullet)
-                {
-                    // Enemy -> Bullet
-#ifdef B_DEBUG
-                    TraceLog(LOG_INFO, "bullet impacted Enemy->Bullet");
-#endif
-                    PlaySound(currentState->sounds[SO_collide]);
-                    DestroyObject(currentState, j);
-                    DestroyObject(currentState, objid);
-                    ++currentState->score;
-                }
+                CheckEnemyToObjectCollisions(currentState, objid, otherObject, j);
             }
             // TODO(player.h): we should move this to a player file maybe?
             else if (currentState->objects[objid].type == T_player)
             {
                 // Player -> Enemy
-                if (otherObject->type == T_enemy)
-                {
-#ifndef NO_LOSE
-                    currentState->status = S_lose;
-#endif
-                }
+                CheckPlayerToObjectCollisions(otherObject, currentState);
             }
             // TODO(player): we might need to move this to player.h maybe? not sure though
             else if (currentState->objects[objid].type == T_bullet)
             {
-                // Bullet -> Enemy
-                if (otherObject->type == T_enemy)
-                {
-#ifdef B_DEBUG
-                    TraceLog(LOG_INFO, "bullet impacted Bullet->Enemy");
-#endif
-                    PlaySound(currentState->sounds[SO_collide]);
-                    DestroyObject(currentState, j);
-                    DestroyObject(currentState, objid);
-                    ++currentState->score;
-                }
+                CheckBulletToObjectCollisions(otherObject, currentState, j, objid);
             }
         }
+    }
+}
+
+void CheckBulletToObjectCollisions(const Object *otherObject, GameState *currentState, int j, Objid objid)
+{
+    // Bullet -> Enemy
+    if (otherObject->type == T_enemy)
+    {
+#ifdef B_DEBUG
+        TraceLog(LOG_INFO, "bullet impacted Bullet->Enemy");
+#endif
+        PlaySound(currentState->sounds[SO_collide]);
+        DestroyObject(currentState, j);
+        DestroyObject(currentState, objid);
+        ++currentState->score;
+    }
+}
+
+void CheckPlayerToObjectCollisions(const Object *otherObject, GameState *currentState)
+{
+    if (otherObject->type == T_enemy)
+    {
+#ifndef NO_LOSE
+        currentState->status = S_lose;
+#endif
+    }
+}
+
+void CheckEnemyToObjectCollisions(GameState *currentState, Objid objid, const Object *otherObject, int j)
+{
+    Object *enemy = &currentState->objects[objid];
+    // Enemy -> Enemy x
+    if (otherObject->type == T_enemy)
+    {
+        // we need to tell the object had collied and
+        // the amount of time we want him to be in a
+        // different trajectory than the default one
+        // (chasing the player)
+        enemy->isColliding = true;
+        enemy->timeVisible = GetTime() + enemy->duration;
+
+        Vector2 normal =
+            Vector2Normalize(Vector2Subtract(enemy->position, currentState->objects[j].position));
+        Vector2 relativeVel = Vector2Subtract(enemy->vel, currentState->objects[j].vel);
+        Vector2 reflectVel = Vector2Reflect(relativeVel, normal);
+
+        enemy->vel = Vector2Scale(reflectVel, -ENEMY_COLLISION_REFLECT_SCALE);
+        currentState->objects[j].vel = Vector2Scale(reflectVel, ENEMY_COLLISION_REFLECT_SCALE);
+    }
+    else if (otherObject->type == T_player)
+    {
+#ifndef NO_LOSE
+        // Enemy -> payer
+        currentState->status = S_lose;
+#endif
+    }
+    else if (otherObject->type == T_bullet)
+    {
+        // Enemy -> Bullet
+        PlaySound(currentState->sounds[SO_collide]);
+        DestroyObject(currentState, j);
+        DestroyObject(currentState, objid);
+        ++currentState->score;
     }
 }
 
@@ -346,11 +363,10 @@ void MoveObject(Object *obj)
 void UpdatePlayingGameState(GameState *currentState)
 {
     int i = 1;
-    const double timeNow = GetTime();
 
     for (i = 1; i < MAX_OBJECTS; ++i)
     {
-        UpdateStateWithCollisions(currentState, i, timeNow);
+        UpdateStateWithCollisions(currentState, i);
 
         // TODO(gamestate): this should be moved to gamestate.h (along side with this methods)
         MoveObject(&currentState->objects[i]);
@@ -360,32 +376,13 @@ void UpdatePlayingGameState(GameState *currentState)
         {
         case T_enemy:
         {
-            // TODO(enemies): should move this to enemies.h I think
-            Object *enemy = &currentState->objects[i];
-            // Todo implement proper AI / logic to move and attack the player
-            // this is not a good experience, we need to find a way to make it
-            // feel more real, now is like converging all T_enemies attacker into one point
-            enemy->rotation += (float)GetRandomValue(-10, 10);
-
-            bool enemyNotCollidingOrVisibilityTimeOut = (!enemy->isColliding || !(enemy->timeVisible >= GetTime()));
-            // when we are not colliding we make sure is being set
-            // state to not colliding and also that the attackers
-            // are chasing the player.
-            if (enemy->subType == OS_attacker && enemyNotCollidingOrVisibilityTimeOut)
-            {
-                enemy->isColliding = false;
-                // WIP: testing if adding some random scalar to the player position would make it more fun
-                SetObjectDirAndSpeed(enemy, Vector2Scale(currentState->player->position, (float)GetRandomValue(1, 2)));
-            }
+            UpdateWithEnemyAI(currentState, i);
             break;
         }
         case T_bullet:
             // TODO(player): we should move this to the player.h
             // destroy the bullet
-            if (currentState->objects[i].timeVisible < timeNow)
-            {
-                DestroyObject(currentState, i);
-            }
+            DestroyBulletObjectIfTimeOut(currentState, i);
 
             // TraceLog(LOG_INFO, "currentState.activeObjects %d",
             // currentState.activeObjects);w
@@ -398,6 +395,35 @@ void UpdatePlayingGameState(GameState *currentState)
     if (currentState->totalEnemies == 0)
     {
         currentState->status = S_win;
+    }
+}
+void UpdateWithEnemyAI(GameState *currentState, int i)
+{
+    // TODO(enemies): should move this to enemies.h I think
+    Object *enemy = &currentState->objects[i];
+    // Todo implement proper AI / logic to move and attack the player
+    // this is not a good experience, we need to find a way to make it
+    // feel more real, now is like converging all T_enemies attacker into one point
+    enemy->rotation += (float)GetRandomValue(-10, 10);
+
+    bool enemyNotCollidingOrVisibilityTimeOut = (!enemy->isColliding || !(enemy->timeVisible >= GetTime()));
+    // when we are not colliding we make sure is being set
+    // state to not colliding and also that the attackers
+    // are chasing the player.
+    if (enemy->subType == OS_attacker && enemyNotCollidingOrVisibilityTimeOut)
+    {
+        enemy->isColliding = false;
+        // WIP: testing if adding some random scalar to the player position would make it more fun
+        if (currentState != NULL && currentState->player != NULL)
+            SetObjectDirAndSpeed(enemy, Vector2Scale(currentState->player->position, (float)GetRandomValue(1, 2)));
+    }
+}
+
+void DestroyBulletObjectIfTimeOut(GameState *currentState, int i)
+{
+    if (currentState->objects[i].timeVisible < GetTime())
+    {
+        DestroyObject(currentState, i);
     }
 }
 #endif

@@ -32,5 +32,4 @@ void InitEnemies(GameState *currentState)
         }
     }
 }
-
 #endif
