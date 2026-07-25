@@ -6,14 +6,15 @@
 
 void MenuItemSFXVolume(GameState *currentState);
 void MenuItemMusicVolume(GameState *currentState);
+void DrawVolumeItem(const Menu*, const GameState*, const int);
 
 #endif // H_MUSIC_MENU
 
 #ifdef H_MUSIC_MENU_IMPLEMENTATION
 
 // For now I would prefer to not use dynamic arrays or maps.
-MenuItem gMenuItemSFXVolume = {"SFX Volume: %.0f%%", (Vector2){WINDOW_CENTRE_H, 100}, MenuItemSFXVolume};
-MenuItem gMenuItemMusicVolume = {"Music Volume: %.0f%%", (Vector2){WINDOW_CENTRE_H, 140}, MenuItemMusicVolume};
+MenuItem gMenuItemSFXVolume = {"SFX Volume: %.0f%%", (Vector2){WINDOW_CENTRE_H, 100}, MenuItemSFXVolume, DrawVolumeItem};
+MenuItem gMenuItemMusicVolume = {"Music Volume: %.0f%%", (Vector2){WINDOW_CENTRE_H, 140}, MenuItemMusicVolume, DrawVolumeItem};
 MenuItem *menuItemVolItems[] = {&gMenuItemSFXVolume, &gMenuItemMusicVolume};
 Menu menuVolume = {"Set Volume", 0, 2, menuItemVolItems, DARKBLUE, WHITE, YELLOW};
 
@@ -42,27 +43,11 @@ void MenuItemMusicVolume(GameState *currentState)
 #endif
 }
 
-// we must always implement this one, I think is always related to what are you trying to do with the menu
-// Maybe in the future I could find a way to describe it with data and create a generic draw.
-// But I suspect that we would need to use dynamic arrays to / maps to store more information.
-// Maybe we could add a callback function to every item to tell how it should draw.
-// This way we could keep the generic menu render and each item is responsible for defining how the should render (similar to the action).
-void DrawMenu(const Menu *menu, const GameState *currentState)
+void DrawVolumeItem(const Menu *menu, const GameState *currentState, const int i)
 {
-    const char * exitMessage = "Press [SPACE] to exit the menu.";
-    
-    ClearBackground(menu->background);
-    DrawText(menu->title, WINDOW_CENTRE_H - MeasureText(menu->title, 40) / 2.0, 30, 40, menu->foreground);
-
-    for (int i = 0; i < menu->count; i++)
-    {
-        const char *buff =
-            TextFormat(menu->items[i]->name, (i == 0 ? currentState->soundsVol : currentState->musicVol) * 100.0f);
-        DrawText(buff, (int)menu->items[i]->position.x - MeasureText(buff, 30) / 2, (int)menu->items[i]->position.y, 30,
-                 menu->selected == i ? menu->activeForeground : menu->foreground);
-    }
-
-    DrawText(exitMessage, WINDOW_CENTRE_H - MeasureText(exitMessage, 20) / 2.0, WINDOW_HEIGHT - 60, 20, menu->foreground);
+    const char *buff =
+        TextFormat(menu->items[i]->name, (i == 0 ? currentState->soundsVol : currentState->musicVol) * 100.0f);
+    DrawText(buff, (int)menu->items[i]->position.x - MeasureText(buff, 30) / 2, (int)menu->items[i]->position.y, 30,
+             menu->selected == i ? menu->activeForeground : menu->foreground);
 }
-
 #endif // H_MUSIC_MENU_IMPLEMENTATION

@@ -25,11 +25,12 @@ void SetInitialGameState(GameState *currState, bool loadSound)
     currState->activeObjects = 0;
     currState->score = 0;
     currState->totalEnemies = 0;
-    currState->soundsVol = 0.1f;
-    currState->musicVol = 0.1f;
 
     if (loadSound)
     {
+        currState->soundsVol = 0.1f;
+        currState->musicVol = 0.1f;
+
         currState->sounds[SO_bullet] = LoadSound("./sounds/slimeball.wav");
         SetSoundVolume(currState->sounds[SO_bullet], currState->soundsVol);
         currState->sounds[SO_collide] = LoadSound("./sounds/boom.wav");
@@ -89,7 +90,8 @@ void Render(void)
         ClearBackground(BLACK);
         DrawPlayingGameState(&currentState);
         break;
-    case S_lose: {
+    case S_lose:
+    {
         // TODO(): All text here is hardcoded and will need to be adjustable to the screen size / ratio.
         const char *youLost = "YOU LOST";
 
@@ -100,7 +102,8 @@ void Render(void)
                  WINDOW_HEIGHT / 2.0 + 30, 30, RED);
         break;
     }
-    case S_win: {
+    case S_win:
+    {
         // TODO(): All text here is hardcoded and will need to be adjustable to the screen size / ratio.
         const char *youWon = "YOU WON";
 
