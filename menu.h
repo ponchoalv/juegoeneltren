@@ -20,7 +20,16 @@ typedef struct
     Color activeForeground;
 } Menu;
 
+// This one I provided a generic implementation because I think we could do it
 void ProcessInputMenu(Menu *menu, GameState *currentState);
+
+// This method is not implemented because I don't know how to draw it in a generic way
+// TODO(menu.h) Maybe including more information in the menu items related to how we want to draw.
+void DrawMenu(const Menu *menu, const GameState *currentState);
+
+#endif // H_MENU
+
+#ifdef H_MENU_IMPLEMENTATION
 
 void ProcessInputMenu(Menu *menu, GameState *currentState)
 {
@@ -54,4 +63,4 @@ void ProcessInputMenu(Menu *menu, GameState *currentState)
     }
 }
 
-#endif
+#endif // H_MENU_IMPLEMENTATION

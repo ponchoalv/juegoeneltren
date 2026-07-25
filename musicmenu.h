@@ -1,14 +1,21 @@
 #ifndef H_MUSIC_MENU
 #define H_MUSIC_MENU
 
+#define H_MENU_IMPLEMENTATION // process input for the menu is already implemented in the header file
 #include "menu.h"
 
 void MenuItemSFXVolume(GameState *currentState);
 void MenuItemMusicVolume(GameState *currentState);
-void MenuDrawVolMenu(const Menu *menu, const GameState *currentState);
 
+#endif // H_MUSIC_MENU
+
+#ifdef H_MUSIC_MENU_IMPLEMENTATION
+
+// For now I would prefer to not use dynamic arrays or maps.
 MenuItem gMenuItemSFXVolume = {"SFX Volume: %.0f%%", (Vector2){WINDOW_CENTRE_H, 100}, MenuItemSFXVolume};
 MenuItem gMenuItemMusicVolume = {"Music Volume: %.0f%%", (Vector2){WINDOW_CENTRE_H, 140}, MenuItemMusicVolume};
+MenuItem *menuItemVolItems[] = {&gMenuItemSFXVolume, &gMenuItemMusicVolume};
+Menu menuVolume = {"Set Volume", 0, 2, menuItemVolItems, DARKBLUE, WHITE, YELLOW};
 
 void MenuItemSFXVolume(GameState *currentState)
 {
@@ -35,11 +42,10 @@ void MenuItemMusicVolume(GameState *currentState)
 #endif
 }
 
-MenuItem *menuItemVolItems[] = {&gMenuItemSFXVolume, &gMenuItemMusicVolume};
-
-Menu menuVolume = {"Set Volume", 0, 2, menuItemVolItems, DARKBLUE, WHITE, YELLOW};
-
-void MenuDrawVolMenu(const Menu *menu, const GameState *currentState)
+// we must always implement this one, I think is always related to what are you trying to do with the menu
+// Maybe in the future I could find a way to describe it with data and create a generic draw.
+// But I suspect that we would need to use dynamic arrays to / maps to store more information.
+void DrawMenu(const Menu *menu, const GameState *currentState)
 {
     ClearBackground(menu->background);
     DrawText(menu->title, WINDOW_CENTRE_H - MeasureText(menu->title, 40) / 2.0, 30, 40, menu->foreground);
@@ -52,4 +58,5 @@ void MenuDrawVolMenu(const Menu *menu, const GameState *currentState)
                  menu->selected == i ? menu->activeForeground : menu->foreground);
     }
 }
-#endif
+
+#endif // H_MUSIC_MENU_IMPLEMENTATION

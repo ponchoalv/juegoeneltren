@@ -10,6 +10,7 @@
 #define H_ENEMIES_IMPLEMENTATION
 #include "enemies.h"
 
+#define H_MUSIC_MENU_IMPLEMENTATION
 #include "musicmenu.h"
 
 #define SHOW_FPS
@@ -111,7 +112,7 @@ void Render(void)
         break;
     }
     case S_menu:
-        MenuDrawVolMenu(&menuVolume, &currentState);
+        DrawMenu(&menuVolume, &currentState);
         break;
     }
 
