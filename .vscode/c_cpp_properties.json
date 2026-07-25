@@ -13,6 +13,20 @@
       "compilerArgs": [
         "--std=c99"
       ]
+    },
+    {
+      "name": "macos-clang-arm64",
+      "includePath": [
+        "${workspaceFolder}/**"
+      ],
+      "defines": [],
+      "cStandard": "${default}",
+      "cppStandard": "${default}",
+      "intelliSenseMode": "macos-clang-arm64",
+      "compilerPath": "/usr/bin/clang",
+      "compilerArgs": [
+        "--std=c99"
+      ]
     }
   ],
   "version": 4
