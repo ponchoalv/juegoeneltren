@@ -1,7 +1,6 @@
 #ifndef H_MENU
 #define H_MENU
 
-// typedef void* Menu;
 typedef struct Menu Menu;
 typedef struct MenuItem MenuItem;
 
@@ -10,8 +9,8 @@ struct MenuItem
 {
     char *name;
     Vector2 position;
-    void (*action)(GameState*);
-    void (*drawItem) (const Menu*, const GameState*, const int);
+    void (*action)(GameState *);
+    void (*drawItem)(const MenuItem *, const GameState *, const Color);
 };
 
 struct Menu
@@ -71,17 +70,19 @@ void ProcessInputMenu(Menu *menu, GameState *currentState)
 // First attempt to generic drawing
 void DrawMenu(const Menu *menu, const GameState *currentState)
 {
-    const char * exitMessage = "Press [SPACE] to exit the menu.";
-    
+    const char *exitMessage = "Press [SPACE] to exit the menu.";
+
     ClearBackground(menu->background);
     DrawText(menu->title, WINDOW_CENTRE_H - MeasureText(menu->title, 40) / 2.0, 30, 40, menu->foreground);
 
     for (int i = 0; i < menu->count; i++)
     {
-        menu->items[i]->drawItem((void*)menu, currentState, i);
+        menu->items[i]->drawItem(menu->items[i], currentState,
+                                 menu->selected == i ? menu->activeForeground : menu->foreground);
     }
 
-    DrawText(exitMessage, WINDOW_CENTRE_H - MeasureText(exitMessage, 20) / 2.0, WINDOW_HEIGHT - 60, 20, menu->foreground);
+    DrawText(exitMessage, WINDOW_CENTRE_H - MeasureText(exitMessage, 20) / 2.0, WINDOW_HEIGHT - 60, 20,
+             menu->foreground);
 }
 
 #endif // H_MENU_IMPLEMENTATION

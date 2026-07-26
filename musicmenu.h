@@ -6,15 +6,16 @@
 
 void MenuItemSFXVolume(GameState *currentState);
 void MenuItemMusicVolume(GameState *currentState);
-void DrawVolumeItem(const Menu*, const GameState*, const int);
+void DrawSFXVolumeItem(const MenuItem *, const GameState *, const Color);
+void DrawMusicVolumeItem(const MenuItem *, const GameState *, const Color);
 
 #endif // H_MUSIC_MENU
 
 #ifdef H_MUSIC_MENU_IMPLEMENTATION
 
 // For now I would prefer to not use dynamic arrays or maps.
-MenuItem gMenuItemSFXVolume = {"SFX Volume: %.0f%%", (Vector2){WINDOW_CENTRE_H, 100}, MenuItemSFXVolume, DrawVolumeItem};
-MenuItem gMenuItemMusicVolume = {"Music Volume: %.0f%%", (Vector2){WINDOW_CENTRE_H, 140}, MenuItemMusicVolume, DrawVolumeItem};
+MenuItem gMenuItemSFXVolume = {"SFX Volume: %.0f%%", (Vector2){WINDOW_CENTRE_H, 100}, MenuItemSFXVolume, DrawSFXVolumeItem};
+MenuItem gMenuItemMusicVolume = {"Music Volume: %.0f%%", (Vector2){WINDOW_CENTRE_H, 140}, MenuItemMusicVolume, DrawMusicVolumeItem};
 MenuItem *menuItemVolItems[] = {&gMenuItemSFXVolume, &gMenuItemMusicVolume};
 Menu menuVolume = {"Set Volume", 0, 2, menuItemVolItems, DARKBLUE, WHITE, YELLOW};
 
@@ -43,11 +44,25 @@ void MenuItemMusicVolume(GameState *currentState)
 #endif
 }
 
-void DrawVolumeItem(const Menu *menu, const GameState *currentState, const int i)
+// helper function to prevent code duplication
+void DrawVolumeItem(const MenuItem *menuItem, const Color foreground, const float vol)
 {
     const char *buff =
-        TextFormat(menu->items[i]->name, (i == 0 ? currentState->soundsVol : currentState->musicVol) * 100.0f);
-    DrawText(buff, (int)menu->items[i]->position.x - MeasureText(buff, 30) / 2, (int)menu->items[i]->position.y, 30,
-             menu->selected == i ? menu->activeForeground : menu->foreground);
+        TextFormat(menuItem->name, vol * 100.0f);
+    DrawText(buff, (int)menuItem->position.x - MeasureText(buff, 30) / 2, (int)menuItem->position.y, 30,
+             foreground);
 }
+
+void DrawSFXVolumeItem(const MenuItem *menuItem, const GameState *currentState, const Color foreground)
+{
+    // Subscribe to the SFX volume variable from the game state.
+    DrawVolumeItem(menuItem, foreground, currentState->soundsVol);
+}
+
+void DrawMusicVolumeItem(const MenuItem *menuItem, const GameState *currentState, const Color foreground)
+{
+    // Subscribe to the Music volume variable from the game state.
+    DrawVolumeItem(menuItem, foreground, currentState->musicVol);
+}
+
 #endif // H_MUSIC_MENU_IMPLEMENTATION
