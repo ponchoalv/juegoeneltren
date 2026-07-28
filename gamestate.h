@@ -169,8 +169,8 @@ void WrapObjectPosition(const GameState *currentState, Object *obj)
 
 void SetRandomObjectPosition(const GameState *currentState, Object *obj)
 {
-    obj->position.x = (float)GetRandomValue(0 + (int)obj->radius, currentState->screenRes.x - obj->radius);
-    obj->position.y = (float)GetRandomValue(0 + (int)obj->radius, currentState->screenRes.y - obj->radius);
+    obj->position.x = (float)GetRandomValue(0 + (int)obj->radius, (int)(currentState->screenRes.x - obj->radius));
+    obj->position.y = (float)GetRandomValue(0 + (int)obj->radius, (int)(currentState->screenRes.y - obj->radius));
 }
 
 int CheckCollisionBetweenObjects(const Object *a, const Object *b)
@@ -432,7 +432,7 @@ void DestroyBulletObjectIfTimeOut(GameState *currentState, int i)
 
 Vector2 GetScreenCentre(const GameState *currentState)
 {
-    return Vector2Scale(currentState->screenRes, 0.5);
+    return Vector2Scale(currentState->screenRes, 0.5f);
 }
 
 #endif

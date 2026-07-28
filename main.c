@@ -101,10 +101,10 @@ void Render(void)
         const char *youLost = "YOU LOST";
 
         ClearBackground(BLACK);
-        DrawScoreColor(currentState.score, RED, currentState.screenRes.x, currentState.screenRes.y);
-        DrawText(youLost, (currentState.screenRes.x - MeasureText(youLost, 60)) / 2, currentState.screenRes.y / 2 - 40, 60, RED);
-        DrawText("Press [SPACE] to start again", (currentState.screenRes.x - MeasureText("Press [SPACE] to start again", 30)) / 2,
-                 currentState.screenRes.y / 2.0 + 30, 30, RED);
+        DrawScoreColor(currentState.score, RED, (int)currentState.screenRes.x, (int)currentState.screenRes.y);
+        DrawText(youLost, ((int)currentState.screenRes.x - MeasureText(youLost, 60)) / 2, (int)currentState.screenRes.y / 2 - 40, 60, RED);
+        DrawText("Press [SPACE] to start again", ((int)currentState.screenRes.x - MeasureText("Press [SPACE] to start again", 30)) / 2,
+                 (int)currentState.screenRes.y / 2 + 30, 30, RED);
         break;
     }
     case S_win:
@@ -113,10 +113,10 @@ void Render(void)
         const char *youWon = "YOU WON";
 
         ClearBackground(BLACK);
-        DrawScoreColor(currentState.score, GREEN, currentState.screenRes.x, currentState.screenRes.y);
-        DrawText(youWon, (currentState.screenRes.x - MeasureText(youWon, 60)) / 2, currentState.screenRes.y / 2 - 40, 60, GREEN);
-        DrawText("Press [SPACE] to start again", (currentState.screenRes.x - MeasureText("Press [SPACE] to start again", 30)) / 2,
-                 currentState.screenRes.y / 2.0 + 30, 30, GREEN);
+        DrawScoreColor(currentState.score, GREEN, (int)currentState.screenRes.x, (int)currentState.screenRes.y);
+        DrawText(youWon, ((int)currentState.screenRes.x - MeasureText(youWon, 60)) / 2, (int)currentState.screenRes.y / 2 - 40, 60, GREEN);
+        DrawText("Press [SPACE] to start again", ((int)currentState.screenRes.x - MeasureText("Press [SPACE] to start again", 30)) / 2,
+                 (int)currentState.screenRes.y / 2 + 30, 30, GREEN);
         break;
     }
     case S_menu:
@@ -155,8 +155,8 @@ void UpdateScreenSize(void)
 {
     if (IsWindowResized())
     {
-        currentState.screenRes.x = GetScreenWidth();
-        currentState.screenRes.y = GetScreenHeight();
+        currentState.screenRes.x = (float)GetScreenWidth();
+        currentState.screenRes.y = (float)GetScreenHeight();
     }
 }
 

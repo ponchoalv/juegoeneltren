@@ -67,28 +67,23 @@ void ProcessInputMenu(Menu *menu, GameState *currentState)
     }
 }
 
-void UpdateMenuItemX(MenuItem *menuItem, int x)
-{
-    menuItem->position.x = x;
-}
-
 // First attempt to generic drawing
 void DrawMenu(const Menu *menu, const GameState *currentState)
 {
     const char *exitMessage = "Press [SPACE] to exit the menu.";
-    const int screenCentreH = GetScreenCentre(currentState).x;
+    const float screenCentreH = GetScreenCentre(currentState).x;
 
     ClearBackground(menu->background);
-    DrawText(menu->title, screenCentreH - MeasureText(menu->title, 40) / 2.0, 30, 40, menu->foreground);
+    DrawText(menu->title, (int)screenCentreH - MeasureText(menu->title, 40) / 2, 30, 40, menu->foreground);
 
     for (int i = 0; i < menu->count; i++)
     {
-        UpdateMenuItemX(menu->items[i], screenCentreH);
+        menu->items[i]->position.x = screenCentreH;
         menu->items[i]->drawItem(menu->items[i], currentState,
                                  menu->selected == i ? menu->activeForeground : menu->foreground);
     }
 
-    DrawText(exitMessage, screenCentreH - MeasureText(exitMessage, 20) / 2.0, currentState->screenRes.y - 60, 20,
+    DrawText(exitMessage, (int)screenCentreH - MeasureText(exitMessage, 20) / 2, (int)currentState->screenRes.y - 60, 20,
              menu->foreground);
 }
 
