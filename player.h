@@ -39,8 +39,7 @@ void InitPlayer(GameState *currentState)
     if (currentState->poid == NULL)
         TraceLog(LOG_FATAL, "failed allocating player object");
     currentState->player = &currentState->objects[currentState->poid];
-    currentState->player->position.x = WINDOW_CENTRE_H;
-    currentState->player->position.y = WINDOW_CENTRE_V;
+    currentState->player->position = GetScreenCentre(currentState);
     currentState->player->color = GREEN;
     currentState->player->rotation = 0;
     currentState->player->sides = 3;

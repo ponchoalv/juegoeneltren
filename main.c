@@ -17,7 +17,7 @@
 
 GameState currentState = {0};
 
-void SetInitialGameState(GameState *currState, bool loadSound)
+void SetInitialGameState(GameState *currState, bool loadSound, bool setScreen)
 {
     // first we reset the state of the game to be in playing mode.
     // then we set the counters to the initial status.
@@ -42,6 +42,11 @@ void SetInitialGameState(GameState *currState, bool loadSound)
         currState->soundsLoaded = true;
     }
 
+    if (setScreen)
+    {
+        currState->screenRes = (Vector2) {WINDOW_WIDTH, WINDOW_HEIGHT};
+    }
+
     // here we create all the object.
     // this objects should be visible during playing status.
     InitObjects(currState);
@@ -64,16 +69,16 @@ void ProcessInput(void)
     default:
         if (IsKeyPressed(KEY_SPACE))
         {
-            SetInitialGameState(&currentState, false);
+            SetInitialGameState(&currentState, false, false);
         }
         break;
     }
 }
 
-void DrawScoreColor(int score, Color color)
+void DrawScoreColor(int score, Color color, int x, int y)
 {
     const char *score_text = TextFormat("YOUR SCORE WAS: %2i", score);
-    DrawText(score_text, (WINDOW_WIDTH - MeasureText(score_text, 20)) / 2, WINDOW_HEIGHT / 2 - 100, 20, color);
+    DrawText(score_text, (x - MeasureText(score_text, 20)) / 2, y / 2 - 100, 20, color);
 }
 
 void Render(void)
@@ -96,10 +101,10 @@ void Render(void)
         const char *youLost = "YOU LOST";
 
         ClearBackground(BLACK);
-        DrawScoreColor(currentState.score, RED);
-        DrawText(youLost, (WINDOW_WIDTH - MeasureText(youLost, 60)) / 2, WINDOW_HEIGHT / 2 - 40, 60, RED);
-        DrawText("Press [SPACE] to start again", (WINDOW_WIDTH - MeasureText("Press [SPACE] to start again", 30)) / 2,
-                 WINDOW_HEIGHT / 2.0 + 30, 30, RED);
+        DrawScoreColor(currentState.score, RED, currentState.screenRes.x, currentState.screenRes.y);
+        DrawText(youLost, (currentState.screenRes.x - MeasureText(youLost, 60)) / 2, currentState.screenRes.y / 2 - 40, 60, RED);
+        DrawText("Press [SPACE] to start again", (currentState.screenRes.x - MeasureText("Press [SPACE] to start again", 30)) / 2,
+                 currentState.screenRes.y / 2.0 + 30, 30, RED);
         break;
     }
     case S_win:
@@ -108,10 +113,10 @@ void Render(void)
         const char *youWon = "YOU WON";
 
         ClearBackground(BLACK);
-        DrawScoreColor(currentState.score, GREEN);
-        DrawText(youWon, (WINDOW_WIDTH - MeasureText(youWon, 60)) / 2, WINDOW_HEIGHT / 2 - 40, 60, GREEN);
-        DrawText("Press [SPACE] to start again", (WINDOW_WIDTH - MeasureText("Press [SPACE] to start again", 30)) / 2,
-                 WINDOW_HEIGHT / 2.0 + 30, 30, GREEN);
+        DrawScoreColor(currentState.score, GREEN, currentState.screenRes.x, currentState.screenRes.y);
+        DrawText(youWon, (currentState.screenRes.x - MeasureText(youWon, 60)) / 2, currentState.screenRes.y / 2 - 40, 60, GREEN);
+        DrawText("Press [SPACE] to start again", (currentState.screenRes.x - MeasureText("Press [SPACE] to start again", 30)) / 2,
+                 currentState.screenRes.y / 2.0 + 30, 30, GREEN);
         break;
     }
     case S_menu:
@@ -146,11 +151,21 @@ void UpdateGameState(void)
     }
 }
 
+void UpdateScreenSize(void)
+{
+    if (IsWindowResized())
+    {
+        currentState.screenRes.x = GetScreenWidth();
+        currentState.screenRes.y = GetScreenHeight();
+    }
+}
+
 void UpdateAndDrawFrame(void)
 {
     ProcessInput();
     UpdateGameState();
     UpdateMusicStream(currentState.music);
+    UpdateScreenSize();
     Render();
 }
 
@@ -167,9 +182,10 @@ void TestRandNumbers(void)
 int main(void)
 {
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Juego en el tren");
+    SetWindowState(FLAG_WINDOW_RESIZABLE);
     SetTargetFPS(60);
     InitAudioDevice(); // Initialize audio device
-    SetInitialGameState(&currentState, true);
+    SetInitialGameState(&currentState, true, true);
 
     while (!WindowShouldClose())
     {

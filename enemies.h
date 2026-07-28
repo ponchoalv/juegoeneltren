@@ -25,10 +25,10 @@ void InitEnemies(GameState *currentState)
         currentState->objects[objid].duration = 2.0;
 
         // Prevent a new spawn enemy to collide with the player
-        SetRandomObjectPosition(&currentState->objects[objid]);
+        SetRandomObjectPosition(currentState, &currentState->objects[objid]);
         while (CheckCollisionBetweenObjects(currentState->player, &currentState->objects[objid]))
         {
-            SetRandomObjectPosition(&currentState->objects[objid]);
+            SetRandomObjectPosition(currentState, &currentState->objects[objid]);
         }
     }
 }

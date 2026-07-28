@@ -8,7 +8,7 @@ typedef struct MenuItem MenuItem;
 struct MenuItem
 {
     char *name;
-    Vector2 position;
+    Vector2 position; // change this to LEFT, CENTRE, RIGHT
     void (*action)(GameState *);
     void (*drawItem)(const MenuItem *, const GameState *, const Color);
 };
@@ -67,21 +67,28 @@ void ProcessInputMenu(Menu *menu, GameState *currentState)
     }
 }
 
+void UpdateMenuItemX(MenuItem *menuItem, int x)
+{
+    menuItem->position.x = x;
+}
+
 // First attempt to generic drawing
 void DrawMenu(const Menu *menu, const GameState *currentState)
 {
     const char *exitMessage = "Press [SPACE] to exit the menu.";
+    const int screenCentreH = GetScreenCentre(currentState).x;
 
     ClearBackground(menu->background);
-    DrawText(menu->title, WINDOW_CENTRE_H - MeasureText(menu->title, 40) / 2.0, 30, 40, menu->foreground);
+    DrawText(menu->title, screenCentreH - MeasureText(menu->title, 40) / 2.0, 30, 40, menu->foreground);
 
     for (int i = 0; i < menu->count; i++)
     {
+        UpdateMenuItemX(menu->items[i], screenCentreH);
         menu->items[i]->drawItem(menu->items[i], currentState,
                                  menu->selected == i ? menu->activeForeground : menu->foreground);
     }
 
-    DrawText(exitMessage, WINDOW_CENTRE_H - MeasureText(exitMessage, 20) / 2.0, WINDOW_HEIGHT - 60, 20,
+    DrawText(exitMessage, screenCentreH - MeasureText(exitMessage, 20) / 2.0, currentState->screenRes.y - 60, 20,
              menu->foreground);
 }
 

@@ -83,13 +83,14 @@ typedef struct
     int score;
     int totalEnemies;
     bool soundsLoaded;
+    Vector2 screenRes;
 } GameState;
 
 Objid InitObject(GameState *currentState, ObjType type, ObjSubType subType);
 void DestroyObject(GameState *currentState, Objid objid);
 void InitObjects(GameState *currentState);
-void WrapObjectPosition(Object *obj);
-void SetRandomObjectPosition(Object *obj);
+void WrapObjectPosition(const GameState *currentState, Object *obj);
+void SetRandomObjectPosition(const GameState *currentState, Object *obj);
 int CheckCollisionBetweenObjects(const Object *a, const Object *b);
 Vector2 GetOrientationVector(Vector2 from, Vector2 to);
 void SetObjectDirAndSpeed(Object *obj, Vector2 to);
@@ -103,6 +104,7 @@ void DrawPlayingGameState(GameState *currentState);
 void UpdatePlayingGameState(GameState *currentState);
 void UpdateWithEnemyAI(GameState *currentState, int i);
 void DestroyBulletObjectIfTimeOut(GameState *currentState, int i);
+Vector2 GetScreenCentre(const GameState *currentState);
 #endif
 
 #ifdef H_GAME_STATE_IMPLEMENTATION
@@ -150,25 +152,25 @@ void InitObjects(GameState *currentState)
     }
 }
 
-void WrapObjectPosition(Object *obj)
+void WrapObjectPosition(const GameState *currentState, Object *obj)
 {
     if (obj->position.x < 0)
-        obj->position.x = WINDOW_WIDTH;
+        obj->position.x = currentState->screenRes.x;
 
-    if (obj->position.x > WINDOW_WIDTH)
+    if (obj->position.x > currentState->screenRes.x)
         obj->position.x = 0;
 
-    if (obj->position.y > WINDOW_HEIGHT)
+    if (obj->position.y > currentState->screenRes.y)
         obj->position.y = 0;
 
     if (obj->position.y < 0)
-        obj->position.y = WINDOW_HEIGHT;
+        obj->position.y = currentState->screenRes.y;
 }
 
-void SetRandomObjectPosition(Object *obj)
+void SetRandomObjectPosition(const GameState *currentState, Object *obj)
 {
-    obj->position.x = (float)GetRandomValue(0 + (int)obj->radius, WINDOW_WIDTH - obj->radius);
-    obj->position.y = (float)GetRandomValue(0 + (int)obj->radius, WINDOW_HEIGHT - obj->radius);
+    obj->position.x = (float)GetRandomValue(0 + (int)obj->radius, currentState->screenRes.x - obj->radius);
+    obj->position.y = (float)GetRandomValue(0 + (int)obj->radius, currentState->screenRes.y - obj->radius);
 }
 
 int CheckCollisionBetweenObjects(const Object *a, const Object *b)
@@ -370,7 +372,7 @@ void UpdatePlayingGameState(GameState *currentState)
 
         // TODO(gamestate): this should be moved to gamestate.h (along side with this methods)
         MoveObject(&currentState->objects[i]);
-        WrapObjectPosition(&currentState->objects[i]);
+        WrapObjectPosition(currentState, &currentState->objects[i]);
 
         switch (currentState->objects[i].type)
         {
@@ -397,6 +399,7 @@ void UpdatePlayingGameState(GameState *currentState)
         currentState->status = S_win;
     }
 }
+
 void UpdateWithEnemyAI(GameState *currentState, int i)
 {
     // TODO(enemies): should move this to enemies.h I think
@@ -426,4 +429,10 @@ void DestroyBulletObjectIfTimeOut(GameState *currentState, int i)
         DestroyObject(currentState, i);
     }
 }
+
+Vector2 GetScreenCentre(const GameState *currentState)
+{
+    return Vector2Scale(currentState->screenRes, 0.5);
+}
+
 #endif
