@@ -13,6 +13,8 @@
 #define H_MUSIC_MENU_IMPLEMENTATION
 #include "musicmenu.h"
 
+#define MENU_FONT "fonts/JetBrainsMono-Medium.ttf"
+
 #define SHOW_FPS
 
 GameState currentState = {0};
@@ -56,7 +58,7 @@ void SetInitialGameState(GameState *currState, bool loadSound, bool setScreen)
 
 void ProcessInput(void)
 {
-    CaptureMouseWithinWindow();
+    CaptureMouseWithinWindow(&currentState);
 
     switch (currentState.status)
     {
@@ -64,7 +66,7 @@ void ProcessInput(void)
         ProcessPlayerInput(&currentState);
         break;
     case S_menu:
-        ProcessInputMenu(&menuVolume, &currentState);
+        MenuProcessInput(&menuVolume, &currentState);
         break;
     default:
         if (IsKeyPressed(KEY_SPACE))
@@ -120,7 +122,7 @@ void Render(void)
         break;
     }
     case S_menu:
-        DrawMenu(&menuVolume, &currentState);
+        MenuDraw(&menuVolume, &currentState);
         break;
     }
 
@@ -186,6 +188,7 @@ int main(void)
     SetTargetFPS(60);
     InitAudioDevice(); // Initialize audio device
     SetInitialGameState(&currentState, true, true);
+    MenuLoadFont(&menuVolume, MENU_FONT);
 
     while (!WindowShouldClose())
     {
@@ -195,6 +198,7 @@ int main(void)
 
     // tengo que unload los audios acá UnloadSound()
     UnloadGameFXSoundsAndMusic(&currentState);
+    MenuUnloadFont(&menuVolume);
     CloseAudioDevice(); // Close audio device
     CloseWindow();
 

@@ -94,7 +94,7 @@ void SetRandomObjectPosition(const GameState *currentState, Object *obj);
 int CheckCollisionBetweenObjects(const Object *a, const Object *b);
 Vector2 GetOrientationVector(Vector2 from, Vector2 to);
 void SetObjectDirAndSpeed(Object *obj, Vector2 to);
-void CaptureMouseWithinWindow(void);
+void CaptureMouseWithinWindow(const GameState*);
 void UnloadGameFXSoundsAndMusic(GameState *currentState);
 void UpdateStateWithCollisions(GameState *currentState, Objid objid);
 void CheckBulletToObjectCollisions(const Object *otherObject, GameState *currentState, int j, Objid objid);
@@ -191,7 +191,7 @@ void SetObjectDirAndSpeed(Object *obj, Vector2 to)
         Vector2Multiply(GetOrientationVector(obj->position, to), (Vector2){obj->speedMultiplier, obj->speedMultiplier});
 }
 
-void CaptureMouseWithinWindow(void)
+void CaptureMouseWithinWindow(const GameState *currentState)
 {
     // added an extra 5 pixels to prevent the mouse to bounce out of
     // the window, not sure if this the right thing to do, was the
@@ -200,14 +200,14 @@ void CaptureMouseWithinWindow(void)
     const int y = GetMouseY();
 
     // this logic to capture the mouse is not working properly and make gameplay a bit awkward
-    if (WINDOW_WIDTH - MOUSE_MARGIN < x)
-        SetMousePosition(WINDOW_WIDTH - MOUSE_MARGIN, y);
+    if ((int)currentState->screenRes.x - MOUSE_MARGIN < x)
+        SetMousePosition((int)currentState->screenRes.x - MOUSE_MARGIN, y);
     if (MOUSE_MARGIN >= x)
         SetMousePosition(MOUSE_MARGIN, y);
     if (MOUSE_MARGIN >= y)
         SetMousePosition(x, MOUSE_MARGIN);
-    if (WINDOW_HEIGHT - MOUSE_MARGIN <= y)
-        SetMousePosition(x, WINDOW_HEIGHT - MOUSE_MARGIN);
+    if ((int)currentState->screenRes.y - MOUSE_MARGIN <= y)
+        SetMousePosition(x, (int)currentState->screenRes.y - MOUSE_MARGIN);
 }
 
 void UnloadGameFXSoundsAndMusic(GameState *currentState)
