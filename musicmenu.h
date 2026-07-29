@@ -14,8 +14,8 @@ void DrawMusicVolumeItem(const MenuItem *, const GameState *, const Color);
 #ifdef H_MUSIC_MENU_IMPLEMENTATION
 
 // For now I would prefer to not use dynamic arrays or maps.
-MenuItem gMenuItemSFXVolume = {"SFX Volume: %.0f%%", (Vector2){WINDOW_CENTRE_H, 100}, MenuItemSFXVolume, DrawSFXVolumeItem};
-MenuItem gMenuItemMusicVolume = {"Music Volume: %.0f%%", (Vector2){WINDOW_CENTRE_H, 140}, MenuItemMusicVolume, DrawMusicVolumeItem};
+MenuItem gMenuItemSFXVolume   = {"SFX Volume:   %3.0f%%", (Vector2){WINDOW_CENTRE_H, 100}, MenuItemSFXVolume, DrawSFXVolumeItem};
+MenuItem gMenuItemMusicVolume = {"Music Volume: %3.0f%%", (Vector2){WINDOW_CENTRE_H, 140}, MenuItemMusicVolume, DrawMusicVolumeItem};
 MenuItem *menuItemVolItems[] = {&gMenuItemSFXVolume, &gMenuItemMusicVolume};
 Menu menuVolume = {"Set Volume", 0, 2, menuItemVolItems, DARKBLUE, WHITE, YELLOW};
 
