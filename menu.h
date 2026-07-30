@@ -27,7 +27,7 @@ struct MenuItem
     MenuItemAlignment alignment;
     Vector2 position; // change this to LEFT, CENTRE, RIGHT
     void (*action)(GameState *);
-    void (*drawItem)(const MenuItem *, const GameState *, const Color, const Font *, const int);
+    void (*drawItem)(const MenuItem *, const GameState *, const Color, const Font *, const float);
 };
 
 // How to add a font to the menu, or should be a global font used for everything?
@@ -42,7 +42,7 @@ struct Menu
     int selected;
     int count;
     MenuItem **items;
-    int fontSize[M_F_TOTAL];
+    float fontSize[M_F_TOTAL];
     Font font[M_F_TOTAL];
     Color background;
     Color foreground;
@@ -135,7 +135,7 @@ void MenuLoadFont(Menu *menu, const char *filename)
     int i = 0;
     for (i = 0; i < M_F_TOTAL; i++)
     {
-        menu->font[i] = LoadFontEx(filename, menu->fontSize[i], NULL, 0);
+        menu->font[i] = LoadFontEx(filename, (int)menu->fontSize[i], NULL, 0);
     }
 }
 
