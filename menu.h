@@ -22,6 +22,9 @@ struct MenuItem
 };
 
 // How to add a font to the menu, or should be a global font used for everything?
+// I don't like how this font thing looks, we will need to load the font texture for the different font sizes we want to support
+// I think it would be better to leave to the menuItem to define their own font (and we call their font initializer from LoadFont)
+// TODO(menu.h) I need to rethinl this font thing
 // Maybe all the menus should have the same
 struct Menu
 {
