@@ -1,21 +1,5 @@
 {
   "configurations": [
-     {
-            "name": "macos-clang-x64",
-            "includePath": [
-                "${workspaceFolder}/**",
-                "/usr/local/opt/llvm/include",
-                "/usr/local/Cellar/llvm/21.1.8/lib/clang/21/include"
-            ],
-            "defines": [],
-            "cStandard": "${default}",
-            "cppStandard": "${default}",
-            "intelliSenseMode": "macos-clang-x64",
-            "compilerPath": "/usr/local/opt/llvm/bin/clang",
-            "compilerArgs": [
-                "--std=c99"
-            ]
-    },
     {
       "name": "macos-clang-arm64",
       "includePath": [
@@ -26,6 +10,9 @@
       "cppStandard": "${default}",
       "intelliSenseMode": "macos-clang-arm64",
       "compilerPath": "/usr/bin/clang",
+      "compileCommands": [
+        "${workspaceFolder}/compile_commands.json"
+      ],
       "compilerArgs": [
         "--std=c99"
       ]

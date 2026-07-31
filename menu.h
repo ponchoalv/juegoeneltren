@@ -20,6 +20,12 @@ typedef enum
     M_F_TOTAL
 } MenuFont;
 
+typedef struct
+{
+    const Font *font;
+    const float fontSize;
+} MenuFontConfig;
+
 // I think this should be Menu 1-* MenuItems
 struct MenuItem
 {
@@ -27,14 +33,14 @@ struct MenuItem
     MenuItemAlignment alignment;
     Vector2 position; // change this to LEFT, CENTRE, RIGHT
     void (*action)(GameState *);
-    void (*drawItem)(const MenuItem *, const GameState *, const Color, const Font *, const float);
+    void (*drawItem)(const MenuItem *, const GameState *, const Color, const MenuFontConfig);
 };
 
 // How to add a font to the menu, or should be a global font used for everything?
 // I don't like how this font thing looks, we will need to load the font texture for the different font sizes we want to
 // support I think it would be better to leave to the menuItem to define their own font (and we call their font
 // initializer from LoadFont)
-// TODO(menu.h) I need to rethinl this font thing
+// TODO(menu.h) I need to rethink this font thing
 // Maybe all the menus should have the same
 struct Menu
 {
@@ -103,7 +109,7 @@ void MenuDraw(const Menu *menu, const GameState *currentState)
 {
     const char *exitMessage = "Press [SPACE] to exit the menu.";
     const float screenCentreH = GetScreenCentre(currentState).x;
-
+    const MenuFontConfig fontConfig = {&menu->font[M_F_ITEM], menu->fontSize[M_F_ITEM]};
     const Vector2 exitMessageMeasure =
         MeasureTextEx(menu->font[M_F_EXIT], exitMessage, menu->fontSize[M_F_EXIT], 3); // Measure string size for Font
     const Vector2 titleMeasure =
@@ -119,8 +125,7 @@ void MenuDraw(const Menu *menu, const GameState *currentState)
     {
         menu->items[i]->position.x = screenCentreH;
         menu->items[i]->drawItem(menu->items[i], currentState,
-                                 menu->selected == i ? menu->activeForeground : menu->foreground, &menu->font[M_F_ITEM],
-                                 menu->fontSize[M_F_ITEM]);
+                                 menu->selected == i ? menu->activeForeground : menu->foreground, fontConfig);
     }
 
     // DrawTextEx(menu->font, menu->title, (Vector2){screenCentreH - titleMeasure.x / 2.0f, 30.0f}, 40, 4,

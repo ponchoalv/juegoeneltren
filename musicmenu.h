@@ -6,8 +6,8 @@
 
 void MenuItemSFXVolume(GameState *currentState);
 void MenuItemMusicVolume(GameState *currentState);
-void DrawSFXVolumeItem(const MenuItem *, const GameState *, const Color, const Font *, const float fontSize);
-void DrawMusicVolumeItem(const MenuItem *, const GameState *, const Color, const Font *, const float fontSize);
+void DrawSFXVolumeItem(const MenuItem *, const GameState *, const Color, const MenuFontConfig);
+void DrawMusicVolumeItem(const MenuItem *, const GameState *, const Color, const MenuFontConfig);
 
 #define FONT_SIZE_TITLE 64.0
 #define FONT_SIZE_ITEM 40.0
@@ -51,24 +51,24 @@ void MenuItemMusicVolume(GameState *currentState)
 }
 
 // helper function to prevent code duplication
-void DrawVolumeItem(const MenuItem *menuItem, const Color foreground, const float vol, const Font *font, const float fontSize)
+void DrawVolumeItem(const MenuItem *menuItem, const Color foreground, const float vol, const MenuFontConfig menuFontConfig)
 {
     const char *buff = TextFormat(menuItem->name, vol * 100.0f);
-    const Vector2 buffMeasure = MeasureTextEx(*font, buff, fontSize, 1.0f);
-    DrawTextEx(*font, buff, (Vector2){menuItem->position.x - buffMeasure.x / 2.0f, menuItem->position.y}, fontSize, 1.0f, foreground);
+    const Vector2 buffMeasure = MeasureTextEx(*menuFontConfig.font, buff, menuFontConfig.fontSize, 1.0f);
+    DrawTextEx(*menuFontConfig.font, buff, (Vector2){menuItem->position.x - buffMeasure.x / 2.0f, menuItem->position.y}, menuFontConfig.fontSize, 1.0f, foreground);
     /* DrawText(buff, (int)menuItem->position.x - MeasureText(buff, 30) / 2, (int)menuItem->position.y, 30, foreground); */
 }
 
-void DrawSFXVolumeItem(const MenuItem *menuItem, const GameState *currentState, const Color foreground, const Font *font, const float fontSize)
+void DrawSFXVolumeItem(const MenuItem *menuItem, const GameState *currentState, const Color foreground, const MenuFontConfig menuFontConfig)
 {
     // Subscribe to the SFX volume variable from the game state.
-    DrawVolumeItem(menuItem, foreground, currentState->soundsVol, font, fontSize);
+    DrawVolumeItem(menuItem, foreground, currentState->soundsVol, menuFontConfig);
 }
 
-void DrawMusicVolumeItem(const MenuItem *menuItem, const GameState *currentState, const Color foreground, const Font *font, const float fontSize)
+void DrawMusicVolumeItem(const MenuItem *menuItem, const GameState *currentState, const Color foreground, const MenuFontConfig menuFontConfig)
 {
     // Subscribe to the Music volume variable from the game state.
-    DrawVolumeItem(menuItem, foreground, currentState->musicVol, font, fontSize);
+    DrawVolumeItem(menuItem, foreground, currentState->musicVol, menuFontConfig);
 }
 
 #endif // H_MUSIC_MENU_IMPLEMENTATION
