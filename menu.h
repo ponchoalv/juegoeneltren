@@ -63,7 +63,7 @@ void MenuProcessInput(Menu *menu, GameState *currentState);
 void MenuDraw(const Menu *menu, const GameState *currentState);
 
 // Load Font into the GPU & RAM
-void MenuLoadFont(Menu *menu, const char *filename);
+void MenuLoadFonts(Menu *menu, const char *filename);
 
 // Unload Font from the GPU & RAM
 void MenuUnloadFont(Menu *menu);
@@ -135,7 +135,7 @@ void MenuDraw(const Menu *menu, const GameState *currentState)
                menu->fontSize[M_F_EXIT], 3, menu->foreground);
 }
 
-void MenuLoadFont(Menu *menu, const char *filename)
+void MenuLoadFonts(Menu *menu, const char *filename)
 {
     int i = 0;
     for (i = 0; i < M_F_TOTAL; i++)

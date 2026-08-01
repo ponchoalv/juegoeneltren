@@ -177,7 +177,7 @@ int main(void)
     SetTargetFPS(60);
     InitAudioDevice(); // Initialize audio device
     SetInitialGameState(&currentState, true, true);
-    MenuLoadFont(&menuVolume, MENU_FONT);
+    MenuLoadFonts(&menuVolume, MENU_FONT);
 
     while (!WindowShouldClose())
     {
