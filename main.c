@@ -1,5 +1,4 @@
 #include <raylib.h>
-#include <raymath.h>
 
 #define H_GAME_STATE_IMPLEMENTATION
 #include "gamestate.h"
@@ -17,9 +16,9 @@
 
 #define SHOW_FPS
 
-GameState currentState = {0};
+static GameState currentState = {0};
 
-void SetInitialGameState(GameState *currState, bool loadSound, bool setScreen)
+static void SetInitialGameState(GameState *currState, const bool loadSound, const bool setScreen)
 {
     // first we reset the state of the game to be in playing mode.
     // then we set the counters to the initial status.
@@ -46,7 +45,7 @@ void SetInitialGameState(GameState *currState, bool loadSound, bool setScreen)
 
     if (setScreen)
     {
-        currState->screenRes = (Vector2) {WINDOW_WIDTH, WINDOW_HEIGHT};
+        currState->screenRes = (Vector2) {.x = WINDOW_WIDTH, .y = WINDOW_HEIGHT};
     }
 
     // here we create all the object.
@@ -56,7 +55,7 @@ void SetInitialGameState(GameState *currState, bool loadSound, bool setScreen)
     InitEnemies(currState);
 }
 
-void ProcessInput(void)
+static void ProcessInput(void)
 {
     CaptureMouseWithinWindow(&currentState);
 
@@ -77,13 +76,13 @@ void ProcessInput(void)
     }
 }
 
-void DrawScoreColor(int score, Color color, int x, int y)
+static void DrawScoreColor(const int score, const Color color, const int x, const int y)
 {
     const char *score_text = TextFormat("YOUR SCORE WAS: %2i", score);
     DrawText(score_text, (x - MeasureText(score_text, 20)) / 2, y / 2 - 100, 20, color);
 }
 
-void Render(void)
+static void Render(void)
 {
     BeginDrawing();
 
@@ -129,7 +128,7 @@ void Render(void)
     EndDrawing();
 }
 
-void UpdateGameState(void)
+static void UpdateGameState(void)
 {
     switch (currentState.status)
     {
@@ -153,7 +152,7 @@ void UpdateGameState(void)
     }
 }
 
-void UpdateScreenSize(void)
+static void UpdateScreenSize(void)
 {
     if (IsWindowResized())
     {
@@ -162,23 +161,13 @@ void UpdateScreenSize(void)
     }
 }
 
-void UpdateAndDrawFrame(void)
+static void UpdateAndDrawFrame(void)
 {
     ProcessInput();
     UpdateGameState();
     UpdateMusicStream(currentState.music);
     UpdateScreenSize();
     Render();
-}
-
-void TestRandNumbers(void)
-{
-    int i;
-    const int *numbers = LoadRandomSequence(10, 0, 100);
-    for (i = 0; i < 10; ++i)
-    {
-        TraceLog(LOG_INFO, "The random number at %d is %d", i, numbers[i]);
-    }
 }
 
 int main(void)
