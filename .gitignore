@@ -12,3 +12,4 @@ deps/libraylib.a
 .idea/
 .cache/clangd/
 compile_commands.json
+/deps/libraylib.web.a
