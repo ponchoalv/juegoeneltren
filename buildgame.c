@@ -106,14 +106,14 @@ int main(int argc, char **argv)
     nob_cmd_append(&cmd, "clang");
     if (debug)
         nob_cmd_append(&cmd, "-g");
-    nob_cmd_append(&cmd, "-std=c99", "-Wall", "-Wextra", "-Wpedantic", "-I" INCL_FOLDER, "-L" DEPS, "-framework", "CoreVideo", "-framework",
-                   "IOKit", "-framework", "Cocoa", "-framework", "GLUT", "-framework", "OpenGL", "-lraylib",
-                   SRC_FOLDER "main.c", "-o", BUILD_FOLDER "juego_en_el_tren");
+    nob_cmd_append(&cmd, "-std=c99", "-Wall", "-Wextra", "-Wpedantic", "-I" INCL_FOLDER, "-L" DEPS, "-framework",
+                   "CoreVideo", "-framework", "IOKit", "-framework", "Cocoa", "-framework", "GLUT", "-framework",
+                   "OpenGL", "-lraylib", SRC_FOLDER "main.c", "-o", BUILD_FOLDER "juego_en_el_tren");
 #else
     // On MSVC
-    nob_cmd_append(&cmd, "cl", "-std=c99", "-Wall", "-Wextra", "-Wpedantic", "-I" INCL_FOLDER, "-L" DEPS, "-framework", "CoreVideo", "-framework",
-                   "IOKit", "-framework", "Cocoa", "-framework", "GLUT", "-framework", "OpenGL", "-lraylib",
-                   SRC_FOLDER "main.c", "-o", BUILD_FOLDER "juego_en_el_tren");
+    nob_cmd_append(&cmd, "cl", "-std=c99", "-Wall", "-Wextra", "-Wpedantic", "-I" INCL_FOLDER, "-L" DEPS, "-framework",
+                   "CoreVideo", "-framework", "IOKit", "-framework", "Cocoa", "-framework", "GLUT", "-framework",
+                   "OpenGL", "-lraylib", SRC_FOLDER "main.c", "-o", BUILD_FOLDER "juego_en_el_tren");
 #endif // _MSC_VER
 
     // Let's execute the command.

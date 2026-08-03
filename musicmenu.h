@@ -8,7 +8,8 @@ void MenuItemSFXVolume(GameState *currentState);
 void MenuItemMusicVolume(GameState *currentState);
 void DrawSFXVolumeItem(const MenuItem *, const GameState *, const Color, const MenuFontConfig);
 void DrawMusicVolumeItem(const MenuItem *, const GameState *, const Color, const MenuFontConfig);
-void DrawVolumeItem(const MenuItem *menuItem, const Color foreground, const float vol, const MenuFontConfig menuFontConfig);
+void DrawVolumeItem(const MenuItem *menuItem, const Color foreground, const float vol,
+                    const MenuFontConfig menuFontConfig);
 
 #define FONT_SIZE_TITLE 64.0
 #define FONT_SIZE_ITEM 40.0
@@ -24,7 +25,8 @@ MenuItem gMenuItemSFXVolume = {"SFX Volume:   %3.0f%%", M_CENTRE, (Vector2){WIND
 MenuItem gMenuItemMusicVolume = {"Music Volume: %3.0f%%", M_CENTRE, (Vector2){WINDOW_CENTRE_H, 140},
                                  MenuItemMusicVolume, DrawMusicVolumeItem};
 MenuItem *menuItemVolItems[] = {&gMenuItemSFXVolume, &gMenuItemMusicVolume};
-Menu menuVolume = {"Set Volume", 0, 2, menuItemVolItems, {FONT_SIZE_TITLE, FONT_SIZE_EXIT, FONT_SIZE_ITEM}, {0}, DARKBLUE, WHITE, YELLOW};
+Menu menuVolume = {"Set Volume", 0,     2,     menuItemVolItems, {FONT_SIZE_TITLE, FONT_SIZE_EXIT, FONT_SIZE_ITEM}, {0},
+                   DARKBLUE,     WHITE, YELLOW};
 
 inline void MenuItemSFXVolume(GameState *currentState)
 {
@@ -52,21 +54,26 @@ inline void MenuItemMusicVolume(GameState *currentState)
 }
 
 // helper function to prevent code duplication
-inline void DrawVolumeItem(const MenuItem *menuItem, const Color foreground, const float vol, const MenuFontConfig menuFontConfig)
+inline void DrawVolumeItem(const MenuItem *menuItem, const Color foreground, const float vol,
+                           const MenuFontConfig menuFontConfig)
 {
     const char *buff = TextFormat(menuItem->name, vol * 100.0f);
     const Vector2 buffMeasure = MeasureTextEx(*menuFontConfig.font, buff, menuFontConfig.fontSize, 1.0f);
-    DrawTextEx(*menuFontConfig.font, buff, (Vector2){menuItem->position.x - buffMeasure.x / 2.0f, menuItem->position.y}, menuFontConfig.fontSize, 1.0f, foreground);
-    /* DrawText(buff, (int)menuItem->position.x - MeasureText(buff, 30) / 2, (int)menuItem->position.y, 30, foreground); */
+    DrawTextEx(*menuFontConfig.font, buff, (Vector2){menuItem->position.x - buffMeasure.x / 2.0f, menuItem->position.y},
+               menuFontConfig.fontSize, 1.0f, foreground);
+    /* DrawText(buff, (int)menuItem->position.x - MeasureText(buff, 30) / 2, (int)menuItem->position.y, 30, foreground);
+     */
 }
 
-inline void DrawSFXVolumeItem(const MenuItem *menuItem, const GameState *currentState, const Color foreground, const MenuFontConfig menuFontConfig)
+inline void DrawSFXVolumeItem(const MenuItem *menuItem, const GameState *currentState, const Color foreground,
+                              const MenuFontConfig menuFontConfig)
 {
     // Subscribe to the SFX volume variable from the game state.
     DrawVolumeItem(menuItem, foreground, currentState->soundsVol, menuFontConfig);
 }
 
-inline void DrawMusicVolumeItem(const MenuItem *menuItem, const GameState *currentState, const Color foreground, const MenuFontConfig menuFontConfig)
+inline void DrawMusicVolumeItem(const MenuItem *menuItem, const GameState *currentState, const Color foreground,
+                                const MenuFontConfig menuFontConfig)
 {
     // Subscribe to the Music volume variable from the game state.
     DrawVolumeItem(menuItem, foreground, currentState->musicVol, menuFontConfig);
