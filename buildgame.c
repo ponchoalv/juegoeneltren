@@ -23,6 +23,7 @@
 
 // Some folder paths that we use throughout the build process.
 #define BUILD_FOLDER "build/"
+#define BUILD_WEB_FOLDER BUILD_FOLDER"web/"
 #define SRC_FOLDER "./"
 #define DEPS "./deps/"
 #define INCL_FOLDER DEPS "include/"
@@ -72,14 +73,19 @@ int main(int argc, char **argv)
     // success, false - failure). If the operation returned false you don't need to log anything, the
     // convention is usually that the function logs what happened to itself. Just do
     // `if (!nob_function()) return;`
-    if (!nob_mkdir_if_not_exists(BUILD_FOLDER))
-        return 1;
 
     // The working horse of nob is the Nob_Cmd structure. It's a Dynamic Array of strings which represent
     // command line that you want to execute.
     Nob_Cmd cmd = {0};
     bool debug = argc > 1 && strcmp(argv[1], "-debug") == 0;
     bool run = argc > 1 && strcmp(argv[1], "-run") == 0;
+    bool web = argc > 1 && strcmp(argv[1], "-web") == 0;
+
+    if (!nob_mkdir_if_not_exists(BUILD_FOLDER))
+        return 1;
+
+    if(web && !nob_mkdir_if_not_exists(BUILD_WEB_FOLDER))
+        return 1;
 
     nob_set_current_dir(DEPS);
 
@@ -92,6 +98,10 @@ int main(int argc, char **argv)
     }
 
     nob_cmd_append(&cmd, "./deps");
+    if (web)
+    {
+        nob_cmd_append(&cmd, "-web");
+    }
     if (!nob_cmd_run(&cmd))
         return 1;
 
@@ -103,14 +113,23 @@ int main(int argc, char **argv)
     /// "clang", "-std=c99", "-Wall", "-Wextra", "-Wpedantic", "-framework", "CoreVideo", "-framework", "IOKit",
     /// "-framework", "Cocoa", "-framework", "GLUT", "-framework", "OpenGL", "libraylib.a", "main.c", "-o",
     /// "build/juego_en_el_tren"
-    nob_cmd_append(&cmd, "clang");
+    nob_cmd_append(&cmd, web ? "emcc" : "clang");
     if (debug)
         nob_cmd_append(&cmd, "-g");
-    nob_cmd_append(&cmd, "-std=c99", "-Wall", "-Wextra", "-Wpedantic", "-I" INCL_FOLDER, "-L" DEPS, "-framework",
-                   "CoreVideo", "-framework", "IOKit", "-framework", "Cocoa", "-framework", "GLUT", "-framework",
-                   "OpenGL", "-lraylib", SRC_FOLDER "main.c", "-o", BUILD_FOLDER "juego_en_el_tren");
-#else
-    // On MSVC
+    if (web)
+    {
+        nob_cmd_append(&cmd, "main.c", "-I" INCL_FOLDER, "-L" DEPS, "-framework",
+                       "CoreVideo", "-framework", "IOKit", "-framework", "Cocoa", "-framework", "GLUT", "-framework",
+                       "OpenGL", "-lraylib", SRC_FOLDER , "-o", BUILD_FOLDER "juego_en_el_tren");
+    }
+    else
+    {
+        nob_cmd_append(&cmd, "-std=c99", "-Wall", "-Wextra", "-Wpedantic", "-I" INCL_FOLDER, "-L" DEPS, "-framework",
+                       "CoreVideo", "-framework", "IOKit", "-framework", "Cocoa", "-framework", "GLUT", "-framework",
+                       "OpenGL", "-lraylib", SRC_FOLDER "main.c", "-o", BUILD_FOLDER "juego_en_el_tren");
+    }
+    #else
+    // TODO On MSVC
     nob_cmd_append(&cmd, "cl", "-std=c99", "-Wall", "-Wextra", "-Wpedantic", "-I" INCL_FOLDER, "-L" DEPS, "-framework",
                    "CoreVideo", "-framework", "IOKit", "-framework", "Cocoa", "-framework", "GLUT", "-framework",
                    "OpenGL", "-lraylib", SRC_FOLDER "main.c", "-o", BUILD_FOLDER "juego_en_el_tren");
