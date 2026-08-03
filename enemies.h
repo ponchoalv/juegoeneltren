@@ -14,7 +14,7 @@ void InitEnemies(GameState *currentState)
     for (i = 1; i < TOTAL_ENEMIES + 1 && currentState->totalEnemies <= TOTAL_ENEMIES; ++i)
     {
         Objid objid = InitObject(currentState, T_enemy, (ObjSubType)GetRandomValue(0, 2));
-        if (objid == NULL)
+        if (objid == 0)
             TraceLog(LOG_FATAL, "failed allocating enemy object");
 
         currentState->objects[objid].radius = (float)GetRandomValue(8, 15);

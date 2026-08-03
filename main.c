@@ -1,5 +1,13 @@
 #include <raylib.h>
 
+#if defined(PLATFORM_WEB)
+    #include <emscripten/emscripten.h>      // Emscripten library
+#endif
+
+#ifndef NULL
+#define NULL 0
+#endif
+
 #define H_GAME_STATE_IMPLEMENTATION
 #include "gamestate.h"
 
@@ -181,12 +189,16 @@ int main(void)
     SetInitialGameState(&currentState, true, true);
     MenuLoadFonts(&menuVolume, MENU_FONT);
 
+#if defined(PLATFORM_WEB)
+    emscripten_set_main_loop(UpdateAndDrawFrame, 60, 1);
+#else
+
     while (!WindowShouldClose())
     {
         // en alguna parte del loop hacer PlaySound()
         UpdateAndDrawFrame();
     }
-
+#endif
     // tengo que unload los audios acá UnloadSound()
     UnloadGameFXSoundsAndMusic(&currentState);
     MenuUnloadFont(&menuVolume);

@@ -4,7 +4,7 @@
 #include <raymath.h>
 
 #define MAX_OBJECTS 1024
-#define NULL 0
+/* #define NULL 0 */
 // #define B_DEBUG
 
 #define WINDOW_WIDTH 1024
@@ -127,7 +127,7 @@ Objid InitObject(GameState *currentState, ObjType type, ObjSubType subType)
             return i;
         }
     }
-    return NULL;
+    return 0;
 }
 
 void DestroyObject(GameState *currentState, Objid objid)

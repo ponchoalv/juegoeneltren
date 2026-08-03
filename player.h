@@ -36,7 +36,7 @@ void FireBullet(GameState *currentState, double duration)
 void InitPlayer(GameState *currentState)
 {
     currentState->poid = InitObject(currentState, T_player, OS_none);
-    if (currentState->poid == NULL)
+    if (currentState->poid == 0)
         TraceLog(LOG_FATAL, "failed allocating player object");
     currentState->player = &currentState->objects[currentState->poid];
     currentState->player->position = GetScreenCentre(currentState);
