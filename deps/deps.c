@@ -24,6 +24,10 @@
 // Some folder paths that we use throughout the build process.
 #define RAYLIB_SRC "./raylib/src/"
 #define RAYLIB_STATIC "libraylib.a"
+#define RAYLIB_WEB_STATIC "libraylib.web.a"
+
+#define RAYLIB_PLATFORM "PLATFORM=PLATFORM_DESKTOP"
+#define RAYLIB_WEB_PLATFORM "PLATFORM=PLATFORM_WEB"
 
 int main(int argc, char **argv)
 {
@@ -31,7 +35,13 @@ int main(int argc, char **argv)
     // runs it again.
     NOB_GO_REBUILD_URSELF(argc, argv);
 
-    if (nob_file_exists(RAYLIB_STATIC))
+    bool web = argc > 1 && strcmp(argv[1], "-web") == 0;
+
+    if (!web && nob_file_exists(RAYLIB_STATIC))
+    {
+        return 0;
+    }
+    else if (web && nob_file_exists(RAYLIB_WEB_STATIC))
     {
         return 0;
     }
@@ -54,23 +64,34 @@ int main(int argc, char **argv)
     // command line that you want to execute.
     Nob_Cmd cmd = {0};
 
+    nob_cmd_append(&cmd, "make", "clean");
+    // Let's execute the command.
+    if (!nob_cmd_run(&cmd))
+        return 1;
+
     // Let's append the command line arguments
 #if !defined(_MSC_VER)
     // On POSIX
-    nob_cmd_append(&cmd, "make", "PLATFORM=PLATFORM_DESKTOP", "RAYLIB_LIBTYPE=STATIC");
+    nob_cmd_append(&cmd, "make", web ? RAYLIB_WEB_PLATFORM : RAYLIB_PLATFORM, "RAYLIB_LIBTYPE=STATIC");
 #else
     // On MSVC
-    nob_cmd_append(&cmd, "make", "PLATFORM=PLATFORM_DESKTOP", "RAYLIB_LIBTYPE=STATIC");
+    nob_cmd_append(&cmd, "make", web ? RAYLIB_WEB_PLATFORM : RAYLIB_PLATFORM, "RAYLIB_LIBTYPE=STATIC");
 #endif // _MSC_VER
 
     // Let's execute the command.
     if (!nob_cmd_run(&cmd))
         return 1;
 
-    if (nob_file_exists(RAYLIB_STATIC))
+    if (!web && nob_file_exists(RAYLIB_STATIC))
     {
         nob_cmd_append(&cmd, "cp", RAYLIB_STATIC, "../../");
-    } else
+    }
+    else if (web && nob_file_exists(RAYLIB_WEB_STATIC))
+    {
+        nob_cmd_append(&cmd, "cp", RAYLIB_WEB_STATIC, "../../");
+    }
+
+    else
     {
         nob_log(NOB_ERROR, "Not found: "RAYLIB_STATIC);
         return 1;
