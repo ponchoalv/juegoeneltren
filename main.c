@@ -45,7 +45,7 @@ static void SetInitialGameState(GameState *currState, const bool loadSound, cons
 
     if (setScreen)
     {
-        currState->screenRes = (Vector2) {.x = WINDOW_WIDTH, .y = WINDOW_HEIGHT};
+        currState->screenRes = (Vector2){.x = WINDOW_WIDTH, .y = WINDOW_HEIGHT};
     }
 
     // here we create all the object.
@@ -96,27 +96,29 @@ static void Render(void)
         ClearBackground(BLACK);
         DrawPlayingGameState(&currentState);
         break;
-    case S_lose:
-    {
+    case S_lose: {
         // TODO(): All text here is hardcoded and will need to be adjustable to the screen size / ratio.
         const char *youLost = "YOU LOST";
 
         ClearBackground(BLACK);
         DrawScoreColor(currentState.score, RED, (int)currentState.screenRes.x, (int)currentState.screenRes.y);
-        DrawText(youLost, ((int)currentState.screenRes.x - MeasureText(youLost, 60)) / 2, (int)currentState.screenRes.y / 2 - 40, 60, RED);
-        DrawText("Press [SPACE] to start again", ((int)currentState.screenRes.x - MeasureText("Press [SPACE] to start again", 30)) / 2,
+        DrawText(youLost, ((int)currentState.screenRes.x - MeasureText(youLost, 60)) / 2,
+                 (int)currentState.screenRes.y / 2 - 40, 60, RED);
+        DrawText("Press [SPACE] to start again",
+                 ((int)currentState.screenRes.x - MeasureText("Press [SPACE] to start again", 30)) / 2,
                  (int)currentState.screenRes.y / 2 + 30, 30, RED);
         break;
     }
-    case S_win:
-    {
+    case S_win: {
         // TODO(): All text here is hardcoded and will need to be adjustable to the screen size / ratio.
         const char *youWon = "YOU WON";
 
         ClearBackground(BLACK);
         DrawScoreColor(currentState.score, GREEN, (int)currentState.screenRes.x, (int)currentState.screenRes.y);
-        DrawText(youWon, ((int)currentState.screenRes.x - MeasureText(youWon, 60)) / 2, (int)currentState.screenRes.y / 2 - 40, 60, GREEN);
-        DrawText("Press [SPACE] to start again", ((int)currentState.screenRes.x - MeasureText("Press [SPACE] to start again", 30)) / 2,
+        DrawText(youWon, ((int)currentState.screenRes.x - MeasureText(youWon, 60)) / 2,
+                 (int)currentState.screenRes.y / 2 - 40, 60, GREEN);
+        DrawText("Press [SPACE] to start again",
+                 ((int)currentState.screenRes.x - MeasureText("Press [SPACE] to start again", 30)) / 2,
                  (int)currentState.screenRes.y / 2 + 30, 30, GREEN);
         break;
     }
