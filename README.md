@@ -1,5 +1,7 @@
 ## Juego en el tren
 
+Play the game from a browser: [Play the game in your browser →](https://ponchoalv.github.io/juegoeneltren/)
+
 ### I'm Using no build
 
 #### For building the firt time run:
@@ -23,6 +25,11 @@ cc buildgame.c -o buildgame && ./buildgame
 ./buildgame -run
 ```
 
+#### If you want to build the webassembly version
+
+```
+./buildgame -web
+```
 
 #### deps
 
