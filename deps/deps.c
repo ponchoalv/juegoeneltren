@@ -63,16 +63,15 @@ int main(int argc, char **argv)
         usage(stdout);
         return 0;
     }
-
-    if (!*web && nob_file_exists(RAYLIB_STATIC))
+    
+    bool is_not_web_and_raylib_was_compiled = !*web && nob_file_exists(RAYLIB_STATIC);
+    bool is_web_and_raylib_web_was_compiled = *web && nob_file_exists(RAYLIB_WEB_STATIC);
+    
+    if ( is_not_web_and_raylib_was_compiled || is_web_and_raylib_web_was_compiled)
     {
         return 0;
     }
-    else if (*web && nob_file_exists(RAYLIB_WEB_STATIC))
-    {
-        return 0;
-    }
-
+    
     Nob_Cmd cmd = {0};
 
     if(!nob_file_exists(RAYLIB_SRC))
@@ -136,24 +135,6 @@ int main(int argc, char **argv)
     // Let's execute the command.
     if (!nob_cmd_run(&cmd))
         return 1;
-
-    /* // nob_cmd_run() automatically resets the cmd array, so you can nob_cmd_append() more strings */
-    /* // into it. */
-
-    /* if (argc > 1) { */
-    /*   if(strncmp(argv[1], "-run", 4) == 0) { */
-    /*     nob_cmd_append(&cmd, "./"BUILD_FOLDER"/juego_en_el_tren"); */
-    /*     if (!nob_cmd_run(&cmd)) return 1; */
-    /*   } */
-    /* } */
-    // nob.h ships with a bunch of nob_cc_* macros that try abstract away the specific compiler.
-    // They are verify basic and not particularly flexible, but you can redefine them if you need to
-    // or not use them at all and create your own abstraction on top of Nob_Cmd.
-    /* nob_cc(&cmd); */
-    /* nob_cc_flags(&cmd); */
-    /* nob_cc_output(&cmd, BUILD_FOLDER "nob"); */
-    /* nob_cc_inputs(&cmd, SRC_FOLDER "nob.c"); */
-    /* if (!nob_cmd_run(&cmd)) return 1; */
 
     return 0;
 }
