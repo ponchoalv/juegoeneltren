@@ -23,10 +23,14 @@
 
 // Some folder paths that we use throughout the build process.
 #define BUILD_FOLDER "build/"
-#define BUILD_WEB_FOLDER BUILD_FOLDER"web/"
+#define BUILD_WEB_FOLDER BUILD_FOLDER "web/"
 #define SRC_FOLDER "./"
-#define DEPS "./deps/"
+#define DEPS "deps/"
 #define INCL_FOLDER DEPS "include/"
+#define RAYLIB_WEB_STATIC DEPS "libraylib.web.a"
+#define PLATFORM_WEB "-DPLATFORM_WEB"
+#define FONTS_FOLDER "fonts"
+#define SOUNDS_FOLDER "sounds"
 
 static void append_json_string(Nob_String_Builder *sb, const char *value)
 {
@@ -84,7 +88,7 @@ int main(int argc, char **argv)
     if (!nob_mkdir_if_not_exists(BUILD_FOLDER))
         return 1;
 
-    if(web && !nob_mkdir_if_not_exists(BUILD_WEB_FOLDER))
+    if (web && !nob_mkdir_if_not_exists(BUILD_WEB_FOLDER))
         return 1;
 
     nob_set_current_dir(DEPS);
@@ -118,9 +122,17 @@ int main(int argc, char **argv)
         nob_cmd_append(&cmd, "-g");
     if (web)
     {
-        nob_cmd_append(&cmd, "main.c", "-I" INCL_FOLDER, "-L" DEPS, "-framework",
-                       "CoreVideo", "-framework", "IOKit", "-framework", "Cocoa", "-framework", "GLUT", "-framework",
-                       "OpenGL", "-lraylib", SRC_FOLDER , "-o", BUILD_FOLDER "juego_en_el_tren");
+        /*
+          emcc main.c deps/libraylib.web.a \
+  -Ideps/include \
+  -DPLATFORM_WEB -s USE_GLFW=3 \
+  --shell-file deps/raylib/src/minshell.html \
+  --preload-file fonts --preload-file sounds \
+  -o build/web/index.html
+         */
+        nob_cmd_append(&cmd, SRC_FOLDER "main.c", RAYLIB_WEB_STATIC, "-I" INCL_FOLDER, PLATFORM_WEB, "-s", "USE_GLFW=3",
+                       "--shell-file", DEPS "raylib/src/minshell.html", "--preload-file", FONTS_FOLDER,
+                       "--preload-file", SOUNDS_FOLDER, "-o", BUILD_WEB_FOLDER "index.html");
     }
     else
     {
@@ -128,7 +140,7 @@ int main(int argc, char **argv)
                        "CoreVideo", "-framework", "IOKit", "-framework", "Cocoa", "-framework", "GLUT", "-framework",
                        "OpenGL", "-lraylib", SRC_FOLDER "main.c", "-o", BUILD_FOLDER "juego_en_el_tren");
     }
-    #else
+#else
     // TODO On MSVC
     nob_cmd_append(&cmd, "cl", "-std=c99", "-Wall", "-Wextra", "-Wpedantic", "-I" INCL_FOLDER, "-L" DEPS, "-framework",
                    "CoreVideo", "-framework", "IOKit", "-framework", "Cocoa", "-framework", "GLUT", "-framework",

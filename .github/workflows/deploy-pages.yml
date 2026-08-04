@@ -1,0 +1,56 @@
+name: Build and deploy web game
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out game
+        uses: actions/checkout@v4
+
+      - name: Check out raylib
+        uses: actions/checkout@v4
+        with:
+          repository: raysan5/raylib
+          ref: 99b61089c846e7d7f2b372c3496165e615b47c1b
+          path: deps/raylib
+          fetch-depth: 1
+
+      - name: Install Emscripten
+        uses: emscripten-core/setup-emsdk@v15
+        with:
+          version: latest
+
+      - name: Build web game
+        run: |
+          cc buildgame.c -o buildgame
+          ./buildgame -web
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/web
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
