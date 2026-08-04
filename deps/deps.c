@@ -21,6 +21,10 @@
 // examples)
 #include "../nob.h"
 
+#define FLAG_IMPLEMENTATION
+#include "../flag.h"
+
+
 // Some folder paths that we use throughout the build process.
 #define RAYLIB_SRC "./raylib/src/"
 #define RAYLIB_STATIC "libraylib.a"
@@ -29,40 +33,72 @@
 #define RAYLIB_PLATFORM "PLATFORM=PLATFORM_DESKTOP"
 #define RAYLIB_WEB_PLATFORM "PLATFORM=PLATFORM_WEB"
 
+void usage(FILE *stream)
+{
+    fprintf(stream, "Usage: ./deps [OPTIONS]\n");
+    fprintf(stream, "OPTIONS:\n");
+    flag_print_options(stream);
+}
+
 int main(int argc, char **argv)
 {
     // This line enables the self-rebuilding. It detects when nob.c is updated and auto rebuilds it then
     // runs it again.
     NOB_GO_REBUILD_URSELF(argc, argv);
 
-    bool web = argc > 1 && strcmp(argv[1], "-web") == 0;
+    bool *help = flag_bool("help", false, "Print this help to stdout and exit with 0");
+    bool *debug = flag_bool("debug", false, "we accept this one but we don't do anything");
+    bool *run = flag_bool("run", false, "we accept this one but we don't do anything");
+    bool *web = flag_bool("web", false, "Build the game for webassembly (index.htlm in build/web)");
+    bool *no_fetch = flag_bool("no-fetch", false, "Do not fetch raylib library from github (used for -web in the CI)");
 
-    if (!web && nob_file_exists(RAYLIB_STATIC))
+    if (!flag_parse(argc, argv))
+    {
+        usage(stderr);
+        flag_print_error(stderr);
+        return 1;
+    }
+
+    if (*help) {
+        usage(stdout);
+        return 0;
+    }
+
+    if (!*web && nob_file_exists(RAYLIB_STATIC))
     {
         return 0;
     }
-    else if (web && nob_file_exists(RAYLIB_WEB_STATIC))
+    else if (*web && nob_file_exists(RAYLIB_WEB_STATIC))
     {
         return 0;
+    }
+
+    Nob_Cmd cmd = {0};
+
+    if(!nob_file_exists(RAYLIB_SRC))
+    {
+        if (*no_fetch)
+        {
+            nob_log(NOB_ERROR, "Folder not found: "RAYLIB_SRC" remember to clone last raylib repo");
+            return 1;
+        }
+        else
+        {
+            nob_cmd_append(&cmd, "git");
+            nob_cmd_append(&cmd, "clone");
+            nob_cmd_append(&cmd, "--depth");
+            nob_cmd_append(&cmd, "1");
+            nob_cmd_append(&cmd, "git@github.com:ponchoalv/raylib.git");
+            if (!nob_cmd_run(&cmd))
+                return 1;
+        }
     }
 
     if(!nob_set_current_dir(RAYLIB_SRC))
     {
-        nob_log(NOB_ERROR, "Folder not found: "RAYLIB_SRC" remember to clone last raylib repo");
+        nob_log(NOB_ERROR, "Cannot move to folder: "RAYLIB_SRC" remember to clone last raylib repo");
+        return 1;
     }
-
-    // It's better to keep all the building artifacts in a separate build folder. Let's create it if it
-    // does not exist yet.
-    //
-    // Majority of the nob command return bool which indicates whether operation has failed or not (true -
-    // success, false - failure). If the operation returned false you don't need to log anything, the
-    // convention is usually that the function logs what happened to itself. Just do
-    // `if (!nob_function()) return;`
-    /* if (!nob_mkdir_if_not_exists(BUILD_FOLDER)) return 1; */
-
-    // The working horse of nob is the Nob_Cmd structure. It's a Dynamic Array of strings which represent
-    // command line that you want to execute.
-    Nob_Cmd cmd = {0};
 
     nob_cmd_append(&cmd, "make", "clean");
     // Let's execute the command.
@@ -72,10 +108,10 @@ int main(int argc, char **argv)
     // Let's append the command line arguments
 #if !defined(_MSC_VER)
     // On POSIX
-    nob_cmd_append(&cmd, "make", web ? RAYLIB_WEB_PLATFORM : RAYLIB_PLATFORM, "RAYLIB_LIBTYPE=STATIC");
+    nob_cmd_append(&cmd, "make", *web ? RAYLIB_WEB_PLATFORM : RAYLIB_PLATFORM, "RAYLIB_LIBTYPE=STATIC");
 #else
     // On MSVC
-    nob_cmd_append(&cmd, "make", web ? RAYLIB_WEB_PLATFORM : RAYLIB_PLATFORM, "RAYLIB_LIBTYPE=STATIC");
+    nob_cmd_append(&cmd, "make", *web ? RAYLIB_WEB_PLATFORM : RAYLIB_PLATFORM, "RAYLIB_LIBTYPE=STATIC");
 #endif // _MSC_VER
 
     // Let's execute the command.

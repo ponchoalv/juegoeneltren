@@ -21,6 +21,9 @@
 // examples)
 #include "nob.h"
 
+#define FLAG_IMPLEMENTATION
+#include "./flag.h"
+
 // Some folder paths that we use throughout the build process.
 #define BUILD_FOLDER "build/"
 #define BUILD_WEB_FOLDER BUILD_FOLDER "web/"
@@ -64,6 +67,13 @@ static bool write_compile_commands(Nob_Cmd command)
     return result;
 }
 
+void usage(FILE *stream)
+{
+    fprintf(stream, "Usage: ./buildgame [OPTIONS]\n");
+    fprintf(stream, "OPTIONS:\n");
+    flag_print_options(stream);
+}
+
 int main(int argc, char **argv)
 {
     // This line enables the self-rebuilding. It detects when nob.c is updated and auto rebuilds it then
@@ -80,15 +90,32 @@ int main(int argc, char **argv)
 
     // The working horse of nob is the Nob_Cmd structure. It's a Dynamic Array of strings which represent
     // command line that you want to execute.
+    bool *help = flag_bool("help", false, "Print this help to stdout and exit with 0");
+    bool *debug = flag_bool("debug", false, "Build the game with debug symbols");
+    bool *run = flag_bool("run", false, "Build and run the game in Desktop mode");
+    bool *web = flag_bool("web", false, "Build the game for webassembly (index.htlm in build/web)");
+    bool *no_fetch = flag_bool("no-fetch", false, "Do not fetch raylib library from github (used for -web in the CI)");
+    int i = 1;
+
+    if (!flag_parse(argc, argv))
+    {
+        usage(stderr);
+        flag_print_error(stderr);
+        return 1;
+    }
+
+    if (*help) {
+        usage(stdout);
+        return 0;
+    }
+
+
     Nob_Cmd cmd = {0};
-    bool debug = argc > 1 && strcmp(argv[1], "-debug") == 0;
-    bool run = argc > 1 && strcmp(argv[1], "-run") == 0;
-    bool web = argc > 1 && strcmp(argv[1], "-web") == 0;
 
     if (!nob_mkdir_if_not_exists(BUILD_FOLDER))
         return 1;
 
-    if (web && !nob_mkdir_if_not_exists(BUILD_WEB_FOLDER))
+    if (*web && !nob_mkdir_if_not_exists(BUILD_WEB_FOLDER))
         return 1;
 
     nob_set_current_dir(DEPS);
@@ -102,10 +129,12 @@ int main(int argc, char **argv)
     }
 
     nob_cmd_append(&cmd, "./deps");
-    if (web)
+
+    for (i = 1; i < argc; i++)
     {
-        nob_cmd_append(&cmd, "-web");
+        nob_cmd_append(&cmd, argv[i]);
     }
+
     if (!nob_cmd_run(&cmd))
         return 1;
 
@@ -117,18 +146,18 @@ int main(int argc, char **argv)
     /// "clang", "-std=c99", "-Wall", "-Wextra", "-Wpedantic", "-framework", "CoreVideo", "-framework", "IOKit",
     /// "-framework", "Cocoa", "-framework", "GLUT", "-framework", "OpenGL", "libraylib.a", "main.c", "-o",
     /// "build/juego_en_el_tren"
-    nob_cmd_append(&cmd, web ? "emcc" : "clang");
-    if (debug)
+    nob_cmd_append(&cmd, *web ? "emcc" : "clang");
+    if (*debug)
         nob_cmd_append(&cmd, "-g");
-    if (web)
+    if (*web)
     {
         /*
           emcc main.c deps/libraylib.web.a \
-  -Ideps/include \
-  -DPLATFORM_WEB -s USE_GLFW=3 \
-  --shell-file deps/raylib/src/minshell.html \
-  --preload-file fonts --preload-file sounds \
-  -o build/web/index.html
+          -Ideps/include                   \
+          -DPLATFORM_WEB -s USE_GLFW=3       \
+          --shell-file deps/raylib/src/minshell.html    \
+          --preload-file fonts --preload-file sounds    \
+          -o build/web/index.html
          */
         nob_cmd_append(&cmd, SRC_FOLDER "main.c", RAYLIB_WEB_STATIC, "-I" INCL_FOLDER, PLATFORM_WEB, "-s", "USE_GLFW=3",
                        "--shell-file", DEPS "raylib/src/minshell.html", "--preload-file", FONTS_FOLDER,
@@ -158,7 +187,7 @@ int main(int argc, char **argv)
     // nob_cmd_run() automatically resets the cmd array, so you can nob_cmd_append() more strings
     // into it.
 
-    if (run)
+    if (*run)
     {
         nob_cmd_append(&cmd, "./" BUILD_FOLDER "juego_en_el_tren");
         if (!nob_cmd_run(&cmd))

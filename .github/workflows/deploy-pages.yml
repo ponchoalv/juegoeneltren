@@ -37,7 +37,7 @@ jobs:
       - name: Build web game
         run: |
           cc buildgame.c -o buildgame
-          ./buildgame -web
+          ./buildgame -web -no-fetch
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

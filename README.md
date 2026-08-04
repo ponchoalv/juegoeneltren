@@ -33,4 +33,5 @@ cc buildgame.c -o buildgame && ./buildgame
 
 #### deps
 
-You will need to download / clone the deps under `/deps` folder... for now is only raylib, the link is present in the folder readme.
+If option `-no-fetch` provided to `./buildgame` you will need to download / clone the deps under `/deps` folder... for now is only raylib, the link is present in the folder readme.
+Otherwise raylib will be clone from my fork `git@github.com:ponchoalv/raylib.git.`
