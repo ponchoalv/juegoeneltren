@@ -53,7 +53,7 @@ static void SetInitialGameState(GameState *currState, const bool loadSound, cons
 
     if (setScreen)
     {
-        currState->screenRes = (Vector2){.x = WINDOW_WIDTH, .y = WINDOW_HEIGHT};
+        currState->screenRes = (Vector2){.x = (float)GetScreenWidth(), .y = (float)GetScreenHeight()};
     }
 
     // here we create all the object.
@@ -66,6 +66,9 @@ static void SetInitialGameState(GameState *currState, const bool loadSound, cons
 static void ProcessInput(void)
 {
     CaptureMouseWithinWindow(&currentState);
+#if !defined(PLATFORM_WEB)
+    if (IsKeyPressed(KEY_F11)) ToggleFullscreen();
+#endif
 
     switch (currentState.status)
     {
@@ -182,8 +185,12 @@ static void UpdateAndDrawFrame(void)
 
 int main(void)
 {
+#if defined(PLATFORM_WEB)
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Juego en el tren");
-    SetWindowState(FLAG_WINDOW_RESIZABLE);
+#else
+    SetConfigFlags(FLAG_FULLSCREEN_MODE);
+    InitWindow(0, 0, "Juego en el tren");
+#endif
     SetTargetFPS(60);
     InitAudioDevice(); // Initialize audio device
     SetInitialGameState(&currentState, true, true);

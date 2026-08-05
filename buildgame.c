@@ -162,7 +162,7 @@ int main(int argc, char **argv)
           -o build/web/index.html
          */
         nob_cmd_append(&cmd, SRC_FOLDER "main.c", RAYLIB_WEB_STATIC, "-I" INCL_FOLDER, PLATFORM_WEB, "-s", "USE_GLFW=3",
-                       "--shell-file", DEPS "raylib/src/minshell.html", "--preload-file", FONTS_FOLDER,
+                       "--shell-file","./minshell.html", "--preload-file", FONTS_FOLDER,
                        "--preload-file", SOUNDS_FOLDER, "-o", BUILD_WEB_FOLDER "index.html");
     }
     else
