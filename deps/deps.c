@@ -117,11 +117,11 @@ int main(int argc, char **argv)
     if (!nob_cmd_run(&cmd))
         return 1;
 
-    if (!web && nob_file_exists(RAYLIB_STATIC))
+    if (!*web && nob_file_exists(RAYLIB_STATIC))
     {
         nob_cmd_append(&cmd, "cp", RAYLIB_STATIC, "../../");
     }
-    else if (web && nob_file_exists(RAYLIB_WEB_STATIC))
+    else if (*web && nob_file_exists(RAYLIB_WEB_STATIC))
     {
         nob_cmd_append(&cmd, "cp", RAYLIB_WEB_STATIC, "../../");
     }
