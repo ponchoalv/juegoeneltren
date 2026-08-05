@@ -31,6 +31,18 @@ cc buildgame.c -o buildgame && ./buildgame
 ./buildgame -web
 ```
 
+####  once, with Emscripten activated
+
+```
+./buildgame -web
+```
+
+# serve the generated game
+
+```
+cd build/web && python3 -m http.server 8080
+```
+
 #### deps
 
 If option `-no-fetch` provided to `./buildgame` you will need to download / clone the deps under `/deps` folder... for now is only raylib, the link is present in the folder readme.

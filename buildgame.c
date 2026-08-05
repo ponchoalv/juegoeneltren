@@ -95,7 +95,6 @@ int main(int argc, char **argv)
     bool *run = flag_bool("run", false, "Build and run the game in Desktop mode");
     bool *web = flag_bool("web", false, "Build the game for webassembly (index.htlm in build/web)");
     bool *no_fetch = flag_bool("no-fetch", false, "Do not fetch raylib library from github (used for -web in the CI)");
-    int i = 1;
 
     if (!flag_parse(argc, argv))
     {
@@ -130,13 +129,16 @@ int main(int argc, char **argv)
 
     nob_cmd_append(&cmd, "./deps");
 
-    for (i = 1; i < argc; i++)
     {
-        nob_cmd_append(&cmd, argv[i]);
-    }
+        int i = 1;
+        for (i = 1; i < argc; i++)
+        {
+            nob_cmd_append(&cmd, argv[i]);
+        }
 
-    if (!nob_cmd_run(&cmd))
-        return 1;
+        if (!nob_cmd_run(&cmd))
+            return 1;
+    }
 
     nob_set_current_dir("../");
 
