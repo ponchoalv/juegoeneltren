@@ -104,11 +104,11 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    if (*help) {
+    if (*help)
+    {
         usage(stdout);
         return 0;
     }
-
 
     Nob_Cmd cmd = {0};
 

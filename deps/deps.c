@@ -24,7 +24,6 @@
 #define FLAG_IMPLEMENTATION
 #include "../flag.h"
 
-
 // Some folder paths that we use throughout the build process.
 #define RAYLIB_SRC "./raylib/src/"
 #define RAYLIB_STATIC "libraylib.a"
@@ -59,26 +58,27 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    if (*help) {
+    if (*help)
+    {
         usage(stdout);
         return 0;
     }
-    
+
     bool is_not_web_and_raylib_was_compiled = !*web && nob_file_exists(RAYLIB_STATIC);
     bool is_web_and_raylib_web_was_compiled = *web && nob_file_exists(RAYLIB_WEB_STATIC);
-    
-    if ( is_not_web_and_raylib_was_compiled || is_web_and_raylib_web_was_compiled)
+
+    if (is_not_web_and_raylib_was_compiled || is_web_and_raylib_web_was_compiled)
     {
         return 0;
     }
-    
+
     Nob_Cmd cmd = {0};
 
-    if(!nob_file_exists(RAYLIB_SRC))
+    if (!nob_file_exists(RAYLIB_SRC))
     {
         if (*no_fetch)
         {
-            nob_log(NOB_ERROR, "Folder not found: "RAYLIB_SRC" remember to clone last raylib repo");
+            nob_log(NOB_ERROR, "Folder not found: " RAYLIB_SRC " remember to clone last raylib repo");
             return 1;
         }
         else
@@ -93,9 +93,9 @@ int main(int argc, char **argv)
         }
     }
 
-    if(!nob_set_current_dir(RAYLIB_SRC))
+    if (!nob_set_current_dir(RAYLIB_SRC))
     {
-        nob_log(NOB_ERROR, "Cannot move to folder: "RAYLIB_SRC" remember to clone last raylib repo");
+        nob_log(NOB_ERROR, "Cannot move to folder: " RAYLIB_SRC " remember to clone last raylib repo");
         return 1;
     }
 
@@ -128,7 +128,7 @@ int main(int argc, char **argv)
 
     else
     {
-        nob_log(NOB_ERROR, "Not found: "RAYLIB_STATIC);
+        nob_log(NOB_ERROR, "Not found: " RAYLIB_STATIC);
         return 1;
     }
 
