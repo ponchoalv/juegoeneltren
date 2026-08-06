@@ -4,38 +4,51 @@
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 
-    <title>raylib web game</title>
+    <title>Poncho Asteroids</title>
 
-    <meta name="title" content="raylib web game">
-    <meta name="description" content="New raylib web videogame, developed using raylib videogames library">
-    <meta name="keywords" content="raylib, programming, examples, html5, C, C++, library, learn, games, videogames">
+    <meta name="title" content="asteroids web game">
+    <meta name="description" content="An asteroids like game done to test raylib">
+    <meta name="keywords" content="raylib, programming, examples, html5, C, C++, library, learn, games, videogames, asteroids">
     <meta name="viewport" content="width=device-width">
 
     <!-- Open Graph metatags for sharing -->
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="raylib web game">
+    <meta property="og:title" content="asteroids web game">
     <meta property="og:image:type" content="image/png">
     <meta property="og:image" content="https://www.raylib.com/common/raylib_logo.png">
-    <meta property="og:image:alt" content="New raylib web videogame, developed using raylib videogames library" />
-    <meta property="og:site_name" content="raylib - example">
-    <meta property="og:url" content="https://www.raylib.com/games.html">
-    <meta property="og:description" content="New raylib web videogame, developed using raylib videogames library">
+    <meta property="og:image:alt" content="an asteroids like game done to test raylib" />
+    <meta property="og:site_name" content="poncho asteroids">
+    <meta property="og:url" content="https://ponchoalv.github.io/juegoeneltren">
+    <meta property="og:description" content="An asteroids like game done to test raylib">
 
     <!-- Twitter metatags for sharing -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@raysan5">
-    <meta name="twitter:title" content="raylib web game">
+    <meta name="twitter:title" content="asteroids web game">
     <meta name="twitter:image" content="https://www.raylib.com/common/raylib_logo.png">
-    <meta name="twitter:image:alt" content="New raylib web videogame, developed using raylib videogames library">
-    <meta name="twitter:url" content="https://www.raylib.com/games.html">
-    <meta name="twitter:description" content="New raylib web videogame, developed using raylib videogames library">
+    <meta name="twitter:image:alt" content="an asteroids like game done to test raylib">
+    <meta name="twitter:url" content="https://ponchoalv.github.io/juegoeneltren">
+    <meta name="twitter:description" content="An asteroids like game done to test raylib">
 
     <!-- Favicon -->
     <link rel="shortcut icon" href="https://www.raylib.com/favicon.ico">
 
     <style>
-        body { margin: 0px; overflow: hidden; background-color: black; }
-        canvas.emscripten { border: 0px none; background-color: black; }
+        /* body { margin: 0px; overflow: hidden; background-color: black; } */
+        /* canvas.emscripten { border: 0px none; background-color: black; } */
+        html, body {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        canvas.emscripten {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+            background-color: black;
+        }
     </style>
     <script type='text/javascript' src="https://cdn.jsdelivr.net/gh/eligrey/FileSaver.js/dist/FileSaver.min.js"> </script>
     <script type='text/javascript'>
@@ -54,7 +67,7 @@
             // 'Ask where to save each file before downloading' - which you can set true/false.
             // If you enable this setting it would always ask you and bring the SaveAsDialog
             saveAs(blob, localFSname);
-          
+
             // Alternative implementation to avoid FileSaver.js
             //const link = document.createElement("a");
             //link.href = URL.createObjectURL(blob);
@@ -64,7 +77,8 @@
     </script>
     </head>
     <body>
-        <canvas class=emscripten id=canvas oncontextmenu=event.preventDefault() tabindex=-1></canvas>
+      <!-- <button onclick="Module.requestFullscreen(false, true)">Fullscreen</button> -->
+      <canvas class=emscripten id=canvas oncontextmenu=event.preventDefault() tabindex=-1></canvas>
         <p id="output" />
         <script>
             var Module = {
@@ -88,6 +102,5 @@
         </script>
         {{{ SCRIPT }}}
 
-        <!-- <button onclick="Module.requestFullscreen(false, true)">Fullscreen</button> -->
     </body>
 </html>

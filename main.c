@@ -186,10 +186,11 @@ static void UpdateAndDrawFrame(void)
 int main(void)
 {
 #if defined(PLATFORM_WEB)
-    InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Juego en el tren");
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+    InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Poncho Asteroids");
 #else
     SetConfigFlags(FLAG_FULLSCREEN_MODE);
-    InitWindow(0, 0, "Juego en el tren");
+    InitWindow(0, 0, "Poncho Asteroids");
 #endif
     SetTargetFPS(60);
     InitAudioDevice(); // Initialize audio device
