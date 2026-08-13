@@ -119,10 +119,17 @@ int main(int argc, char **argv)
 
     nob_set_current_dir(DEPS);
 
+#if !defined(_MSC_VER)
     if (!nob_file_exists("deps"))
     {
         nob_cc(&cmd);
         nob_cmd_append(&cmd, "deps.c", "-o", "deps");
+#else
+    if (!nob_file_exists("deps.exe"))
+    {
+        nob_cc(&cmd);
+        nob_cmd_append(&cmd, "deps.c", "-o", "deps.exe");
+#endif
         if (!nob_cmd_run(&cmd))
             return 1;
     }
@@ -143,12 +150,12 @@ int main(int argc, char **argv)
     nob_set_current_dir("../");
 
     // Let's append the command line arguments
+    nob_cmd_append(&cmd, *web ? "emcc" : "clang");
 #if !defined(_MSC_VER)
     // On POSIX
     /// "clang", "-std=c99", "-Wall", "-Wextra", "-Wpedantic", "-framework", "CoreVideo", "-framework", "IOKit",
     /// "-framework", "Cocoa", "-framework", "GLUT", "-framework", "OpenGL", "libraylib.a", "main.c", "-o",
     /// "build/juego_en_el_tren"
-    nob_cmd_append(&cmd, *web ? "emcc" : "clang");
     if (*debug)
         nob_cmd_append(&cmd, "-g");
     if (*web)
@@ -162,8 +169,8 @@ int main(int argc, char **argv)
           -o build/web/index.html
          */
         nob_cmd_append(&cmd, SRC_FOLDER "main.c", RAYLIB_WEB_STATIC, "-I" INCL_FOLDER, PLATFORM_WEB, "-s", "USE_GLFW=3",
-                       "--shell-file","./minshell.html", "--preload-file", FONTS_FOLDER,
-                       "--preload-file", SOUNDS_FOLDER, "-o", BUILD_WEB_FOLDER "index.html");
+                       "--shell-file", "./minshell.html", "--preload-file", FONTS_FOLDER, "--preload-file",
+                       SOUNDS_FOLDER, "-o", BUILD_WEB_FOLDER "index.html");
     }
     else
     {
@@ -173,9 +180,9 @@ int main(int argc, char **argv)
     }
 #else
     // TODO On MSVC
-    nob_cmd_append(&cmd, "cl", "-std=c99", "-Wall", "-Wextra", "-Wpedantic", "-I" INCL_FOLDER, "-L" DEPS, "-framework",
-                   "CoreVideo", "-framework", "IOKit", "-framework", "Cocoa", "-framework", "GLUT", "-framework",
-                   "OpenGL", "-lraylib", SRC_FOLDER "main.c", "-o", BUILD_FOLDER "juego_en_el_tren");
+    nob_cmd_append(&cmd, "-std=c99", "-Wall", "-Wextra", "-Wpedantic", "-I" INCL_FOLDER, "-L" DEPS, SRC_FOLDER "main.c", "-o",
+                   BUILD_FOLDER "juego_en_el_tren.exe", "-lopengl32",
+                   "-lgdi32", "-lwinmm", "-luser32", "-lshell32", "-lraylib", "-Wl,/FORCE:MULTIPLE");
 #endif // _MSC_VER
 
     // Let's execute the command.
@@ -191,7 +198,11 @@ int main(int argc, char **argv)
 
     if (*run)
     {
+#if !defined(_MSC_VER)
         nob_cmd_append(&cmd, "./" BUILD_FOLDER "juego_en_el_tren");
+#else
+        nob_cmd_append(&cmd, "./" BUILD_FOLDER "juego_en_el_tren.exe");
+#endif
         if (!nob_cmd_run(&cmd))
             return 1;
     }

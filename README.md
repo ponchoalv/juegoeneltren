@@ -10,6 +10,11 @@ Play the game from a browser: [Play the game in your browser →](https://poncho
 cc buildgame.c -o buildgame && ./buildgame
 ```
 
+or in windows
+
+```
+clang buildgame.c -o buildgame.exe && buildgame.exe
+```
 
 #### Once `buildgame` was build you can rebuild with
 

@@ -26,6 +26,7 @@
 
 // Some folder paths that we use throughout the build process.
 #define RAYLIB_SRC "./raylib/src/"
+#define RAYLIB_STATIC_WIN "raylib.lib"
 #define RAYLIB_STATIC "libraylib.a"
 #define RAYLIB_WEB_STATIC "libraylib.web.a"
 
@@ -64,7 +65,11 @@ int main(int argc, char **argv)
         return 0;
     }
 
+#if !defined(_MSC_VER)
     bool is_not_web_and_raylib_was_compiled = !*web && nob_file_exists(RAYLIB_STATIC);
+#else
+    bool is_not_web_and_raylib_was_compiled = !*web && nob_file_exists(RAYLIB_STATIC_WIN);
+#endif
     bool is_web_and_raylib_web_was_compiled = *web && nob_file_exists(RAYLIB_WEB_STATIC);
 
     if (is_not_web_and_raylib_was_compiled || is_web_and_raylib_web_was_compiled)
@@ -109,17 +114,29 @@ int main(int argc, char **argv)
     // On POSIX
     nob_cmd_append(&cmd, "make", *web ? RAYLIB_WEB_PLATFORM : RAYLIB_PLATFORM, "RAYLIB_LIBTYPE=STATIC");
 #else
-    // On MSVC
-    nob_cmd_append(&cmd, "make", *web ? RAYLIB_WEB_PLATFORM : RAYLIB_PLATFORM, "RAYLIB_LIBTYPE=STATIC");
+    // On MSVC2
+    /* nob_cmd_append(&cmd, "make", *web ? RAYLIB_WEB_PLATFORM : RAYLIB_PLATFORM, "RAYLIB_LIBTYPE=STATIC", "CC=clang", "AR=llvm-lib", "ARFLAGS=/OUT"); */
+    // clang -c rcore.c rshapes.c rtextures.c rtext.c rglfw.c rmodels.c raudio.c -I. -Iexternal/glfw/include -DPLATFORM_DESKTOP -DGRAPHICS_API_OPENGL_33 -O2
+    nob_cmd_append(&cmd, "clang", "-c", "rcore.c", "rshapes.c", "rtextures.c", "rtext.c", "rglfw.c", "rmodels.c", "raudio.c", "-I.", "-Iexternal/glfw/include", "-DPLATFORM_DESKTOP", "-DGRAPHICS_API_OPENGL_33", "-D_CRT_SECURE_NO_WARNINGS", "-O2");
+
+    if (!nob_cmd_run(&cmd))
+        return 1;
+    nob_cmd_append(&cmd,"llvm-lib", "/OUT:"RAYLIB_STATIC_WIN, "rcore.o", "rshapes.o", "rtextures.o", "rtext.o", "rglfw.o", "rmodels.o", "raudio.o");
 #endif // _MSC_VER
 
     // Let's execute the command.
     if (!nob_cmd_run(&cmd))
         return 1;
 
+#if !defined(_MSC_VER)
     if (!*web && nob_file_exists(RAYLIB_STATIC))
     {
         nob_cmd_append(&cmd, "cp", RAYLIB_STATIC, "../../");
+#else
+    if (!*web && nob_file_exists(RAYLIB_STATIC_WIN))
+    {
+        nob_cmd_append(&cmd, "cmd", "/c", "copy", RAYLIB_STATIC_WIN, "..\\..");
+#endif
     }
     else if (*web && nob_file_exists(RAYLIB_WEB_STATIC))
     {
