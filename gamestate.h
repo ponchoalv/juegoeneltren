@@ -423,7 +423,8 @@ void UpdateWithEnemyAI(GameState *currentState, int i)
 
 void DestroyBulletObjectIfTimeOut(GameState *currentState, int i)
 {
-    if (currentState->objects[i].timeVisible < GetTime())
+    currentState->objects[i].duration -= GetFrameTime();
+    if (currentState->objects[i].duration <= 0.0)
     {
         DestroyObject(currentState, i);
     }
