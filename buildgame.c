@@ -174,9 +174,10 @@ int main(int argc, char **argv)
     }
     else
     {
+	// clang -std=c99 -Wall -Wextra -Wpedantic -Ideps/include/ -O2 ./main.c ./game.c ./menu.c -Ldeps/ -framework CoreVideo -framework IOKit -framework Cocoa -framework GLUT -framework OpenGL -framework QuartzCore -lraylib -o build/juego_en_el_tren
         nob_cmd_append(&cmd, "-std=c99", "-Wall", "-Wextra", "-Wpedantic", "-I" INCL_FOLDER, "-L" DEPS, "-framework",
                        "CoreVideo", "-framework", "IOKit", "-framework", "Cocoa", "-framework", "GLUT", "-framework",
-                       "OpenGL", "-lraylib", SRC_FOLDER "main.c", "-o", BUILD_FOLDER "juego_en_el_tren");
+                       "OpenGL", "-framework", "QuartzCore", "-lraylib", SRC_FOLDER "main.c", "-o", BUILD_FOLDER "juego_en_el_tren");
     }
 #else
     // TODO On MSVC
